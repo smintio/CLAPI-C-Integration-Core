@@ -20,6 +20,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
 
         public string RecommendedFileName { get; set; }
         
+        public string Culture { get; set; }
+
         public int Version { get; set; }
     }
 }

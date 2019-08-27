@@ -291,6 +291,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     Usage = GetValuesForImportLanguages(importLanguages, syncBinary.Usage),
                     DownloadUrl = syncBinary.Download_url,
                     RecommendedFileName = syncBinary.Recommended_file_name,
+                    Culture = syncBinary.Culture,
                     Version = syncBinary.Version ?? 1
                 });
             }
