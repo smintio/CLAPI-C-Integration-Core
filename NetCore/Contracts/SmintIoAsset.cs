@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using SmintIo.CLAPI.Consumer.Client.Generated;
+
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
+{
+    public class SmintIoAsset
+    {
+        public string LicensePurchaseTransactionUuid { get; set; }
+        public string CartPurchaseTransactionUuid { get; set; }
+
+        public LicensePurchaseTransactionStateEnum? State { get; set; }
+
+        public string Provider { get; set; }
+
+        public string ContentType { get; set; }
+
+        public IDictionary<string, string> Name { get; set; }
+        public IDictionary<string, string> Description { get; set; }
+
+        public IDictionary<string, string[]> Keywords { get; set; }
+
+        public string Category { get; set; }
+
+        public SmintIoReleaseDetails ReleaseDetails { get; set; }
+
+        public IDictionary<string, string> CopyrightNotices { get; set; }
+
+        public string ProjectUuid { get; set; }
+        public IDictionary<string, string> ProjectName { get; set; }
+
+        public string CollectionUuid { get; set; }
+        public IDictionary<string, string> CollectionName { get; set; }
+
+        public string LicenseeUuid { get; set; }
+        public string LicenseeName { get; set; }
+
+        public string LicenseType { get; set; }
+
+        public IDictionary<string, string> LicenseText { get; set; }
+        public IList<SmintIoLicenseOptions> LicenseOptions { get; set; }
+
+        public IList<SmintIoUsageConstraints> UsageConstraints { get; set; }
+        public SmintIoDownloadConstraints DownloadConstraints { get; set; }
+
+        public bool? EffectiveIsEditorialUse { get; set; }
+        public bool? EffectiveHasLicenseUsageConstraints { get; set; }
+
+        public List<SmintIoBinary> Binaries { get; set; }
+
+        public string SmintIoUrl { get; set; }
+        
+        public DateTimeOffset PurchasedAt { get; set; }
+        public DateTimeOffset? CreatedAt { get; set; }
+
+        public DateTimeOffset? LastUpdatedAt { get; set; }
+    }
+}
+
