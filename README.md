@@ -16,7 +16,7 @@ The Smint.io Content Licensing Consumer Integration Core package provides a comm
 
 *Example*
 
-Please check out [CLAPI-C-Picturepark-Integration](https://github.com/smintio/CLAPI-C-Picturepark-Integration) to learn more on how to use this package.
+Please check out our sample implementation at [CLAPI-C-Picturepark-Integration](https://github.com/smintio/CLAPI-C-Picturepark-Integration) to learn more on how to use this package.
 
 *Study the Smint.io Integration Guide*
 
