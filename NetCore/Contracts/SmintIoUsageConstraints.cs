@@ -25,6 +25,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
         public IList<string> EffectiveAllowedVerticals { get; set; }
         public IList<string> EffectiveRestrictedVerticals { get; set; }
 
+        public int? EffectiveMaxEditions { get; set; }
+
         public DateTimeOffset? EffectiveValidFrom { get; set; }
         public DateTimeOffset? EffectiveValidUntil { get; set; }
         public DateTimeOffset? EffectiveToBeUsedUntil { get; set; }
