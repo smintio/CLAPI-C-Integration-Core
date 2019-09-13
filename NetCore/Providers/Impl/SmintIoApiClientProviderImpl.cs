@@ -347,6 +347,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     EffectiveAllowedVerticals = licenseUsageConstraint.Effective_allowed_verticals,
                     EffectiveRestrictedVerticals = licenseUsageConstraint.Effective_restricted_verticals,
                     EffectiveToBeUsedUntil = licenseUsageConstraint.Effective_to_be_used_until,
+                    EffectiveMaxEditions = licenseUsageConstraint.Effective_max_editions,
                     EffectiveValidFrom = licenseUsageConstraint.Effective_valid_from,
                     EffectiveValidUntil = licenseUsageConstraint.Effective_valid_until,
                     EffectiveIsEditorialUse = licenseUsageConstraint.Effective_is_editorial_use
