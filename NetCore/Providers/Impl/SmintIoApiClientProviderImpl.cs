@@ -80,12 +80,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             smintIoGenericMetadata.LicenseTypes = GetGroupedMetadataElementsForImportLanguages(importLanguages, syncGenericMetadata.License_types);
             smintIoGenericMetadata.ReleaseStates = GetGroupedMetadataElementsForImportLanguages(importLanguages, syncGenericMetadata.Release_states);
 
+            smintIoGenericMetadata.LicenseExclusivities = GetGroupedMetadataElementsForImportLanguages(importLanguages, syncGenericMetadata.License_exclusivities);
             smintIoGenericMetadata.LicenseUsages = GetGroupedMetadataElementsForImportLanguages(importLanguages, syncGenericMetadata.License_usages);
             smintIoGenericMetadata.LicenseSizes = GetGroupedMetadataElementsForImportLanguages(importLanguages, syncGenericMetadata.License_sizes);
             smintIoGenericMetadata.LicensePlacements = GetGroupedMetadataElementsForImportLanguages(importLanguages, syncGenericMetadata.License_placements);
             smintIoGenericMetadata.LicenseDistributions = GetGroupedMetadataElementsForImportLanguages(importLanguages, syncGenericMetadata.License_distributions);
             smintIoGenericMetadata.LicenseGeographies = GetGroupedMetadataElementsForImportLanguages(importLanguages, syncGenericMetadata.License_geographies);
             smintIoGenericMetadata.LicenseVerticals = GetGroupedMetadataElementsForImportLanguages(importLanguages, syncGenericMetadata.License_verticals);
+            smintIoGenericMetadata.LicenseLanguages = GetGroupedMetadataElementsForImportLanguages(importLanguages, syncGenericMetadata.License_languages);
 
             _logger.LogInformation("Received generic metadata from Smint.io");
 
@@ -195,15 +197,15 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                 {
                     // make sure we do not store editorial use information if no information is there!
 
-                    if (license_usage_constraint.Effective_is_editorial_use != null)
+                    if (license_usage_constraint.Is_editorial_use != null)
                     {
-                        if (license_usage_constraint.Effective_is_editorial_use == true)
+                        if (license_usage_constraint.Is_editorial_use == true)
                         {
                             // if we have a restrictions, always indicate
 
                             isEditorialUse = true;
                         }
-                        else if (license_usage_constraint.Effective_is_editorial_use == false)
+                        else if (license_usage_constraint.Is_editorial_use == false)
                         {
                             // if we have no restriction, only store, if we have no other restriction
 
@@ -213,16 +215,17 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     }
                     
                     hasLicenseUsageConstraints |=
-                        license_usage_constraint.Effective_restricted_usages?.Count > 0 ||
-                        license_usage_constraint.Effective_restricted_sizes?.Count > 0 ||
-                        license_usage_constraint.Effective_restricted_placements?.Count > 0 ||
-                        license_usage_constraint.Effective_restricted_distributions?.Count > 0 ||
-                        license_usage_constraint.Effective_restricted_geographies?.Count > 0 ||
-                        license_usage_constraint.Effective_restricted_verticals?.Count > 0 ||
-                        (license_usage_constraint.Effective_valid_from != null && license_usage_constraint.Effective_valid_from > DateTimeOffset.Now) ||
-                        license_usage_constraint.Effective_valid_until != null ||
-                        license_usage_constraint.Effective_to_be_used_until != null ||
-                        (license_usage_constraint.Effective_is_editorial_use ?? false);
+                        license_usage_constraint.Restricted_usages?.Count > 0 ||
+                        license_usage_constraint.Restricted_sizes?.Count > 0 ||
+                        license_usage_constraint.Restricted_placements?.Count > 0 ||
+                        license_usage_constraint.Restricted_distributions?.Count > 0 ||
+                        license_usage_constraint.Restricted_geographies?.Count > 0 ||
+                        license_usage_constraint.Restricted_verticals?.Count > 0 ||
+                        license_usage_constraint.Restricted_languages?.Count > 0 ||
+                        (license_usage_constraint.Valid_from != null && license_usage_constraint.Valid_from > DateTimeOffset.Now) ||
+                        license_usage_constraint.Valid_until != null ||
+                        license_usage_constraint.To_be_used_until != null ||
+                        (license_usage_constraint.Is_editorial_use ?? false);
                 }
 
                 string url = $"https://{settingsDatabaseModel.TenantId}.smint.io/project/{lpt.Project_uuid}/content-element/{lpt.Content_element.Uuid}";
@@ -253,8 +256,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     LicenseOptions = GetLicenseOptions(importLanguages, lpt),
                     UsageConstraints = GetUsageConstraints(lpt),
                     DownloadConstraints = GetDownloadConstraints(lpt),
-                    EffectiveIsEditorialUse = isEditorialUse,
-                    EffectiveHasLicenseUsageConstraints = hasLicenseUsageConstraints,
+                    IsEditorialUse = isEditorialUse,
+                    HasLicenseUsageConstraints = hasLicenseUsageConstraints,
                     SmintIoUrl = url,
                     PurchasedAt = lpt.Purchased_at,
                     CreatedAt = lpt.Created_at,
@@ -333,24 +336,26 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             {
                 licenseUsageConstraints.Add(new SmintIoUsageConstraints()
                 {
-                    EffectiveIsExclusive = licenseUsageConstraint.Effective_is_exclusive,
-                    EffectiveAllowedUsages = licenseUsageConstraint.Effective_allowed_usages,
-                    EffectiveRestrictedUsages = licenseUsageConstraint.Effective_restricted_usages,
-                    EffectiveAllowedSizes = licenseUsageConstraint.Effective_allowed_sizes,
-                    EffectiveRestrictedSizes = licenseUsageConstraint.Effective_restricted_sizes,
-                    EffectiveAllowedPlacements = licenseUsageConstraint.Effective_allowed_placements,
-                    EffectiveRestrictedPlacements = licenseUsageConstraint.Effective_restricted_placements,
-                    EffectiveAllowedDistributions = licenseUsageConstraint.Effective_allowed_distributions,
-                    EffectiveRestrictedDistributions = licenseUsageConstraint.Effective_restricted_distributions,
-                    EffectiveAllowedGeographies = licenseUsageConstraint.Effective_allowed_geographies,
-                    EffectiveRestrictedGeographies = licenseUsageConstraint.Effective_restricted_geographies,
-                    EffectiveAllowedVerticals = licenseUsageConstraint.Effective_allowed_verticals,
-                    EffectiveRestrictedVerticals = licenseUsageConstraint.Effective_restricted_verticals,
-                    EffectiveToBeUsedUntil = licenseUsageConstraint.Effective_to_be_used_until,
-                    EffectiveMaxEditions = licenseUsageConstraint.Effective_max_editions,
-                    EffectiveValidFrom = licenseUsageConstraint.Effective_valid_from,
-                    EffectiveValidUntil = licenseUsageConstraint.Effective_valid_until,
-                    EffectiveIsEditorialUse = licenseUsageConstraint.Effective_is_editorial_use
+                    Exclusivities = licenseUsageConstraint.Exclusivities,
+                    AllowedUsages = licenseUsageConstraint.Allowed_usages,
+                    RestrictedUsages = licenseUsageConstraint.Restricted_usages,
+                    AllowedSizes = licenseUsageConstraint.Allowed_sizes,
+                    RestrictedSizes = licenseUsageConstraint.Restricted_sizes,
+                    AllowedPlacements = licenseUsageConstraint.Allowed_placements,
+                    RestrictedPlacements = licenseUsageConstraint.Restricted_placements,
+                    AllowedDistributions = licenseUsageConstraint.Allowed_distributions,
+                    RestrictedDistributions = licenseUsageConstraint.Restricted_distributions,
+                    AllowedGeographies = licenseUsageConstraint.Allowed_geographies,
+                    RestrictedGeographies = licenseUsageConstraint.Restricted_geographies,
+                    AllowedVerticals = licenseUsageConstraint.Allowed_verticals,
+                    RestrictedVerticals = licenseUsageConstraint.Restricted_verticals,
+                    AllowedLanguages = licenseUsageConstraint.Allowed_languages,
+                    RestrictedLanguages = licenseUsageConstraint.Restricted_languages,
+                    ToBeUsedUntil = licenseUsageConstraint.To_be_used_until,
+                    MaxEditions = licenseUsageConstraint.Max_editions,
+                    ValidFrom = licenseUsageConstraint.Valid_from,
+                    ValidUntil = licenseUsageConstraint.Valid_until,
+                    IsEditorialUse = licenseUsageConstraint.Is_editorial_use
                 });
             }
 
@@ -368,9 +373,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
 
             return new SmintIoDownloadConstraints()
             {
-                EffectiveMaxDownloads = licenseDownloadConstraints.Effective_max_downloads,
-                EffectiveMaxUsers = licenseDownloadConstraints.Effective_max_users,
-                EffectiveMaxReuses = licenseDownloadConstraints.Effective_max_reuses
+                MaxDownloads = licenseDownloadConstraints.Effective_max_downloads,
+                MaxUsers = licenseDownloadConstraints.Effective_max_users,
+                MaxReuses = licenseDownloadConstraints.Effective_max_reuses
             };
         }
 

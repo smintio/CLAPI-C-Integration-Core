@@ -17,18 +17,21 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         Task ImportLicenseTypesAsync(IList<SmintIoMetadataElement> licenseTypes);
 
         Task ImportReleaseStatesAsync(IList<SmintIoMetadataElement> releaseStates);
+
+        Task ImportLicenseExclusivitiesAsync(IList<SmintIoMetadataElement> licenseExclusivities);
         Task ImportLicenseUsagesAsync(IList<SmintIoMetadataElement> licenseUsages);
         Task ImportLicenseSizesAsync(IList<SmintIoMetadataElement> licenseSizes);
         Task ImportLicensePlacementsAsync(IList<SmintIoMetadataElement> licensePlacements);
         Task ImportLicenseDistributionsAsync(IList<SmintIoMetadataElement> licenseDistributions);
         Task ImportLicenseGeographiesAsync(IList<SmintIoMetadataElement> licenseGeographies);
         Task ImportLicenseVerticalsAsync(IList<SmintIoMetadataElement> licenseVerticals);
+        Task ImportLicenseLanguagesAsync(IList<SmintIoMetadataElement> licenseLanguages);
 
         Task ImportAssetsAsync(string folderName, IList<SmintIoAsset> assets);
 
         Task HandleAuthenticatorExceptionAsync(SmintIoAuthenticatorException exception);
         Task HandleSyncJobExceptionAsync(SmintIoSyncJobException exception);
 
-        void ClearCaches();        
+        void ClearCaches();
     }
 }

@@ -5,32 +5,35 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
 {
     public class SmintIoUsageConstraints
     {
-        public bool? EffectiveIsExclusive { get; set; }
+        public IList<string> Exclusivities { get; set; }
 
-        public IList<string> EffectiveAllowedUsages { get; set; }
-        public IList<string> EffectiveRestrictedUsages { get; set; }
+        public IList<string> AllowedUsages { get; set; }
+        public IList<string> RestrictedUsages { get; set; }
 
-        public IList<string> EffectiveAllowedSizes { get; set; }
-        public IList<string> EffectiveRestrictedSizes { get; set; }
+        public IList<string> AllowedSizes { get; set; }
+        public IList<string> RestrictedSizes { get; set; }
 
-        public IList<string> EffectiveAllowedPlacements { get; set; }
-        public IList<string> EffectiveRestrictedPlacements { get; set; }
+        public IList<string> AllowedPlacements { get; set; }
+        public IList<string> RestrictedPlacements { get; set; }
 
-        public IList<string> EffectiveAllowedDistributions { get; set; }
-        public IList<string> EffectiveRestrictedDistributions { get; set; }
+        public IList<string> AllowedDistributions { get; set; }
+        public IList<string> RestrictedDistributions { get; set; }
 
-        public IList<string> EffectiveAllowedGeographies { get; set; }
-        public IList<string> EffectiveRestrictedGeographies { get; set; }
+        public IList<string> AllowedGeographies { get; set; }
+        public IList<string> RestrictedGeographies { get; set; }
 
-        public IList<string> EffectiveAllowedVerticals { get; set; }
-        public IList<string> EffectiveRestrictedVerticals { get; set; }
+        public IList<string> AllowedVerticals { get; set; }
+        public IList<string> RestrictedVerticals { get; set; }
 
-        public int? EffectiveMaxEditions { get; set; }
+        public IList<string> AllowedLanguages { get; set; }
+        public IList<string> RestrictedLanguages { get; set; }
 
-        public DateTimeOffset? EffectiveValidFrom { get; set; }
-        public DateTimeOffset? EffectiveValidUntil { get; set; }
-        public DateTimeOffset? EffectiveToBeUsedUntil { get; set; }
+        public int? MaxEditions { get; set; }
 
-        public bool? EffectiveIsEditorialUse { get; set; }
+        public DateTimeOffset? ValidFrom { get; set; }
+        public DateTimeOffset? ValidUntil { get; set; }
+        public DateTimeOffset? ToBeUsedUntil { get; set; }
+
+        public bool? IsEditorialUse { get; set; }
     }
 }

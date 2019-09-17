@@ -43,8 +43,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
         public IList<SmintIoUsageConstraints> UsageConstraints { get; set; }
         public SmintIoDownloadConstraints DownloadConstraints { get; set; }
 
-        public bool? EffectiveIsEditorialUse { get; set; }
-        public bool? EffectiveHasLicenseUsageConstraints { get; set; }
+        public bool? IsEditorialUse { get; set; }
+        public bool? HasLicenseUsageConstraints { get; set; }
 
         public List<SmintIoBinary> Binaries { get; set; }
 
