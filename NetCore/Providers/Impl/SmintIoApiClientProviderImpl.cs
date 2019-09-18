@@ -254,7 +254,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     LicenseType = lpt.Offering.License_type,
                     LicenseText = GetValuesForImportLanguages(importLanguages, lpt.Offering.License_text.Effective_text),
                     LicenseOptions = GetLicenseOptions(importLanguages, lpt),
-                    UsageConstraints = GetUsageConstraints(lpt),
+                    UsageConstraints = GetUsageConstraints(importLanguages, lpt),
                     DownloadConstraints = GetDownloadConstraints(lpt),
                     IsEditorialUse = isEditorialUse,
                     HasLicenseUsageConstraints = hasLicenseUsageConstraints,
@@ -323,7 +323,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             return options;
         }
 
-        private List<SmintIoUsageConstraints> GetUsageConstraints(SyncLicensePurchaseTransaction lpt)
+        private List<SmintIoUsageConstraints> GetUsageConstraints(string[] importLanguages, SyncLicensePurchaseTransaction lpt)
         {
             if (lpt.License_usage_constraints == null || lpt.License_usage_constraints.Count == 0)
             {
@@ -336,6 +336,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             {
                 licenseUsageConstraints.Add(new SmintIoUsageConstraints()
                 {
+                    SequenceNumber = licenseUsageConstraint.Sequence_number,
+                    Name = GetValuesForImportLanguages(importLanguages, licenseUsageConstraint.Name),
                     Exclusivities = licenseUsageConstraint.Exclusivities,
                     AllowedUsages = licenseUsageConstraint.Allowed_usages,
                     RestrictedUsages = licenseUsageConstraint.Restricted_usages,
