@@ -24,8 +24,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         Task ImportLicensePlacementsAsync(IList<SmintIoMetadataElement> licensePlacements);
         Task ImportLicenseDistributionsAsync(IList<SmintIoMetadataElement> licenseDistributions);
         Task ImportLicenseGeographiesAsync(IList<SmintIoMetadataElement> licenseGeographies);
-        Task ImportLicenseVerticalsAsync(IList<SmintIoMetadataElement> licenseVerticals);
+        Task ImportLicenseIndustriesAsync(IList<SmintIoMetadataElement> licenseIndustries);
         Task ImportLicenseLanguagesAsync(IList<SmintIoMetadataElement> licenseLanguages);
+        Task ImportLicenseUsageLimitsAsync(IList<SmintIoMetadataElement> licenseUsageLimits);
 
         Task ImportAssetsAsync(string folderName, IList<SmintIoAsset> assets);
 

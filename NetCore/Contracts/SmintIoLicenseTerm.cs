@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
 {
-    public class SmintIoUsageConstraints
+    public class SmintIoLicenseTerm
     {
         public int? SequenceNumber { get; set; }
 
@@ -26,13 +26,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
         public IList<string> AllowedGeographies { get; set; }
         public IList<string> RestrictedGeographies { get; set; }
 
-        public IList<string> AllowedVerticals { get; set; }
-        public IList<string> RestrictedVerticals { get; set; }
+        public IList<string> AllowedIndustries { get; set; }
+        public IList<string> RestrictedIndustries { get; set; }
 
         public IList<string> AllowedLanguages { get; set; }
         public IList<string> RestrictedLanguages { get; set; }
 
-        public int? MaxEditions { get; set; }
+        public IList<string> UsageLimits { get; set; }
 
         public DateTimeOffset? ValidFrom { get; set; }
         public DateTimeOffset? ValidUntil { get; set; }
