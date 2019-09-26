@@ -1,0 +1,43 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
+{
+    public class SmintIoLicenseTerm
+    {
+        public int? SequenceNumber { get; set; }
+
+        public IDictionary<string, string> Name { get; set; }
+
+        public IList<string> Exclusivities { get; set; }
+
+        public IList<string> AllowedUsages { get; set; }
+        public IList<string> RestrictedUsages { get; set; }
+
+        public IList<string> AllowedSizes { get; set; }
+        public IList<string> RestrictedSizes { get; set; }
+
+        public IList<string> AllowedPlacements { get; set; }
+        public IList<string> RestrictedPlacements { get; set; }
+
+        public IList<string> AllowedDistributions { get; set; }
+        public IList<string> RestrictedDistributions { get; set; }
+
+        public IList<string> AllowedGeographies { get; set; }
+        public IList<string> RestrictedGeographies { get; set; }
+
+        public IList<string> AllowedIndustries { get; set; }
+        public IList<string> RestrictedIndustries { get; set; }
+
+        public IList<string> AllowedLanguages { get; set; }
+        public IList<string> RestrictedLanguages { get; set; }
+
+        public IList<string> UsageLimits { get; set; }
+
+        public DateTimeOffset? ValidFrom { get; set; }
+        public DateTimeOffset? ValidUntil { get; set; }
+        public DateTimeOffset? ToBeUsedUntil { get; set; }
+
+        public bool? IsEditorialUse { get; set; }
+    }
+}

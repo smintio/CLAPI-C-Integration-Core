@@ -2,8 +2,8 @@
 {
     public class SmintIoDownloadConstraints
     {
-        public int? EffectiveMaxDownloads { get; set; }
-        public int? EffectiveMaxUsers { get; set; }
-        public int? EffectiveMaxReuses { get; set; }
+        public int? MaxDownloads { get; set; }
+        public int? MaxUsers { get; set; }
+        public int? MaxReuses { get; set; }
     }
 }

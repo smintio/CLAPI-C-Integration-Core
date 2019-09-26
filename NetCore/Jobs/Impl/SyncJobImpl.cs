@@ -111,12 +111,15 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             await _syncTarget.ImportReleaseStatesAsync(genericMetadata.ReleaseStates);
 
+            await _syncTarget.ImportLicenseExclusivitiesAsync(genericMetadata.LicenseExclusivities);
             await _syncTarget.ImportLicenseUsagesAsync(genericMetadata.LicenseUsages);
             await _syncTarget.ImportLicenseSizesAsync(genericMetadata.LicenseSizes);
             await _syncTarget.ImportLicensePlacementsAsync(genericMetadata.LicensePlacements);
             await _syncTarget.ImportLicenseDistributionsAsync(genericMetadata.LicenseDistributions);
             await _syncTarget.ImportLicenseGeographiesAsync(genericMetadata.LicenseGeographies);
-            await _syncTarget.ImportLicenseVerticalsAsync(genericMetadata.LicenseVerticals);            
+            await _syncTarget.ImportLicenseIndustriesAsync(genericMetadata.LicenseIndustries);
+            await _syncTarget.ImportLicenseLanguagesAsync(genericMetadata.LicenseLanguages);
+            await _syncTarget.ImportLicenseUsageLimitsAsync(genericMetadata.LicenseUsageLimits);
 
             _syncTarget.ClearCaches();
 

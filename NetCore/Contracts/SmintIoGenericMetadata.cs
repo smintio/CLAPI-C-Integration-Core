@@ -14,11 +14,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
         public IList<SmintIoMetadataElement> LicenseTypes;
         public IList<SmintIoMetadataElement> ReleaseStates;
 
+        public IList<SmintIoMetadataElement> LicenseExclusivities;
         public IList<SmintIoMetadataElement> LicenseUsages;
         public IList<SmintIoMetadataElement> LicenseSizes;
         public IList<SmintIoMetadataElement> LicensePlacements;
         public IList<SmintIoMetadataElement> LicenseDistributions;
         public IList<SmintIoMetadataElement> LicenseGeographies;
-        public IList<SmintIoMetadataElement> LicenseVerticals;
+        public IList<SmintIoMetadataElement> LicenseIndustries;
+        public IList<SmintIoMetadataElement> LicenseLanguages;
+        public IList<SmintIoMetadataElement> LicenseUsageLimits;
     }
 }

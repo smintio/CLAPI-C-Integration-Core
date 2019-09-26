@@ -40,11 +40,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
         public IDictionary<string, string> LicenseText { get; set; }
         public IList<SmintIoLicenseOptions> LicenseOptions { get; set; }
 
-        public IList<SmintIoUsageConstraints> UsageConstraints { get; set; }
+        public IList<SmintIoLicenseTerm> LicenseTerms { get; set; }
         public SmintIoDownloadConstraints DownloadConstraints { get; set; }
 
-        public bool? EffectiveIsEditorialUse { get; set; }
-        public bool? EffectiveHasLicenseUsageConstraints { get; set; }
+        public bool? IsEditorialUse { get; set; }
+        public bool? HasLicenseTerms { get; set; }
 
         public List<SmintIoBinary> Binaries { get; set; }
 
