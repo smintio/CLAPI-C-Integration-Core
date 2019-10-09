@@ -58,6 +58,15 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                 var settingsDatabaseModel = await _settingsDatabaseProvider.GetSettingsDatabaseModelAsync();
                 settingsDatabaseModel.ValidateForSync();
 
+                if (!_syncTarget.GetCapabilities().IsMultiLanguageSupported() &&
+                    settingsDatabaseModel.ImportLanguages.Length > 1)
+                {
+                    throw new SmintIoSyncJobException(
+                        SmintIoSyncJobException.SyncJobError.Generic,
+                        "SyncTarget supports only one language but multiple language are set to be synced!"
+                    );
+                }
+
                 var tokenDatabaseModel = await _tokenDatabaseProvider.GetTokenDatabaseModelAsync();
                 tokenDatabaseModel.ValidateForSync();
 
