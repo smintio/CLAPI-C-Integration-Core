@@ -8,6 +8,12 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
     public interface ISyncTarget
     {
         /// <summary>
+        /// Provides information about features this sync target supports and thus is capable of.
+        /// </summary>
+        /// <returns>Must not return <c>null</c> but always a valid instance!</returns>
+        ISyncTargetCapabilities GetCapabilities();
+
+        /// <summary>
         /// A hook to be called before any synchronisation is started in this turn.
         /// </summary>
         ///
@@ -27,7 +33,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         /// <exception cref="Exception">Any such exception indicates a faulty ending, immediately aborting
         /// synchronization. So make sure all exceptions to be ignored are caught within the task.</exception>
         Task<bool> BeforeSyncAsync();
-
 
         Task ImportContentProvidersAsync(IList<SmintIoMetadataElement> contentProviders);
 
@@ -68,7 +73,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         /// special care.</exception>
         Task AfterSyncAsync();
 
-
         /// <summary>
         /// Clears all cached generic meta data.
         /// </summary>
@@ -81,11 +85,5 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         /// consumed by the cache.
         /// </remarks>
         void ClearGenericMetadataCaches();
-
-        /// <summary>
-        /// Provides information about features this sync target supports and thus is capable of.
-        /// </summary>
-        /// <returns>Must not return <c>null</c> but always a valid instance!</returns>
-        ISyncTargetCapabilities GetCapabilities();
     }
 }
