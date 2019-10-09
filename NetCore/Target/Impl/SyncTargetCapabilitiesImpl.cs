@@ -7,7 +7,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         /// <inheritdoc/>
         public SyncTargetCapabilitiesEnum[] Capabilities { get; }
 
-        public SyncTargetCapabilitiesImpl(SyncTargetCapabilitiesEnum[] capabilities)
+        public SyncTargetCapabilitiesImpl(params SyncTargetCapabilitiesEnum[] capabilities)
         {
             Capabilities = capabilities;
         }
