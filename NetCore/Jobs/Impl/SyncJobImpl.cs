@@ -77,13 +77,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                 if (synchronizeGenericMetadata)
                 {
                     await SynchronizeGenericMetadataAsync();
-                    // clear metadata cache
                 }
-
-
+                
                 await SynchronizeAssetsAsync();
 
-                _logger.LogTrace("executing 'AfterSync'");
+                _logger.LogTrace("Executing 'AfterSync'");
                 await _syncTarget.AfterSyncAsync();
                 _logger.LogTrace("DONE executing 'AfterSync'");
             }
@@ -138,7 +136,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             await _syncTarget.ImportLicenseLanguagesAsync(genericMetadata.LicenseLanguages);
             await _syncTarget.ImportLicenseUsageLimitsAsync(genericMetadata.LicenseUsageLimits);
 
-            _logger.LogTrace("call 'ClearGenericMetadataCaches'");
+            _logger.LogTrace("Call 'ClearGenericMetadataCaches'");
             _syncTarget.ClearGenericMetadataCaches();
 
             _logger.LogInformation("Finished Smint.io generic metadata synchronization");
@@ -183,7 +181,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                 _logger.LogInformation("Finished Smint.io asset synchronization");
 
-                _logger.LogTrace("call 'ClearGenericMetadataCaches'");
+                _logger.LogTrace("Call 'ClearGenericMetadataCaches'");
                 _syncTarget.ClearGenericMetadataCaches();
             }
             finally
