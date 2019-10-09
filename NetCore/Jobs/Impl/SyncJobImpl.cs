@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
-using System.Linq.Expressions;
 using SmintIo.CLAPI.Consumer.Integration.Core.Contracts;
 using SmintIo.CLAPI.Consumer.Integration.Core.Providers;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
@@ -63,16 +61,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                 var tokenDatabaseModel = await _tokenDatabaseProvider.GetTokenDatabaseModelAsync();
                 tokenDatabaseModel.ValidateForSync();
 
-                _logger.LogTrace("Executing 'BeforeSync'");
                 var cancelTask = await _syncTarget.BeforeSyncAsync();
-                _logger.LogTrace("DONE executing 'BeforeSync'");
-
+                
                 if (cancelTask)
                 {
                     _logger.LogInformation("'BeforeSync' task terminated with 'false', indicating to abort sync.");
+
                     return;
                 }
-
 
                 if (synchronizeGenericMetadata)
                 {
@@ -81,9 +77,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                 
                 await SynchronizeAssetsAsync();
 
-                _logger.LogTrace("Executing 'AfterSync'");
                 await _syncTarget.AfterSyncAsync();
-                _logger.LogTrace("DONE executing 'AfterSync'");
             }
             catch (SmintIoAuthenticatorException e)
             {
@@ -136,7 +130,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             await _syncTarget.ImportLicenseLanguagesAsync(genericMetadata.LicenseLanguages);
             await _syncTarget.ImportLicenseUsageLimitsAsync(genericMetadata.LicenseUsageLimits);
 
-            _logger.LogTrace("Call 'ClearGenericMetadataCaches'");
             _syncTarget.ClearGenericMetadataCaches();
 
             _logger.LogInformation("Finished Smint.io generic metadata synchronization");
@@ -181,7 +174,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                 _logger.LogInformation("Finished Smint.io asset synchronization");
 
-                _logger.LogTrace("Call 'ClearGenericMetadataCaches'");
                 _syncTarget.ClearGenericMetadataCaches();
             }
             finally
