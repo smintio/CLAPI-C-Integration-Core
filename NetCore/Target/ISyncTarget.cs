@@ -59,12 +59,12 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         /// A hook to be called after all synchronisation took place.
         /// </summary>
         ///
-        /// <remarks>After all synchronisation took place, some clean-up might be necessary, besides <c>ClearCaches</c>
-        /// (see <see cref="ClearCaches"/>). The task returned by this hook is executed after all synchronisation has
-        /// ended - no matter whether successfully or not - but <i>before</i> <see cref="ClearCaches"/> is called. 
+        /// <remarks>After all synchronisation took place, some clean-up might be necessary, besides <c>ClearGenericMetadataCaches</c>
+        /// (see <see cref="ClearGenericMetadataCaches"/>). The task returned by this hook is executed after all synchronisation has
+        /// ended - no matter whether successfully or not - but <i>before</i> <see cref="ClearGenericMetadataCaches"/> is called. 
         /// So the running task still has access to all the created caches.
         /// </remarks>
-         /// <exception cref="Exception">Any such exception is being caught and ignored. The task does not need to take
+        /// <exception cref="Exception">Any such exception is being caught and ignored. The task does not need to take
         /// special care.</exception>
         Task AfterSyncAsync();
 
