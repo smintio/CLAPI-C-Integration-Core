@@ -69,6 +69,17 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         Task AfterSyncAsync();
 
 
-        void ClearCaches();
+        /// <summary>
+        /// Clears all cached generic meta data.
+        /// </summary>
+        ///
+        /// <remarks>During synchronisation of license information, asset types, release states and content categories,
+        /// a lot of meta data is usually cached locally to avoid multiple remote lookups. This speeds-up the
+        /// synchronisation of these meta data items. But before synchronisation of content takes place and at the end
+        /// of each synchronisation process, this cache is cleared. In the former case it will guarantee a fresh start
+        /// and will avoid any errors due to failure in meta data sync process. The latter releases all memory
+        /// consumed by the cache.
+        /// </remarks>
+        void ClearGenericMetadataCaches();
     }
 }
