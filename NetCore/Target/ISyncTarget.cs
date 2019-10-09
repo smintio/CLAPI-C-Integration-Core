@@ -81,5 +81,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         /// consumed by the cache.
         /// </remarks>
         void ClearGenericMetadataCaches();
+
+        /// <summary>
+        /// Provides information about features this sync target supports and thus is capable of.
+        /// </summary>
+        /// <returns>Must not return <c>null</c> but always a valid instance!</returns>
+        ISyncTargetCapabilities GetCapabilities();
     }
 }
