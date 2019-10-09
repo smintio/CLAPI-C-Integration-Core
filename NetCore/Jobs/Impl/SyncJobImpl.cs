@@ -61,7 +61,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                 var tokenDatabaseModel = await _tokenDatabaseProvider.GetTokenDatabaseModelAsync();
                 tokenDatabaseModel.ValidateForSync();
 
-                var cancelTask = await _syncTarget.BeforeSyncAsync();
+                var cancelTask = !await _syncTarget.BeforeSyncAsync();
                 
                 if (cancelTask)
                 {
