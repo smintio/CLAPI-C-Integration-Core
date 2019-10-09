@@ -4,20 +4,18 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 {
     public class SyncTargetCapabilitiesImpl: ISyncTargetCapabilities
     {
-        private readonly SyncTargetCapabilitiesEnum[] _capabilities;
+        /// <inheritdoc/>
+        public SyncTargetCapabilitiesEnum[] Capabilities { get; }
 
         public SyncTargetCapabilitiesImpl(SyncTargetCapabilitiesEnum[] capabilities)
         {
-            _capabilities = capabilities;
+            Capabilities = capabilities;
         }
-
-        /// <inheritdoc/>
-        public SyncTargetCapabilitiesEnum[] Capabilities => _capabilities;
 
         /// <inheritdoc/>
         public bool IsMultiLanguageSupported()
         {
-            return ((IList<SyncTargetCapabilitiesEnum>) _capabilities)
+            return ((IList<SyncTargetCapabilitiesEnum>) Capabilities)
                 .Contains(SyncTargetCapabilitiesEnum.MultiLanguageEnum);
         }
     }
