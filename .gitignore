@@ -350,3 +350,56 @@ MigrationBackup/
 
 # End of https://www.gitignore.io/api/csharp
 /PictureparkIntegration/Client/sync_database.json
+
+
+# temporary backup files
+*~
+*.old
+*.tmp
+*.orig
+*.rej
+*.
+*.temp
+RemoteSystemsTempFiles
+/temp/
+
+
+# IDE
+.idea/*
+!.idea/runConfigurations
+!.idea/jsLinters
+nbproject
+
+/build/**
+/out/**
+*.iml
+
+
+# OS X
+*.DS_Store
+.AppleDouble
+.LSOverride
+.DS_Store?
+
+
+#Windows image files cache
+Thumbs.db
+ehtthumbs.db
+
+#Folder config file
+Desktop.ini
+
+#SVN/CVS
+.svn/
+/CVS/*
+**/CVS/*
+.cvsignore
+*/.cvsignore
+/nbproject/private/
+/temp/
+/reports/
+/.tscache/
+
+/.metadata/
+/.settings/
+*/.settings/
