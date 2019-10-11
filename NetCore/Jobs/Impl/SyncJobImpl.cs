@@ -137,6 +137,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
         {
             _logger.LogInformation("Starting Smint.io generic metadata synchronization...");
 
+            var cancelMetadataSync = !await _syncTarget.BeforeGenericMetadataSyncAsync();
+            if (cancelMetadataSync)
+            {
+                _logger.LogInformation("'BeforeGenericMetadataSyncAsync' task aborted meta data sync");
+
+                return;
+            }
+
             var genericMetadata = await _smintIoClient.GetGenericMetadataAsync();
 
             await _syncTarget.ImportContentProvidersAsync(genericMetadata.ContentProviders);
@@ -160,6 +168,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             await _syncTarget.ImportLicenseLanguagesAsync(genericMetadata.LicenseLanguages);
             await _syncTarget.ImportLicenseUsageLimitsAsync(genericMetadata.LicenseUsageLimits);
 
+            await _syncTarget.AfterGenericMetadataSyncAsync();
+
             _syncTarget.ClearGenericMetadataCaches();
 
             _logger.LogInformation("Finished Smint.io generic metadata synchronization");
@@ -168,6 +178,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
         private async Task SynchronizeAssetsAsync()
         {
             _logger.LogInformation("Starting Smint.io asset synchronization...");
+
+            var cancelAssetsSync = !await _syncTarget.BeforeAssetsSyncAsync();
+            if (cancelAssetsSync)
+            {
+                _logger.LogInformation("'BeforeAssetsSyncAsync' task aborted assets sync");
+
+                return;
+            }
 
             var folderName = Folder + new Random().Next(1000000, 9999999);
 
@@ -203,6 +221,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                 } while (assets != null && assets.Any());
 
                 _logger.LogInformation("Finished Smint.io asset synchronization");
+
+                await _syncTarget.AfterAssetsSyncAsync();
 
                 _syncTarget.ClearGenericMetadataCaches();
             }
