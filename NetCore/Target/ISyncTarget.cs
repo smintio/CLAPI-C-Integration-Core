@@ -55,6 +55,28 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         /// synchronization. So make sure all exceptions to be ignored are caught within the task.</exception>
         Task<bool> BeforeSyncAsync();
 
+        #region GenericMetaData
+
+        /// <summary>
+        /// Is called right before the generic meta data is about to be synced but after <see cref="BeforeSyncAsync"/>.
+        /// </summary>
+        ///
+        /// <remarks>This hook is only called in case the generic meta data is to be synchronized. Usually this is
+        /// done on a regular and scheduled basis. Additionally to a re-scheduled background task for synchronisation
+        /// asset content is synced on demand - without any generic meta data.
+        ///
+        /// <para>Although this task is executed in an asynchronous way, synchronisation is only started after this
+        /// tasks ends successfully. In case the tasks returns <c>false</c> synchronisation of generic meta data is
+        /// aborted immediately. In case the task crashes with an exception, overall synchronisation is terminated
+        /// without syncing any asset.</para></remarks>
+        /// <returns>The task returns a boolean value, indicating whether to continue meta data synchronisation or not.
+        /// <c>true</c> means, synchronisation will continue, whereas <c>false</c> aborts the sync task without further
+        /// notice and without calling <see cref="AfterGenericMetadataSyncAsync"/>.
+        /// </returns>
+        /// <exception cref="Exception">Any such exception indicates a faulty ending, immediately aborting the
+        /// overall synchronization. So make sure all exceptions to be ignored are caught within the task.</exception>
+        Task<bool> BeforeGenericMetadataSyncAsync();
+
         Task ImportContentProvidersAsync(IList<SmintIoMetadataElement> contentProviders);
 
         Task ImportContentTypesAsync(IList<SmintIoMetadataElement> contentTypes);
@@ -76,7 +98,54 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         Task ImportLicenseLanguagesAsync(IList<SmintIoMetadataElement> licenseLanguages);
         Task ImportLicenseUsageLimitsAsync(IList<SmintIoMetadataElement> licenseUsageLimits);
 
+        /// <summary>
+        /// After the synchronisation of all generic meta data this is called, before any syncing of assets with
+        /// <see cref="ImportAssetsAsync"/>.
+        /// </summary>
+        ///
+        /// <remarks>This hook is only called in case the generic meta data has been synchronized without any exception.
+        ///
+        /// <para>Although this task is executed in an asynchronous way, synchronisation of assets only starts after
+        /// this tasks ends successfully. Any aborts, crashes or unsuccessfully endings are aborting the overall
+        /// synchronisation process immediately - without syncing assets. Such ending usually is indicated by throwing
+        /// an exception.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="Exception">Any such exception indicates a faulty ending, immediately aborting
+        /// synchronization of assets. So make sure all exceptions to be ignored are caught within the task.</exception>
+        Task AfterGenericMetadataSyncAsync();
+
+        #endregion
+
+        #region Assets
+
+        /// <summary>
+        /// Is called right before assets are about to be synced but after <see cref="BeforeSyncAsync"/> and after
+        /// <see cref="AfterGenericMetadataSyncAsync"/>.
+        /// </summary>
+        ///
+        /// <remarks>This hook is only called right before any assets are to be synced.</remarks>
+        /// <returns>The task returns a boolean value, indicating whether to continue asset synchronisation or not.
+        /// <c>true</c> means, synchronisation will continue, whereas <c>false</c> aborts the sync task without further
+        /// notice and without calling <see cref="AfterAssetsSyncAsync"/> or <see cref="AfterSyncAsync"/>.</returns>
+        /// <exception cref="Exception">Any such exception indicates a faulty ending, immediately aborting
+        /// synchronization. Hence <see cref="AfterAssetsSyncAsync"/> and <see cref="AfterSyncAsync"/></exception> are
+        /// not executed.
+        Task<bool> BeforeAssetsSyncAsync();
+
         Task ImportAssetsAsync(string folderName, IList<SmintIoAsset> assets);
+
+        /// <summary>
+        /// After the synchronisation of all assets with <see cref="ImportAssetsAsync"/> this is called, but before
+        /// <see cref="AfterSyncAsync"/>.
+        /// </summary>
+        ///
+        /// <exception cref="Exception">Any exception indicates a faulty ending, immediately aborting
+        /// synchronization of assets without calling <see cref="AfterSyncAsync"/>.
+        /// So make sure all exceptions to be ignored are caught within the task.</exception>
+        Task AfterAssetsSyncAsync();
+
+        #endregion
 
         Task HandleAuthenticatorExceptionAsync(SmintIoAuthenticatorException exception);
         Task HandleSyncJobExceptionAsync(SmintIoSyncJobException exception);
