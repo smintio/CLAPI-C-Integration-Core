@@ -1,0 +1,47 @@
+{
+  "metadata": [],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "articles/**.md",
+          "articles/**.yml",
+          "**.yml",
+          "**.md"
+        ],
+        "exclude": [
+          "overwrite/**",
+          "resources/**"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "src": "resources/",
+        "files": [
+          "**"
+        ]
+      }
+    ],
+    "overwrite": [
+      {
+        "src": "overwrite/",
+        "files": [
+          "**.md",
+          "**.html"
+        ]
+      }
+    ],
+    "globalMetadataFiles": [],
+    "fileMetadataFiles": [],
+    "template": [
+      "default"
+    ],
+    "postProcessors": [],
+    "markdownEngineName": "markdig",
+    "noLangKeyword": false,
+    "keepFileLink": false,
+    "cleanupCacheHistory": false,
+    "disableGitFeatures": false
+  }
+}

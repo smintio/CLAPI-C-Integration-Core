@@ -1,0 +1,69 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../../../",
+          "files": [
+            "NetCore/**.csproj"
+          ],
+          "exclude": [
+            "NetCore/bin/**",
+            "NetCore/obj/**"
+          ]
+        }
+      ],
+      "dest": "_extracted-api-info/",
+      "disableGitFeatures": false,
+      "disableDefaultFilter": false
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "**.yml",
+          "**.md"
+        ],
+        "exclude": [
+          "_extracted-api-info/**",
+          "overwrite/**"
+        ]
+      },
+      {
+        "src": "_extracted-api-info/",
+        "files": [
+          "**.yml",
+          "**.md"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "resources/**"
+        ]
+      }
+    ],
+    "overwrite": [
+      {
+        "src": "overwrite/",
+        "files": [
+          "**.md",
+          "**.html"
+        ]
+      }
+    ],
+    "globalMetadataFiles": [],
+    "fileMetadataFiles": [],
+    "template": [
+      "default"
+    ],
+    "postProcessors": [],
+    "markdownEngineName": "markdig",
+    "noLangKeyword": false,
+    "keepFileLink": false,
+    "cleanupCacheHistory": false,
+    "disableGitFeatures": false
+  }
+}

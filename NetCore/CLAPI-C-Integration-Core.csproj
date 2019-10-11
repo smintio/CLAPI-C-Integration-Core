@@ -1,4 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project>
+
+
+  <!-- Implicit top import -->
+  <!-- see: https://docs.microsoft.com/en-us/visualstudio/msbuild/how-to-use-project-sdk?view=vs-2019 -->
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -12,7 +18,32 @@
     <PackageLicenseExpression></PackageLicenseExpression>
     <PackageProjectUrl>https://www.smint.io</PackageProjectUrl>
     <Version>1.0.0</Version>
+    <Title>Smint.io Consumer Integration Core Library</Title>
+    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/smintio/CLAPI-C-Integration-Core</RepositoryUrl>
   </PropertyGroup>
+
+
+  <PropertyGroup>
+    <VersionParts>$([System.Text.RegularExpressions.Regex]::Split($(Version), '\.'))</VersionParts>
+    <MajorVersion>$(VersionParts[0])</MajorVersion>
+    <MinorVersion>$(VersionParts[2])</MinorVersion>
+    <VersionPatchLevel>$(VersionParts[4])</VersionPatchLevel>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RepositoryRootPath>$([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))</RepositoryRootPath>
+    <DocFxRootPath>$([System.IO.Path]::Combine($(RepositoryRootPath), 'documentation'))</DocFxRootPath>
+    <DocFxSourcePath>$([System.IO.Path]::Combine($(DocFxRootPath), 'src'))</DocFxSourcePath>
+    <DocFxOutputPath>$([System.IO.Path]::Combine($(DocFxRootPath), 'html'))</DocFxOutputPath>
+
+    <DocFxApiDocuConfiguration>$([System.IO.Path]::Combine($(DocFxSourcePath), 'api', 'docfx.json'))</DocFxApiDocuConfiguration>
+    <DocFxApiDocuTargetOuput>$([System.IO.Path]::Combine($(DocFxOutputPath), 'api', 'v$(MajorVersion)'))</DocFxApiDocuTargetOuput>
+
+    <DocFxWebDocuConfiguration>$([System.IO.Path]::Combine($(DocFxRootPath), 'src', 'general', 'docfx.json'))</DocFxWebDocuConfiguration>
+    <DocFxWebDocuTargetOuput>$([System.IO.Path]::Combine($(DocFxOutputPath), 'general'))</DocFxWebDocuTargetOuput>
+  </PropertyGroup>
+
 
   <ItemGroup>
     <PackageReference Include="IdentityModel.OidcClient" Version="2.9.1" />
@@ -37,4 +68,30 @@
     <Folder Include="Configuration\" />
   </ItemGroup>
 
+
+  <!-- Implicit bottom import -->
+  <!-- see: https://docs.microsoft.com/en-us/visualstudio/msbuild/how-to-use-project-sdk?view=vs-2019 -->
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <Target Name="BuildDocsAPI">
+    <Exec Command="docfx metadata $(DocFxApiDocuConfiguration)"/>
+    <Exec Command="docfx build $(DocFxApiDocuConfiguration) -o'$(DocFxApiDocuTargetOuput)'"/>
+  </Target>
+
+
+  <Target Name="BuildDocsGeneral">
+    <Exec Command="docfx build $(DocFxWebDocuConfiguration) -o'$(DocFxWebDocuTargetOuput)'"/>
+  </Target>
+
+
+  <Target Name="BuildDocs">
+    <CallTarget Targets="BuildDocsGeneral" />
+    <CallTarget Targets="BuildDocsAPI" />
+  </Target>
+
+  <!-- once documentation is properly styled and working, you might add activate this one
+  <Target Name="AfterBuild">
+    <CallTarget Targets="BuildDocs" />
+  </Target>
+  -->
 </Project>

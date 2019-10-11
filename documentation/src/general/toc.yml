@@ -1,0 +1,6 @@
+- name: HOWTO articles
+  href: articles/intro.html
+  
+- name: API documentation
+  href: ../api/1/
+  

@@ -1,0 +1,23 @@
+###############
+#    folder   #
+###############
+/**/DROP/
+/**/TEMP/
+/**/packages/
+/**/bin/
+/**/obj/
+
+
+# generated API info - updated on every build
+/**/_extracted-api-info/
+
+# temporary backup files
+*~
+*.old
+*.tmp
+*.orig
+*.rej
+*.
+*.temp
+RemoteSystemsTempFiles
+/temp/
