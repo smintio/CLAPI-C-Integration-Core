@@ -24,7 +24,6 @@ using IdentityModel.OidcClient.Browser;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Browser;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
 using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
@@ -50,7 +49,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             _logger = logger;
         }
 
-        public override async Task<InitAuthenticationResultModel> InitSmintIoAuthenticationAsync()
+        public async Task InitSmintIoAuthenticationAsync()
         {
             _logger.LogInformation("Authenticating with Smint.io through system browser...");
 
@@ -95,14 +94,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                         $"Acquiring the Smint.io access token failed: {tokenDatabaseModel.ErrorMessage}");
 
                 _logger.LogInformation("Successfully authenticated with Smint.io through system browser");
-
-                // we need nothing else
-
-                return new InitAuthenticationResultModel()
-                {
-                    Uuid = null,
-                    RedirectUrl = null
-                };
             }
             catch (Exception ex)
             {
@@ -110,13 +101,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
                 throw;
             }
-        }
-
-#pragma warning disable CS1998 // Bei der asynchronen Methode fehlen "await"-Operatoren. Die Methode wird synchron ausgeführt.
-        public override async Task FinalizeSmintIoAuthenticationAsync(string authorizationCode)
-#pragma warning restore CS1998 // Bei der asynchronen Methode fehlen "await"-Operatoren. Die Methode wird synchron ausgeführt.
-        {
-            // we need nothing else
         }
 
         private async Task<LoginResult> LoginAsync(string redirectUri, OidcClientOptions clientOptions)

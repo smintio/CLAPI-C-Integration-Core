@@ -19,7 +19,6 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using Microsoft.Extensions.Configuration;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl;
 using SmintIo.CLAPI.Consumer.Integration.Core.Jobs;
@@ -43,6 +42,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddHostedService<TimedSynchronizerService>();
             services.AddHostedService<PusherService>();
+
+            services.AddSingleton<ISmintIoAuthenticator, SmintIoAuthenticatorImpl>();
 
             Console.WriteLine("CLAPI-C Integration Core initialized successfully");
 

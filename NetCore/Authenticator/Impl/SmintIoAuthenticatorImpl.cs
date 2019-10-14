@@ -28,7 +28,7 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
-    public abstract class SmintIoAuthenticatorImpl : ISmintIoAuthenticator
+    public class SmintIoAuthenticatorImpl : ISmintIoAuthenticator
     {
         private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
         private readonly ITokenDatabaseProvider _tokenDatabaseProvider;
@@ -45,9 +45,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
             _logger = logger;
         }
-
-        public abstract Task<InitAuthenticationResultModel> InitSmintIoAuthenticationAsync();
-        public abstract Task FinalizeSmintIoAuthenticationAsync(string authorizationCode);
 
         public async Task RefreshSmintIoTokenAsync()
         {
