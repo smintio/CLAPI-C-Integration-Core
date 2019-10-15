@@ -20,12 +20,14 @@
 #endregion
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Xunit;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.UnitTests.Database.Models
 {
+    [ExcludeFromCodeCoverage]
     public class SettingsDatabaseModelTest
     {
         [Fact]
