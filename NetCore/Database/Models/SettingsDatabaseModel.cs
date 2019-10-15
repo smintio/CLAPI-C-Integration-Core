@@ -85,6 +85,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Models
 
             if (ChannelId == null)
                 throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.SmintIoIntegrationWrongState, "The channel ID is missing");
+
+            if (ChannelId <= 0)
+                throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.SmintIoIntegrationWrongState, $"The channel ID is invalid: {ChannelId}");
         }
     }
 }
