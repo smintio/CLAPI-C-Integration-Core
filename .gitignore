@@ -403,3 +403,12 @@ Desktop.ini
 /.metadata/
 /.settings/
 */.settings/
+
+
+# coverage files
+lcov.info
+lcov.cobertura.xml
+**/lcov.info
+**/lcov.cobertura.xml
+
+

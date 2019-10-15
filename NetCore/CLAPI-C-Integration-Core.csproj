@@ -100,4 +100,7 @@
     <CallTarget Targets="BuildDocs" />
   </Target>
   -->
+
+  <Target Name="Coverage"></Target>
+
 </Project>
