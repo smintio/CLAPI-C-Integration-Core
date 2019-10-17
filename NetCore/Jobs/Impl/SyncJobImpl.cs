@@ -199,9 +199,12 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             {
                 IList<SmintIoAsset> assets = null;
 
+                bool compoundAssetsSupported = _syncTarget.GetCapabilities().IsCompoundAssetsSupported();
+                bool binaryUpdatesSupported = _syncTarget.GetCapabilities().IsBinaryUpdatesSupported();
+
                 do
                 {
-                    (assets, continuationUuid) = await _smintIoClient.GetAssetsAsync(continuationUuid);
+                    (assets, continuationUuid) = await _smintIoClient.GetAssetsAsync(continuationUuid, compoundAssetsSupported, binaryUpdatesSupported);
 
                     if (assets != null && assets.Any())
                     {

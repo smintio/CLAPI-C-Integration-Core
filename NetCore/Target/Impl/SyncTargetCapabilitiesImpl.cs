@@ -39,5 +39,19 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
             return ((IList<SyncTargetCapabilitiesEnum>) Capabilities)
                 .Contains(SyncTargetCapabilitiesEnum.MultiLanguageEnum);
         }
+
+        /// <inheritdoc/>
+        public bool IsCompoundAssetsSupported()
+        {
+            return ((IList<SyncTargetCapabilitiesEnum>)Capabilities)
+                .Contains(SyncTargetCapabilitiesEnum.CompoundAssetsEnum);
+        }
+
+        /// <inheritdoc/>
+        public bool IsBinaryUpdatesSupported()
+        {
+            return ((IList<SyncTargetCapabilitiesEnum>)Capabilities)
+                .Contains(SyncTargetCapabilitiesEnum.BinaryUpdatesEnum);
+        }
     }
 }

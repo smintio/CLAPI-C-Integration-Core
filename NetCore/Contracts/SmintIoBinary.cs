@@ -35,8 +35,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
 
         public IDictionary<string, string> Usage { get; set; }
 
-        public string Category { get; set; }
-
         public string DownloadUrl { get; set; }
 
         public string RecommendedFileName { get; set; }

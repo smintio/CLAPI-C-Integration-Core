@@ -23,7 +23,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
 {
     public enum SyncTargetCapabilitiesEnum
     {
-            MultiLanguageEnum
+            MultiLanguageEnum,
+            CompoundAssetsEnum,
+            BinaryUpdatesEnum
     }
 
     public interface ISyncTargetCapabilities
@@ -54,5 +56,21 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         /// <remarks>The value should be calculated based on the provided <see cref="Capabilities"/>.
         /// </remarks>
         bool IsMultiLanguageSupported();
+
+        /// <summary>
+        /// Indicates whether compound assets are supported by this sync target implementation.
+        /// </summary>
+        ///
+        /// <remarks>The value should be calculated based on the provided <see cref="Capabilities"/>.
+        /// </remarks>
+        bool IsCompoundAssetsSupported();
+
+        /// <summary>
+        /// Indicates whether binary updates are supported by this sync target implementation.
+        /// </summary>
+        ///
+        /// <remarks>The value should be calculated based on the provided <see cref="Capabilities"/>.
+        /// </remarks>
+        bool IsBinaryUpdatesSupported();
     }
 }

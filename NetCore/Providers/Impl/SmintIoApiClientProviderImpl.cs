@@ -32,6 +32,7 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Contracts;
 using System.Net;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
+using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
 {
@@ -132,13 +133,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                 .ToList();
         }
 
-        public async Task<(IList<SmintIoAsset>, string)> GetAssetsAsync(string continuationUuid)
+        public async Task<(IList<SmintIoAsset>, string)> GetAssetsAsync(string continuationUuid, bool compoundAssetsSupported, bool binaryUpdatesSupported)
         {
             _logger.LogInformation("Receiving assets from Smint.io...");
 
             IList<SmintIoAsset> result;
 
-            (result, continuationUuid) = await LoadAssetsAsync(continuationUuid);
+            (result, continuationUuid) = await LoadAssetsAsync(continuationUuid, compoundAssetsSupported, binaryUpdatesSupported);
             
             _logger.LogInformation($"Received {result.Count()} assets from Smint.io");
 
@@ -190,7 +191,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     });
         }
 
-        private async Task<(IList<SmintIoAsset>, string)> LoadAssetsAsync(string continuationUuid)
+        private async Task<(IList<SmintIoAsset>, string)> LoadAssetsAsync(string continuationUuid, bool compoundAssetsSupported, bool binaryUpdatesSupported)
         {
             await SetupClapicOpenApiClientAsync();
 
@@ -292,7 +293,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     var syncBinaries =
                         await _clapicOpenApiClient.GetLicensePurchaseTransactionBinariesForSyncAsync(asset.CartPurchaseTransactionUuid, asset.LicensePurchaseTransactionUuid);
 
-                    asset.Binaries = GetBinaries(importLanguages, syncBinaries);
+                    asset.Binaries = GetBinaries(importLanguages, syncBinaries, compoundAssetsSupported, binaryUpdatesSupported);
 
                     assets.Add(asset);
                 }
@@ -301,12 +302,38 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             return (assets, syncLptQueryResult.Continuation_uuid);
         }
 
-        private List<SmintIoBinary> GetBinaries(string[] importLanguages, IList<SyncBinary> syncBinaries)
+        private List<SmintIoBinary> GetBinaries(string[] importLanguages, IList<SyncBinary> syncBinaries, bool compoundAssetsSupported, bool binaryUpdatesSupported)
         {
             List<SmintIoBinary> smintIoBinaries = new List<SmintIoBinary>();
 
+            if (syncBinaries.Count > 1)
+            {
+                // compound asset
+
+                if (!compoundAssetsSupported)
+                {
+                    throw new SmintIoSyncJobException(
+                       SmintIoSyncJobException.SyncJobError.Generic,
+                       "SyncTarget does not support compound assets!"
+                   );
+                }
+            }
+
             foreach (var syncBinary in syncBinaries)
             {
+                if (syncBinary.Version != null && syncBinary.Version > 1)
+                {
+                    // binary version update
+
+                    if (!binaryUpdatesSupported)
+                    {
+                        throw new SmintIoSyncJobException(
+                            SmintIoSyncJobException.SyncJobError.Generic,
+                            "SyncTarget does not support binary updates!"
+                        );
+                    }
+                }
+
                 smintIoBinaries.Add(new SmintIoBinary()
                 {
                     Uuid = syncBinary.Uuid,
