@@ -65,6 +65,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Integration-Core.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Configuration\" />
   </ItemGroup>
 
@@ -94,4 +100,7 @@
     <CallTarget Targets="BuildDocs" />
   </Target>
   -->
+
+  <Target Name="Coverage"></Target>
+
 </Project>

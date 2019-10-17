@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <Authors>Smint.io</Authors>
+    <RootNamespace>SmintIo.CLAPI.Consumer.Integration.Core.UnitTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="1.1.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.msbuild" Version="2.7.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="dotnet-reportgenerator-cli" Version="4.3.0" />
+    <DotNetCliToolReference Include="dotnet-reportgenerator-cli" Version="4.3.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.1.0" />
+    <PackageReference Include="moq" Version="4.13.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\NetCore\CLAPI-C-Integration-Core.csproj" />
+  </ItemGroup>
+
+
+  <PropertyGroup>
+    <TestRootPath>$([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))</TestRootPath>
+    <RepositoryRootPath>$([System.IO.Path]::GetDirectoryName($(TestRootPath)))</RepositoryRootPath>
+
+    <CoveragePath>$([System.IO.Path]::Combine($(MSBuildProjectDirectory), 'coverage'))</CoveragePath>
+    <CoverageLcovFile>$([System.IO.Path]::Combine($(RepositoryRootPath), 'lcov'))</CoverageLcovFile>
+    <CoverageCobertureFile>$([System.IO.Path]::Combine($(RepositoryRootPath), 'lcov.cobertura.xml'))</CoverageCobertureFile>
+    <CoverageReportsPath>$([System.IO.Path]::Combine($(CoveragePath), 'reports'))</CoverageReportsPath>
+    <CoverageReportHtmlPath>$([System.IO.Path]::Combine($(CoverageReportsPath), 'html'))</CoverageReportHtmlPath>
+  </PropertyGroup>
+
+  <Target Name="Coverage" AfterTargets="VSTest">
+    <Exec
+      Command="dotnet reportgenerator -reports:'$(CoverageCobertureFile)' -targetdir:$(CoverageReportHtmlPath) -reportTypes:htmlInline"
+      WorkingDirectory="$(MSBuildThisFileDirectory)"
+    />
+  </Target>
+
+</Project>

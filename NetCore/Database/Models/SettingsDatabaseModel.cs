@@ -23,6 +23,26 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Models
 {
+    /// <summary>
+    /// A data model to hold some data needed to synchronize assets and meta data between Smint.IO and external systems.
+    /// </summary>
+    /// <remarks>This data is needed to sync and its existence is checked:
+    /// <para>For authentication via OAuth with Smint.io:
+    ///   <list type="bullet">
+    ///     <item><see cref="ClientId"/> ... the user ID within Smint.io</item>
+    ///     <item><see cref="ClientSecret"/> ... the OAuth secret for the client to authenticate with Smint.io</item>
+    ///     <item><see cref="TenantId"/> ... the ID of the client's tenant within Smint.io</item>
+    ///     <item><see cref="RedirectUri"/> ... the URI to use as OAuth redirection when authenticating with Smint.io
+    ///     </item>
+    ///   </list>
+    /// </para>
+    /// <para>For a synchronization with Smint.io:
+    ///   <list type="bullet">
+    ///     <item><see cref="TenantId"/> ... the ID of the client's tenant to sync its assets</item>
+    ///     <item><see cref="ImportLanguages"/> ... which language to sync for meta data of assets</item>
+    ///   </list>
+    /// </para>
+    /// </remarks>
     public class SettingsDatabaseModel
     {
         public string TenantId { get; set; }
@@ -65,6 +85,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Models
 
             if (ChannelId == null)
                 throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.SmintIoIntegrationWrongState, "The channel ID is missing");
+
+            if (ChannelId <= 0)
+                throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.SmintIoIntegrationWrongState, $"The channel ID is invalid: {ChannelId}");
         }
     }
 }

@@ -1,0 +1,14 @@
+<Project>
+  <Choose>
+    <When Condition=" '$(Configuration)' == 'Debug'">
+      <PropertyGroup> 
+        <CollectCoverage>true</CollectCoverage>
+        <CoverletOutputFormat>cobertura,lcov</CoverletOutputFormat>
+
+        <!-- named just "lcov" in order to support some VStudio gutter plugins -->
+        <CoverletOutput>lcov</CoverletOutput>
+      </PropertyGroup>
+    </When>
+  </Choose>
+</Project>
+
