@@ -46,7 +46,7 @@
 
 
   <ItemGroup>
-    <PackageReference Include="IdentityModel.OidcClient" Version="2.9.1" />
+    <PackageReference Include="IdentityModel.OidcClient" Version="3.0.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
@@ -59,7 +59,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.2.0" />
     <PackageReference Include="Polly" Version="7.1.1" />
-    <PackageReference Include="PusherClient" Version="1.0.2" />
+    <PackageReference Include="PusherClient" Version="1.1.0" />
     <PackageReference Include="RestSharp" Version="106.6.10" />
     <PackageReference Include="SmintIo.CLAPI.Consumer.Client" Version="1.4.1" />
   </ItemGroup>
@@ -80,13 +80,13 @@
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
   <Target Name="BuildDocsAPI">
-    <Exec Command="docfx metadata $(DocFxApiDocuConfiguration)"/>
-    <Exec Command="docfx build $(DocFxApiDocuConfiguration) -o'$(DocFxApiDocuTargetOuput)'"/>
+    <Exec Command="docfx metadata $(DocFxApiDocuConfiguration)" />
+    <Exec Command="docfx build $(DocFxApiDocuConfiguration) -o'$(DocFxApiDocuTargetOuput)'" />
   </Target>
 
 
   <Target Name="BuildDocsGeneral">
-    <Exec Command="docfx build $(DocFxWebDocuConfiguration) -o'$(DocFxWebDocuTargetOuput)'"/>
+    <Exec Command="docfx build $(DocFxWebDocuConfiguration) -o'$(DocFxWebDocuTargetOuput)'" />
   </Target>
 
 

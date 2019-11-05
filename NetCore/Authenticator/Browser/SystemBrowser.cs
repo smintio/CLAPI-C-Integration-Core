@@ -30,6 +30,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Browser
@@ -70,7 +71,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Browser
             return port;
         }
 
-        public async Task<BrowserResult> InvokeAsync(BrowserOptions options)
+        public async Task<BrowserResult> InvokeAsync(BrowserOptions options, CancellationToken cancellationToken = default)
         {
             using (var listener = new LoopbackHttpListener(Port, _path))
             {
