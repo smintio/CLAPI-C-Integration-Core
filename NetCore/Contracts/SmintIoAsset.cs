@@ -27,6 +27,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
 {
     public class SmintIoAsset
     {
+        public string ContentElementUuid { get; set; }
+
         public string LicensePurchaseTransactionUuid { get; set; }
         public string CartPurchaseTransactionUuid { get; set; }
 

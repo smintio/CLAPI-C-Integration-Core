@@ -258,6 +258,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
 
                 var asset = new SmintIoAsset()
                 {
+                    ContentElementUuid = lpt.Content_element.Uuid,
                     LicensePurchaseTransactionUuid = lpt.Uuid,
                     CartPurchaseTransactionUuid = lpt.Cart_purchase_transaction_uuid,                    
                     State = lpt.State,
