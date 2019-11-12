@@ -74,7 +74,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
         public string SmintIoUrl { get; set; }
         
         public DateTimeOffset PurchasedAt { get; set; }
-        public DateTimeOffset? CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
 
         public DateTimeOffset? LastUpdatedAt { get; set; }
     }

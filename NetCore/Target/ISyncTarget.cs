@@ -23,10 +23,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SmintIo.CLAPI.Consumer.Integration.Core.Contracts;
 using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
+using SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
 {
-    public interface ISyncTarget
+    public interface ISyncTarget<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
+        where TSyncAsset : SyncAssetImpl<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
+        where TSyncLicenseOption : SyncLicenseOptionImpl
+        where TSyncLicenseTerm : SyncLicenseTermImpl
+        where TSyncReleaseDetails : SyncReleaseDetailsImpl
+        where TSyncDownloadConstraints : SyncDownloadConstraintsImpl
     {
         /// <summary>
         /// Provides information about features this sync target supports and thus is capable of.
@@ -78,25 +84,55 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         Task<bool> BeforeGenericMetadataSyncAsync();
 
         Task ImportContentProvidersAsync(IList<SmintIoMetadataElement> contentProviders);
+        Task<string> GetContentProviderKeyAsync(string provider);
 
         Task ImportContentTypesAsync(IList<SmintIoMetadataElement> contentTypes);
+        Task<string> GetContentTypeKeyAsync(string contentType);
+
         Task ImportBinaryTypesAsync(IList<SmintIoMetadataElement> binaryTypes);
+        Task<string> GetBinaryTypeKeyAsync(string binaryType);
 
         Task ImportContentCategoriesAsync(IList<SmintIoMetadataElement> contentCategories);
+        Task<string> GetContentCategoryKeyAsync(string contentCategory);
 
         Task ImportLicenseTypesAsync(IList<SmintIoMetadataElement> licenseTypes);
+        Task<string> GetLicenseTypeKeyAsync(string licenseType);
 
         Task ImportReleaseStatesAsync(IList<SmintIoMetadataElement> releaseStates);
+        Task<string> GetReleaseStateKeyAsync(string releaseState);
 
         Task ImportLicenseExclusivitiesAsync(IList<SmintIoMetadataElement> licenseExclusivities);
+        Task<string> GetLicenseExclusivityKeyAsync(string licenseExclusivity);
+
         Task ImportLicenseUsagesAsync(IList<SmintIoMetadataElement> licenseUsages);
+        Task<string> GetLicenseUsageKeyAsync(string licenseUsage);
+
         Task ImportLicenseSizesAsync(IList<SmintIoMetadataElement> licenseSizes);
+        Task<string> GetLicenseSizeKeyAsync(string licenseSize);
+
         Task ImportLicensePlacementsAsync(IList<SmintIoMetadataElement> licensePlacements);
+        Task<string> GetLicensePlacementKeyAsync(string licensePlacement);
+
         Task ImportLicenseDistributionsAsync(IList<SmintIoMetadataElement> licenseDistributions);
+        Task<string> GetLicenseDistributionKeyAsync(string licenseDistribution);
+
         Task ImportLicenseGeographiesAsync(IList<SmintIoMetadataElement> licenseGeographies);
+        Task<string> GetLicenseGeographyKeyAsync(string licenseGeography);
+
         Task ImportLicenseIndustriesAsync(IList<SmintIoMetadataElement> licenseIndustries);
+        Task<string> GetLicenseIndustryKeyAsync(string licenseIndustry);
+
         Task ImportLicenseLanguagesAsync(IList<SmintIoMetadataElement> licenseLanguages);
+        Task<string> GetLicenseLanguageKeyAsync(string licenseLanguage);
+
         Task ImportLicenseUsageLimitsAsync(IList<SmintIoMetadataElement> licenseUsageLimits);
+        Task<string> GetLicenseUsageLimitKeyAsync(string licenseLimit);
+
+        TSyncAsset CreateSyncAsset();
+        TSyncLicenseOption CreateSyncLicenseOption();
+        TSyncLicenseTerm CreateSyncLicenseTerm();
+        TSyncReleaseDetails CreateSyncReleaseDetails();
+        TSyncDownloadConstraints CreateSyncDownloadConstraints();
 
         /// <summary>
         /// After the synchronisation of all generic meta data this is called, before any syncing of assets with
@@ -133,7 +169,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         /// not executed.
         Task<bool> BeforeAssetsSyncAsync();
 
-        Task ImportAssetsAsync(string folderName, IList<SmintIoAsset> assets);
+        Task<string> GetTargetAssetUuidAsync(string assetUuid, string binaryUuid, bool isCompoundAsset);
+
+        Task CreateTargetAssetsAsync(string folderName, IList<TSyncAsset> newTargetAssets);
+        Task UpdateTargetAssetsAsync(string folderName, IList<TSyncAsset> updatedTargetAssets);
+
+        Task CreateTargetCompoundAssetsAsync(IList<TSyncAsset> newTargetCompoundAssets);
+        Task UpdateTargetCompoundAssetsAsync(IList<TSyncAsset> updatedTargetCompoundAssets);
 
         /// <summary>
         /// After the synchronisation of all assets with <see cref="ImportAssetsAsync"/> this is called, but before
@@ -177,3 +219,5 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         void ClearGenericMetadataCaches();
     }
 }
+
+

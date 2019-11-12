@@ -285,7 +285,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     HasLicenseTerms = hasLicenseTerms,
                     SmintIoUrl = url,
                     PurchasedAt = lpt.Purchased_at,
-                    CreatedAt = lpt.Created_at,
+                    CreatedAt = (DateTimeOffset)lpt.Created_at,
                     LastUpdatedAt = lpt.Last_updated_at ?? lpt.Created_at ?? DateTimeOffset.Now,
                 };
 

@@ -26,17 +26,23 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl;
 using SmintIo.CLAPI.Consumer.Integration.Core.Providers;
 using SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl;
 using SmintIo.CLAPI.Consumer.Integration.Core.Services;
+using SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl;
 using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class IntegrationCoreServiceCollectionExtensions
     {
-        public static IServiceCollection AddSmintIoClapicIntegrationCore(this IServiceCollection services)
+        public static IServiceCollection AddSmintIoClapicIntegrationCore<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>(this IServiceCollection services)
+            where TSyncAsset : SyncAssetImpl<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
+            where TSyncLicenseOption : SyncLicenseOptionImpl
+            where TSyncLicenseTerm : SyncLicenseTermImpl
+            where TSyncReleaseDetails : SyncReleaseDetailsImpl
+            where TSyncDownloadConstraints : SyncDownloadConstraintsImpl
         {            
             Console.WriteLine("Initializing CLAPI-C Integration Core...");
 
-            services.AddSingleton<ISyncJob, SyncJobImpl>();
+            services.AddSingleton<ISyncJob, SyncJobImpl<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>>();
 
             services.AddSingleton<ISmintIoApiClientProvider, SmintIoApiClientProviderImpl>();            
 
