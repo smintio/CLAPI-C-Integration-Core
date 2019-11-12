@@ -313,6 +313,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                     targetAsset.SetFindAgainFileUuid($"{rawAsset.LicensePurchaseTransactionUuid}_{binary.Uuid}");
 
+                    targetAsset.SetMimeType(binary.MimeType);
                     targetAsset.SetRecommendedFileName(recommendedFileName);
 
                     targetAsset.SetDownloadUrl(downloadUrl);

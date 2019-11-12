@@ -344,6 +344,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     Description = GetValuesForImportLanguages(importLanguages, syncBinary.Description),
                     Usage = GetValuesForImportLanguages(importLanguages, syncBinary.Usage),
                     DownloadUrl = syncBinary.Download_url,
+                    MimeType = syncBinary.Content_type,
                     RecommendedFileName = syncBinary.Recommended_file_name,
                     Culture = syncBinary.Culture,
                     Version = syncBinary.Version ?? 1

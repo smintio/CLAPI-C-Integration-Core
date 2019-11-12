@@ -37,6 +37,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
 
         public string DownloadUrl { get; set; }
 
+        public string MimeType { get; set; }
         public string RecommendedFileName { get; set; }
         
         public string Culture { get; set; }

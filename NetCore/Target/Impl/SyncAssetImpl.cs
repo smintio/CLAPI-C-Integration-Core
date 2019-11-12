@@ -10,28 +10,29 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         where TSyncReleaseDetails : SyncReleaseDetailsImpl
         where TSyncDownloadConstraints : SyncDownloadConstraintsImpl
     {
-        public string Uuid { get; protected set; }
+        public string Uuid { get; set; }
 
-        public string TargetAssetUuid { get; protected set; }
+        public string TargetAssetUuid { get; set; }
 
-        public IDictionary<string, string> Name { get; protected set; }
+        public IDictionary<string, string> Name { get; set; }
 
-        public string BinaryUuid { get; protected set; }
-        public int BinaryVersion { get; protected set; }
+        public string BinaryUuid { get; set; }
+        public int BinaryVersion { get; set; }
 
-        public IDictionary<string, string> BinaryUsage { get; protected set; }
+        public IDictionary<string, string> BinaryUsage { get; set; }
 
-        public string RecommendedFileName { get; protected set; }
+        public string MimeType { get; set; }
+        public string RecommendedFileName { get; set; }
 
-        public string DownloadUrl { get; protected set; }
+        public string DownloadUrl { get; set; }
 
         public string LocalFileName { get; set; }
 
-        public bool IsCompoundAsset { get; protected set; }
+        public bool IsCompoundAsset { get; set; }
 
-        public IList<TSyncAsset> AssetParts { get; protected set; }
+        public IList<TSyncAsset> AssetParts { get; set; }
 
-        public string FindAgainFileUuid { get; protected set; }
+        public string FindAgainFileUuid { get; set; }
 
         public SyncAssetImpl()
         {
@@ -79,6 +80,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
             BinaryUsage = binaryUsage;
 
             SetBinaryUsage(binaryUsage);
+        }
+
+        public void SetMimeType(string mimeType)
+        {
+            MimeType = mimeType;
         }
 
         public void SetRecommendedFileName(string recommendedFileName)
