@@ -21,7 +21,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 
         public IDictionary<string, string> BinaryUsage { get; set; }
 
-        public string MimeType { get; set; }
         public string RecommendedFileName { get; set; }
 
         public string DownloadUrl { get; set; }
@@ -80,11 +79,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
             BinaryUsage = binaryUsage;
 
             SetBinaryUsage(binaryUsage);
-        }
-
-        public void SetMimeType(string mimeType)
-        {
-            MimeType = mimeType;
         }
 
         public void SetRecommendedFileName(string recommendedFileName)
