@@ -29,6 +29,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers
     {
         Task<SmintIoGenericMetadata> GetGenericMetadataAsync();
 
-        Task<(IList<SmintIoAsset>, string)> GetAssetsAsync(string continuationUuid, bool compoundAssetsSupported, bool binaryUpdatesSupported);
+        Task<(IList<SmintIoAsset>, string, bool)> GetAssetsAsync(string continuationUuid, bool compoundAssetsSupported, bool binaryUpdatesSupported);
     }
 }

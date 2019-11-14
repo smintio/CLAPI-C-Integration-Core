@@ -133,17 +133,18 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                 .ToList();
         }
 
-        public async Task<(IList<SmintIoAsset>, string)> GetAssetsAsync(string continuationUuid, bool compoundAssetsSupported, bool binaryUpdatesSupported)
+        public async Task<(IList<SmintIoAsset>, string, bool)> GetAssetsAsync(string continuationUuid, bool compoundAssetsSupported, bool binaryUpdatesSupported)
         {
             _logger.LogInformation("Receiving assets from Smint.io...");
 
             IList<SmintIoAsset> result;
+            bool hasAssets;
 
-            (result, continuationUuid) = await LoadAssetsAsync(continuationUuid, compoundAssetsSupported, binaryUpdatesSupported);
+            (result, continuationUuid, hasAssets) = await LoadAssetsAsync(continuationUuid, compoundAssetsSupported, binaryUpdatesSupported);
             
             _logger.LogInformation($"Received {result.Count()} assets from Smint.io");
 
-            return (result, continuationUuid);
+            return (result, continuationUuid, hasAssets);
         }
 
         public void Dispose()
@@ -191,7 +192,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     });
         }
 
-        private async Task<(IList<SmintIoAsset>, string)> LoadAssetsAsync(string continuationUuid, bool compoundAssetsSupported, bool binaryUpdatesSupported)
+        private async Task<(IList<SmintIoAsset>, string, bool)> LoadAssetsAsync(string continuationUuid, bool compoundAssetsSupported, bool binaryUpdatesSupported)
         {
             await SetupClapicOpenApiClientAsync();
 
@@ -208,8 +209,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
 
             if (syncLptQueryResult.Count == 0)
             {
-                return (assets, syncLptQueryResult.Continuation_uuid);
+                return (assets, syncLptQueryResult.Continuation_uuid, false);
             }
+
+            bool hasAssets = false;
 
             foreach (var lpt in syncLptQueryResult.License_purchase_transactions)
             {
@@ -289,6 +292,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     LastUpdatedAt = lpt.Last_updated_at ?? lpt.Created_at ?? DateTimeOffset.Now,
                 };
 
+                // we need to store this separately because list will be empty if all assets of the batch have Can_be_synced == false
+
+                hasAssets = true;
+
                 if (lpt.Can_be_synced ?? false)
                 {
                     var syncBinaries =
@@ -300,7 +307,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                 }
             }
 
-            return (assets, syncLptQueryResult.Continuation_uuid);
+            return (assets, syncLptQueryResult.Continuation_uuid, hasAssets);
         }
 
         private List<SmintIoBinary> GetBinaries(string[] importLanguages, IList<SyncBinary> syncBinaries, bool compoundAssetsSupported, bool binaryUpdatesSupported)

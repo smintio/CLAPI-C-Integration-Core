@@ -204,13 +204,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             try
             {
                 IList<SmintIoAsset> rawAssets = null;
+                bool hasAssets;
 
                 bool compoundAssetsSupported = _syncTarget.GetCapabilities().IsCompoundAssetsSupported();
                 bool binaryUpdatesSupported = _syncTarget.GetCapabilities().IsBinaryUpdatesSupported();
 
                 do
                 {
-                    (rawAssets, continuationUuid) = await _smintIoClient.GetAssetsAsync(continuationUuid, compoundAssetsSupported, binaryUpdatesSupported);
+                    (rawAssets, continuationUuid, hasAssets) = await _smintIoClient.GetAssetsAsync(continuationUuid, compoundAssetsSupported, binaryUpdatesSupported);
 
                     if (rawAssets != null && rawAssets.Any())
                     {
@@ -276,7 +277,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                     }
 
                     _logger.LogInformation($"Synchronized {rawAssets.Count()} Smint.io assets");
-                } while (rawAssets != null && rawAssets.Any());
+                } while (hasAssets);
 
                 _logger.LogInformation("Finished Smint.io asset synchronization");
 
