@@ -31,7 +31,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 
         public IList<TSyncAsset> AssetParts { get; set; }
 
-        public string FindAgainFileUuid { get; set; }
+        public string WorldwideUniqueBinaryUuid { get => $"{Uuid}_{BinaryUuid}"; }
 
         public SyncAssetImpl()
         {
@@ -41,11 +41,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         public void SetUuid(string uuid)
         {
             Uuid = uuid;
-        }
-
-        public void SetFindAgainFileUuid(string findAgainFileUuid)
-        {
-            FindAgainFileUuid = findAgainFileUuid;
         }
 
         public void SetTargetAssetUuid(string targetAssetUuid)
