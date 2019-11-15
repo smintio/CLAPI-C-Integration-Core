@@ -226,13 +226,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                         foreach (var targetAsset in targetAssets)
                         {
-                            string targetAssetUuid = await _syncTarget.GetTargetAssetUuidAsync(targetAsset.Uuid, targetAsset.BinaryUuid, targetAsset.IsCompoundAsset);
-
                             if (targetAsset.IsCompoundAsset)
                             {
-                                if (!string.IsNullOrEmpty(targetAssetUuid))
+                                string targetCompoundAssetUuid = await _syncTarget.GetTargetCompoundAssetUuidAsync(targetAsset.Uuid);
+
+                                if (!string.IsNullOrEmpty(targetCompoundAssetUuid))
                                 {
-                                    targetAsset.SetTargetAssetUuid(targetAssetUuid);
+                                    targetAsset.SetTargetAssetUuid(targetCompoundAssetUuid);
 
                                     updatedTargetCompoundAssets.Add(targetAsset);
                                 }
@@ -243,6 +243,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                             }
                             else
                             {
+                                string targetAssetUuid = await _syncTarget.GetTargetAssetBinaryUuidAsync(targetAsset.Uuid, targetAsset.BinaryUuid);
+
                                 if (!string.IsNullOrEmpty(targetAssetUuid))
                                 {
                                     targetAsset.SetTargetAssetUuid(targetAssetUuid);
