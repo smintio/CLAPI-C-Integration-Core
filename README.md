@@ -1,5 +1,5 @@
-CLAPI-C-Integration-Core
-========================
+Smint.io CLAPI-C .NET Core integration core library
+===================================================
 
 The Smint.io Content Licensing Consumer Integration Core package provides a
 common codebase for integration to
