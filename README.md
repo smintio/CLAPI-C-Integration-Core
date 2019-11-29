@@ -7,6 +7,8 @@ common codebase for integration to
 Web2Print, WCM or other systems, written in .NET Core.
 
 
+Current version is: 1.0.0
+
 
 Implemented features
 --------------------
