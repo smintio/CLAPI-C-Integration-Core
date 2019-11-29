@@ -10,6 +10,20 @@ Web2Print, WCM or other systems, written in .NET Core.
 Current version is: 1.0.0
 
 
+Requirements
+------------
+
+### *Smint.io Content Licensing Consumer API library* - add credentials to load the library
+
+This library depends on the *Smint.io Content Licensing Consumer API library ("CLAPI-C")*, that will handle
+all connection to the RESTful Smint.io API. Access to the *CLAPI-C* library is
+restricted. Get in contact with [Smint.io](https://www.smint.io) and request
+access. You will need to sign an NDA first.
+
+You will need an account with Microsoft Visual Studio cloud offerings, as
+the CLAPI-C library is hosted there.
+
+
 Implemented features
 --------------------
 
