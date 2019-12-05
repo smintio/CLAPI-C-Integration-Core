@@ -34,11 +34,11 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class IntegrationCoreServiceCollectionExtensions
     {
         public static IServiceCollection AddSmintIoClapicIntegrationCore<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>(this IServiceCollection services)
-            where TSyncAsset : SyncAssetImpl<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-            where TSyncLicenseOption : SyncLicenseOptionImpl
-            where TSyncLicenseTerm : SyncLicenseTermImpl
-            where TSyncReleaseDetails : SyncReleaseDetailsImpl
-            where TSyncDownloadConstraints : SyncDownloadConstraintsImpl
+            where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
+            where TSyncLicenseOption : BaseSyncLicenseOption
+            where TSyncLicenseTerm : BaseSyncLicenseTerm
+            where TSyncReleaseDetails : BaseSyncReleaseDetails
+            where TSyncDownloadConstraints : BaseSyncDownloadConstraints
         {            
             Console.WriteLine("Initializing CLAPI-C Integration Core...");
 

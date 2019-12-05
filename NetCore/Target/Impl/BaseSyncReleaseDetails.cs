@@ -2,7 +2,7 @@
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 {
-    public abstract class SyncReleaseDetailsImpl : ISyncReleaseDetails
+    public abstract class BaseSyncReleaseDetails
     {
         public abstract void SetModelReleaseState(string modelReleaseStateKey);
         public abstract void SetPropertyReleaseState(string propertyReleaseStateKey);

@@ -28,17 +28,17 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl;
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
 {
     public interface ISyncTarget<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncAsset : SyncAssetImpl<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncLicenseOption : SyncLicenseOptionImpl
-        where TSyncLicenseTerm : SyncLicenseTermImpl
-        where TSyncReleaseDetails : SyncReleaseDetailsImpl
-        where TSyncDownloadConstraints : SyncDownloadConstraintsImpl
+        where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
+        where TSyncLicenseOption : BaseSyncLicenseOption
+        where TSyncLicenseTerm : BaseSyncLicenseTerm
+        where TSyncReleaseDetails : BaseSyncReleaseDetails
+        where TSyncDownloadConstraints : BaseSyncDownloadConstraints
     {
         /// <summary>
         /// Provides information about features this sync target supports and thus is capable of.
         /// </summary>
         /// <returns>Must not return <c>null</c> but always a valid instance!</returns>
-        ISyncTargetCapabilities GetCapabilities();
+        BaseSyncTargetCapabilities GetCapabilities();
 
         /// <summary>
         /// A hook to be called before any synchronisation is started in this turn.
@@ -84,49 +84,49 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         Task<bool> BeforeGenericMetadataSyncAsync();
 
         Task ImportContentProvidersAsync(IList<SmintIoMetadataElement> contentProviders);
-        Task<string> GetContentProviderKeyAsync(string provider);
+        Task<Dictionary<string, string>> GetContentProviderKeyMappingsAsync();
 
         Task ImportContentTypesAsync(IList<SmintIoMetadataElement> contentTypes);
-        Task<string> GetContentTypeKeyAsync(string contentType);
+        Task<Dictionary<string, string>> GetContentTypeKeyMappingsAsync();
 
         Task ImportBinaryTypesAsync(IList<SmintIoMetadataElement> binaryTypes);
-        Task<string> GetBinaryTypeKeyAsync(string binaryType);
+        Task<Dictionary<string, string>> GetBinaryTypeKeyMappingsAsync();
 
         Task ImportContentCategoriesAsync(IList<SmintIoMetadataElement> contentCategories);
-        Task<string> GetContentCategoryKeyAsync(string contentCategory);
+        Task<Dictionary<string, string>> GetContentCategoryKeyMappingsAsync();
 
         Task ImportLicenseTypesAsync(IList<SmintIoMetadataElement> licenseTypes);
-        Task<string> GetLicenseTypeKeyAsync(string licenseType);
+        Task<Dictionary<string, string>> GetLicenseTypeKeyMappingsAsync();
 
         Task ImportReleaseStatesAsync(IList<SmintIoMetadataElement> releaseStates);
-        Task<string> GetReleaseStateKeyAsync(string releaseState);
+        Task<Dictionary<string, string>> GetReleaseStateKeyMappingsAsync();
 
         Task ImportLicenseExclusivitiesAsync(IList<SmintIoMetadataElement> licenseExclusivities);
-        Task<string> GetLicenseExclusivityKeyAsync(string licenseExclusivity);
+        Task<Dictionary<string, string>> GetLicenseExclusivityKeyMappingsAsync();
 
         Task ImportLicenseUsagesAsync(IList<SmintIoMetadataElement> licenseUsages);
-        Task<string> GetLicenseUsageKeyAsync(string licenseUsage);
+        Task<Dictionary<string, string>> GetLicenseUsageKeyMappingsAsync();
 
         Task ImportLicenseSizesAsync(IList<SmintIoMetadataElement> licenseSizes);
-        Task<string> GetLicenseSizeKeyAsync(string licenseSize);
+        Task<Dictionary<string, string>> GetLicenseSizeKeyMappingsAsync();
 
         Task ImportLicensePlacementsAsync(IList<SmintIoMetadataElement> licensePlacements);
-        Task<string> GetLicensePlacementKeyAsync(string licensePlacement);
+        Task<Dictionary<string, string>> GetLicensePlacementKeyMappingsAsync();
 
         Task ImportLicenseDistributionsAsync(IList<SmintIoMetadataElement> licenseDistributions);
-        Task<string> GetLicenseDistributionKeyAsync(string licenseDistribution);
+        Task<Dictionary<string, string>> GetLicenseDistributionKeyMappingsAsync();
 
         Task ImportLicenseGeographiesAsync(IList<SmintIoMetadataElement> licenseGeographies);
-        Task<string> GetLicenseGeographyKeyAsync(string licenseGeography);
+        Task<Dictionary<string, string>> GetLicenseGeographyKeyMappingsAsync();
 
         Task ImportLicenseIndustriesAsync(IList<SmintIoMetadataElement> licenseIndustries);
-        Task<string> GetLicenseIndustryKeyAsync(string licenseIndustry);
+        Task<Dictionary<string, string>> GetLicenseIndustryKeyMappingsAsync();
 
         Task ImportLicenseLanguagesAsync(IList<SmintIoMetadataElement> licenseLanguages);
-        Task<string> GetLicenseLanguageKeyAsync(string licenseLanguage);
+        Task<Dictionary<string, string>> GetLicenseLanguageKeyMappingsAsync();
 
         Task ImportLicenseUsageLimitsAsync(IList<SmintIoMetadataElement> licenseUsageLimits);
-        Task<string> GetLicenseUsageLimitKeyAsync(string licenseLimit);
+        Task<Dictionary<string, string>> GetLicenseUsageLimitKeyMappingsAsync();
 
         TSyncAsset CreateSyncAsset();
         TSyncLicenseOption CreateSyncLicenseOption();
@@ -197,27 +197,12 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         /// A hook to be called after all synchronisation took place.
         /// </summary>
         ///
-        /// <remarks>After all synchronisation took place, some clean-up might be necessary, besides <c>ClearGenericMetadataCaches</c>
-        /// (see <see cref="ClearGenericMetadataCaches"/>). The task returned by this hook is executed after all synchronisation has
-        /// ended - no matter whether successfully or not - but <i>before</i> <see cref="ClearGenericMetadataCaches"/> is called. 
-        /// So the running task still has access to all the created caches.
+        /// <remarks>After all synchronisation took place, some clean-up might be necessary). The task returned by this hook is 
+        /// executed after all synchronisation has ended - no matter whether successfully or not.
         /// </remarks>
         /// <exception cref="Exception">Any such exception is being caught and ignored. The task does not need to take
         /// special care.</exception>
         Task AfterSyncAsync();
-
-        /// <summary>
-        /// Clears all cached generic meta data.
-        /// </summary>
-        ///
-        /// <remarks>During synchronisation of license information, asset types, release states and content categories,
-        /// a lot of meta data is usually cached locally to avoid multiple remote lookups. This speeds-up the
-        /// synchronisation of these meta data items. But before synchronisation of content takes place and at the end
-        /// of each synchronisation process, this cache is cleared. In the former case it will guarantee a fresh start
-        /// and will avoid any errors due to failure in meta data sync process. The latter releases all memory
-        /// consumed by the cache.
-        /// </remarks>
-        void ClearGenericMetadataCaches();
     }
 }
 

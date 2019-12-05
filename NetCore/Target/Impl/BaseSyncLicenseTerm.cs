@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 {
-    public abstract class SyncLicenseTermImpl : ISyncLicenseTerm
+    public abstract class BaseSyncLicenseTerm
     {
         public abstract void SetName(IDictionary<string, string> name);
 

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 {
-    public abstract class SyncAssetImpl<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> : ISyncAsset<TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncAsset : ISyncAsset<TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncLicenseOption : SyncLicenseOptionImpl
-        where TSyncLicenseTerm : SyncLicenseTermImpl
-        where TSyncReleaseDetails : SyncReleaseDetailsImpl
-        where TSyncDownloadConstraints : SyncDownloadConstraintsImpl
+    public abstract class BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
+        where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
+        where TSyncLicenseOption : BaseSyncLicenseOption
+        where TSyncLicenseTerm : BaseSyncLicenseTerm
+        where TSyncReleaseDetails : BaseSyncReleaseDetails
+        where TSyncDownloadConstraints : BaseSyncDownloadConstraints
     {
-        public string Uuid { get; set; }
+        internal string Uuid { get; set; }
 
         public string TargetAssetUuid { get; set; }
 
@@ -33,17 +33,19 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 
         public string WorldwideUniqueBinaryUuid { get => $"{Uuid}_{BinaryUuid}"; }
 
-        public SyncAssetImpl()
+        public BaseSyncAsset()
         {
             IsCompoundAsset = false;
         }
 
-        public void SetUuid(string uuid)
+        internal void SetUuid(string uuid)
         {
             Uuid = uuid;
+
+            SetTransactionUuid(uuid);
         }
 
-        public void SetTargetAssetUuid(string targetAssetUuid)
+        internal void SetTargetAssetUuid(string targetAssetUuid)
         {
             TargetAssetUuid = targetAssetUuid;
         }
@@ -76,22 +78,24 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
             SetBinaryUsage(binaryUsage);
         }
 
-        public void SetRecommendedFileName(string recommendedFileName)
+        internal void SetRecommendedFileName(string recommendedFileName)
         {
             RecommendedFileName = recommendedFileName;
         }
 
-        public void SetDownloadUrl(string downloadUrl)
+        internal void SetDownloadUrl(string downloadUrl)
         {
             DownloadUrl = downloadUrl;
         }
 
-        public void SetAssetParts(IList<TSyncAsset> assetParts)
+        internal void SetAssetParts(IList<TSyncAsset> assetParts)
         {
             IsCompoundAsset = assetParts != null ? AssetParts.Count > 0 : false;
 
             AssetParts = assetParts;
         }
+
+        public abstract void SetTransactionUuid(string transactionUuid);
 
         public abstract void SetContentElementUuid(string contentElementUuid);
 
@@ -108,8 +112,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         public abstract void SetLastUpdatedAt(DateTimeOffset lastUpdatedAt);
         public abstract void SetPurchasedAt(DateTimeOffset purchasedAt);
 
-        public abstract void SetCartPurchaseTransactionUuid(string cartPurchaseTransactionUuid);
-        public abstract void SetLicensePurchaseTransactionUuid(string licensePurchaseTransactionUuid);
+        public abstract void SetCartUuid(string cartUuid);
 
         public abstract void SetHasBeenCancelled(bool hasBeenCancelled);
 

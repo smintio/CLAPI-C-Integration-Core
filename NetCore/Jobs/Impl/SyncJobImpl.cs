@@ -37,11 +37,11 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl;
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 {
     internal class SyncJobImpl<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> : ISyncJob
-        where TSyncAsset : SyncAssetImpl<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncLicenseOption : SyncLicenseOptionImpl
-        where TSyncLicenseTerm : SyncLicenseTermImpl
-        where TSyncReleaseDetails : SyncReleaseDetailsImpl
-        where TSyncDownloadConstraints : SyncDownloadConstraintsImpl
+        where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
+        where TSyncLicenseOption : BaseSyncLicenseOption
+        where TSyncLicenseTerm : BaseSyncLicenseTerm
+        where TSyncReleaseDetails : BaseSyncReleaseDetails
+        where TSyncDownloadConstraints : BaseSyncDownloadConstraints
     {
         private const string Folder = "temp";
 
@@ -56,6 +56,26 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
         private readonly ISyncTarget<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> _syncTarget;
 
         private readonly ILogger _logger;
+
+        private Dictionary<string, string> _contentProviderCache;
+
+        private Dictionary<string, string> _contentTypeCache;
+        private Dictionary<string, string> _binaryTypeCache;
+
+        private Dictionary<string, string> _contentCategoryCache;
+
+        private Dictionary<string, string> _licenseTypeCache;
+        private Dictionary<string, string> _releaseStateCache;
+
+        private Dictionary<string, string> _licenseExclusivityCache;
+        private Dictionary<string, string> _licenseUsageCache;
+        private Dictionary<string, string> _licenseSizeCache;
+        private Dictionary<string, string> _licensePlacementCache;
+        private Dictionary<string, string> _licenseDistributionCache;
+        private Dictionary<string, string> _licenseGeographyCache;
+        private Dictionary<string, string> _licenseIndustryCache;
+        private Dictionary<string, string> _licenseLanguageCache;
+        private Dictionary<string, string> _licenseUsageLimitCache;
 
         public SyncJobImpl(
             ISettingsDatabaseProvider settingsDatabaseProvider,
@@ -176,7 +196,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             await _syncTarget.AfterGenericMetadataSyncAsync();
 
-            _syncTarget.ClearGenericMetadataCaches();
+            ClearGenericMetadataCaches();
 
             _logger.LogInformation("Finished Smint.io generic metadata synchronization");
         }
@@ -285,7 +305,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                 await _syncTarget.AfterAssetsSyncAsync();
 
-                _syncTarget.ClearGenericMetadataCaches();
+                ClearGenericMetadataCaches();
             }
             finally
             {
@@ -352,19 +372,19 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
         {
             var contentTypeString = !string.IsNullOrEmpty(binary?.ContentType) ? binary.ContentType : rawAsset.ContentType;
 
+            targetAsset.SetTransactionUuid(rawAsset.LicensePurchaseTransactionUuid);
             targetAsset.SetContentElementUuid(rawAsset.ContentElementUuid);
-            targetAsset.SetContentProvider(await _syncTarget.GetContentProviderKeyAsync(rawAsset.Provider));
-            targetAsset.SetContentType(await _syncTarget.GetContentTypeKeyAsync(contentTypeString));
-            targetAsset.SetContentCategory(await _syncTarget.GetContentCategoryKeyAsync(rawAsset.Category));
+            targetAsset.SetContentProvider(await GetContentProviderKeyAsync(rawAsset.Provider));
+            targetAsset.SetContentType(await GetContentTypeKeyAsync(contentTypeString));
+            targetAsset.SetContentCategory(await GetContentCategoryKeyAsync(rawAsset.Category));
             targetAsset.SetSmintIoUrl(rawAsset.SmintIoUrl);
             targetAsset.SetPurchasedAt(rawAsset.PurchasedAt);
             targetAsset.SetCreatedAt(rawAsset.CreatedAt);
-            targetAsset.SetCartPurchaseTransactionUuid(rawAsset.CartPurchaseTransactionUuid);
-            targetAsset.SetLicensePurchaseTransactionUuid(rawAsset.LicensePurchaseTransactionUuid);
+            targetAsset.SetCartUuid(rawAsset.CartPurchaseTransactionUuid);
             targetAsset.SetHasBeenCancelled(rawAsset.State == Client.Generated.LicensePurchaseTransactionStateEnum.Cancelled);
 
             if (!string.IsNullOrEmpty(binary?.BinaryType))
-                targetAsset.SetBinaryType(await _syncTarget.GetBinaryTypeKeyAsync(binary.BinaryType));
+                targetAsset.SetBinaryType(await GetBinaryTypeKeyAsync(binary.BinaryType));
 
             if (rawAsset.LastUpdatedAt != null)
                 targetAsset.SetLastUpdatedAt((DateTimeOffset)rawAsset.LastUpdatedAt);
@@ -414,7 +434,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private async Task SetLicenseMetadataAsync(TSyncAsset targetAsset, SmintIoAsset rawAsset)
         {
-            targetAsset.SetLicenseType(await _syncTarget.GetLicenseTypeKeyAsync(rawAsset.LicenseType));
+            targetAsset.SetLicenseType(await GetLicenseTypeKeyAsync(rawAsset.LicenseType));
 
             targetAsset.SetLicenseeUuid(rawAsset.LicenseeUuid);
             targetAsset.SetLicenseeName(rawAsset.LicenseeName);
@@ -454,11 +474,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                 string modelReleaseState = null;
                 if (!string.IsNullOrEmpty(rawReleaseDetails.ModelReleaseState))
-                    modelReleaseState = await _syncTarget.GetReleaseStateKeyAsync(rawReleaseDetails.ModelReleaseState);
+                    modelReleaseState = await GetReleaseStateKeyAsync(rawReleaseDetails.ModelReleaseState);
 
                 string propertyReleaseState = null;
                 if (!string.IsNullOrEmpty(rawReleaseDetails.PropertyReleaseState))
-                    propertyReleaseState = await _syncTarget.GetReleaseStateKeyAsync(rawReleaseDetails.PropertyReleaseState);
+                    propertyReleaseState = await GetReleaseStateKeyAsync(rawReleaseDetails.PropertyReleaseState);
 
                 if (!string.IsNullOrEmpty(modelReleaseState))
                     targetReleaseDetails.SetModelReleaseState(modelReleaseState);
@@ -605,6 +625,138 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             return targetLicenseTerms;
         }
 
+        public async Task<string> GetContentProviderKeyAsync(string smintIoKey)
+        {
+            if (_contentProviderCache != null && _contentProviderCache.ContainsKey(smintIoKey))
+
+                if (_contentProviderCache == null)
+                    _contentProviderCache = await _syncTarget.GetContentProviderKeyMappingsAsync();
+
+            if (_contentProviderCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io content provider key mappings!"
+                 );
+
+            if (_contentProviderCache.ContainsKey(smintIoKey))
+                return _contentProviderCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io content provider key {smintIoKey}!"
+                 );
+        }
+
+        public async Task<string> GetContentTypeKeyAsync(string smintIoKey)
+        {
+            if (_contentTypeCache != null && _contentTypeCache.ContainsKey(smintIoKey))
+
+                if (_contentTypeCache == null)
+                    _contentTypeCache = await _syncTarget.GetContentTypeKeyMappingsAsync();
+
+            if (_contentTypeCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io content type key mappings!"
+                 );
+
+            if (_contentTypeCache.ContainsKey(smintIoKey))
+                return _contentTypeCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io content type key {smintIoKey}!"
+                 );
+        }
+
+        public async Task<string> GetContentCategoryKeyAsync(string smintIoKey)
+        {
+            if (_contentCategoryCache != null && _contentCategoryCache.ContainsKey(smintIoKey))
+
+                if (_contentCategoryCache == null)
+                    _contentCategoryCache = await _syncTarget.GetContentCategoryKeyMappingsAsync();
+
+            if (_contentCategoryCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io content category key mappings!"
+                 );
+
+            if (_contentCategoryCache.ContainsKey(smintIoKey))
+                return _contentCategoryCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io content category key {smintIoKey}!"
+                 );
+        }
+
+        public async Task<string> GetBinaryTypeKeyAsync(string smintIoKey)
+        {
+            if (_binaryTypeCache != null && _binaryTypeCache.ContainsKey(smintIoKey))
+
+                if (_binaryTypeCache == null)
+                    _binaryTypeCache = await _syncTarget.GetBinaryTypeKeyMappingsAsync();
+
+            if (_binaryTypeCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io binary type key mappings!"
+                 );
+
+            if (_binaryTypeCache.ContainsKey(smintIoKey))
+                return _binaryTypeCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io binary type key {smintIoKey}!"
+                 );
+        }
+
+        public async Task<string> GetLicenseTypeKeyAsync(string smintIoKey)
+        {
+            if (_licenseTypeCache != null && _licenseTypeCache.ContainsKey(smintIoKey))
+
+                if (_licenseTypeCache == null)
+                    _licenseTypeCache = await _syncTarget.GetLicenseTypeKeyMappingsAsync();
+
+            if (_licenseTypeCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io license type key mappings!"
+                 );
+
+            if (_licenseTypeCache.ContainsKey(smintIoKey))
+                return _licenseTypeCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io license type key {smintIoKey}!"
+                 );
+        }
+
+        public async Task<string> GetReleaseStateKeyAsync(string smintIoKey)
+        {
+            if (_releaseStateCache != null && _releaseStateCache.ContainsKey(smintIoKey))
+
+                if (_releaseStateCache == null)
+                    _releaseStateCache = await _syncTarget.GetReleaseStateKeyMappingsAsync();
+
+            if (_releaseStateCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io release state key mappings!"
+                 );
+
+            if (_releaseStateCache.ContainsKey(smintIoKey))
+                return _releaseStateCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io release state key {smintIoKey}!"
+                 );
+        }
+
         private async Task<IList<string>> GetLicenseExclusivitiesKeysAsync(IList<string> smintIoKeys)
         {
             if (smintIoKeys == null || !smintIoKeys.Any())
@@ -614,10 +766,32 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await _syncTarget.GetLicenseExclusivityKeyAsync(smintIoKey));
+                targetKeys.Add(await GetLicenseExclusivityKeyAsync(smintIoKey));
             }
 
             return targetKeys;
+        }
+
+        public async Task<string> GetLicenseExclusivityKeyAsync(string smintIoKey)
+        {
+            if (_licenseExclusivityCache != null && _licenseExclusivityCache.ContainsKey(smintIoKey))
+
+                if (_licenseExclusivityCache == null)
+                    _licenseExclusivityCache = await _syncTarget.GetLicenseExclusivityKeyMappingsAsync();
+
+            if (_licenseExclusivityCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io license exclusivity key mappings!"
+                 );
+
+            if (_licenseExclusivityCache.ContainsKey(smintIoKey))
+                return _licenseExclusivityCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io license exclusivity key {smintIoKey}!"
+                 );
         }
 
         private async Task<IList<string>> GetLicenseUsagesKeysAsync(IList<string> smintIoKeys)
@@ -629,10 +803,32 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await _syncTarget.GetLicenseUsageKeyAsync(smintIoKey));
+                targetKeys.Add(await GetLicenseUsageKeyAsync(smintIoKey));
             }
 
             return targetKeys;
+        }
+
+        public async Task<string> GetLicenseUsageKeyAsync(string smintIoKey)
+        {
+            if (_licenseUsageCache != null && _licenseUsageCache.ContainsKey(smintIoKey))
+
+                if (_licenseUsageCache == null)
+                    _licenseUsageCache = await _syncTarget.GetLicenseUsageKeyMappingsAsync();
+
+            if (_licenseUsageCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io license usage key mappings!"
+                 );
+
+            if (_licenseUsageCache.ContainsKey(smintIoKey))
+                return _licenseUsageCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io license usage key {smintIoKey}!"
+                 );
         }
 
         private async Task<IList<string>> GetLicenseSizesKeysAsync(IList<string> smintIoKeys)
@@ -644,10 +840,32 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await _syncTarget.GetLicenseSizeKeyAsync(smintIoKey));
+                targetKeys.Add(await GetLicenseSizeKeyAsync(smintIoKey));
             }
 
             return targetKeys;
+        }
+
+        public async Task<string> GetLicenseSizeKeyAsync(string smintIoKey)
+        {
+            if (_licenseSizeCache != null && _licenseSizeCache.ContainsKey(smintIoKey))
+
+                if (_licenseSizeCache == null)
+                    _licenseSizeCache = await _syncTarget.GetLicenseSizeKeyMappingsAsync();
+
+            if (_licenseSizeCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io license size key mappings!"
+                 );
+
+            if (_licenseSizeCache.ContainsKey(smintIoKey))
+                return _licenseSizeCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io license size key {smintIoKey}!"
+                 );
         }
 
         private async Task<IList<string>> GetLicensePlacementsKeysAsync(IList<string> smintIoKeys)
@@ -659,10 +877,32 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await _syncTarget.GetLicensePlacementKeyAsync(smintIoKey));
+                targetKeys.Add(await GetLicensePlacementKeyAsync(smintIoKey));
             }
 
             return targetKeys;
+        }
+
+        public async Task<string> GetLicensePlacementKeyAsync(string smintIoKey)
+        {
+            if (_licensePlacementCache != null && _licensePlacementCache.ContainsKey(smintIoKey))
+
+                if (_licensePlacementCache == null)
+                    _licensePlacementCache = await _syncTarget.GetLicensePlacementKeyMappingsAsync();
+
+            if (_licensePlacementCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io license placement key mappings!"
+                 );
+
+            if (_licensePlacementCache.ContainsKey(smintIoKey))
+                return _licensePlacementCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io license placement key {smintIoKey}!"
+                 );
         }
 
         private async Task<IList<string>> GetLicenseDistributionsKeysAsync(IList<string> smintIoKeys)
@@ -674,10 +914,32 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await _syncTarget.GetLicenseDistributionKeyAsync(smintIoKey));
+                targetKeys.Add(await GetLicenseDistributionKeyAsync(smintIoKey));
             }
 
             return targetKeys;
+        }
+
+        public async Task<string> GetLicenseDistributionKeyAsync(string smintIoKey)
+        {
+            if (_licenseDistributionCache != null && _licenseDistributionCache.ContainsKey(smintIoKey))
+
+                if (_licenseDistributionCache == null)
+                    _licenseDistributionCache = await _syncTarget.GetLicenseDistributionKeyMappingsAsync();
+
+            if (_licenseDistributionCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io license distribution key mappings!"
+                 );
+
+            if (_licenseDistributionCache.ContainsKey(smintIoKey))
+                return _licenseDistributionCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io license distribution key {smintIoKey}!"
+                 );
         }
 
         private async Task<IList<string>> GetLicenseGeographiesKeysAsync(IList<string> smintIoKeys)
@@ -689,10 +951,32 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await _syncTarget.GetLicenseGeographyKeyAsync(smintIoKey));
+                targetKeys.Add(await GetLicenseGeographyKeyAsync(smintIoKey));
             }
 
             return targetKeys;
+        }
+
+        public async Task<string> GetLicenseGeographyKeyAsync(string smintIoKey)
+        {
+            if (_licenseGeographyCache != null && _licenseGeographyCache.ContainsKey(smintIoKey))
+
+                if (_licenseGeographyCache == null)
+                    _licenseGeographyCache = await _syncTarget.GetLicenseGeographyKeyMappingsAsync();
+
+            if (_licenseGeographyCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io license geography key mappings!"
+                 );
+
+            if (_licenseGeographyCache.ContainsKey(smintIoKey))
+                return _licenseGeographyCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io license geography key {smintIoKey}!"
+                 );
         }
 
         private async Task<IList<string>> GetLicenseIndustriesKeysAsync(IList<string> smintIoKeys)
@@ -704,10 +988,32 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await _syncTarget.GetLicenseIndustryKeyAsync(smintIoKey));
+                targetKeys.Add(await GetLicenseIndustryKeyAsync(smintIoKey));
             }
 
             return targetKeys;
+        }
+
+        public async Task<string> GetLicenseIndustryKeyAsync(string smintIoKey)
+        {
+            if (_licenseIndustryCache != null && _licenseIndustryCache.ContainsKey(smintIoKey))
+
+                if (_licenseIndustryCache == null)
+                    _licenseIndustryCache = await _syncTarget.GetLicenseIndustryKeyMappingsAsync();
+
+            if (_licenseIndustryCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io license industry key mappings!"
+                 );
+
+            if (_licenseIndustryCache.ContainsKey(smintIoKey))
+                return _licenseIndustryCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io license industry key {smintIoKey}!"
+                 );
         }
 
         private async Task<IList<string>> GetLicenseLanguagesKeysAsync(IList<string> smintIoKeys)
@@ -719,10 +1025,32 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await _syncTarget.GetLicenseLanguageKeyAsync(smintIoKey));
+                targetKeys.Add(await GetLicenseLanguageKeyAsync(smintIoKey));
             }
 
             return targetKeys;
+        }
+
+        public async Task<string> GetLicenseLanguageKeyAsync(string smintIoKey)
+        {
+            if (_licenseLanguageCache != null && _licenseLanguageCache.ContainsKey(smintIoKey))
+
+                if (_licenseLanguageCache == null)
+                    _licenseLanguageCache = await _syncTarget.GetLicenseLanguageKeyMappingsAsync();
+
+            if (_licenseLanguageCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io license language key mappings!"
+                 );
+
+            if (_licenseLanguageCache.ContainsKey(smintIoKey))
+                return _licenseLanguageCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io license language key {smintIoKey}!"
+                 );
         }
 
         private async Task<IList<string>> GetLicenseUsageLimitsKeysAsync(IList<string> smintIoKeys)
@@ -734,10 +1062,32 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await _syncTarget.GetLicenseUsageLimitKeyAsync(smintIoKey));
+                targetKeys.Add(await GetLicenseUsageLimitKeyAsync(smintIoKey));
             }
 
             return targetKeys;
+        }
+
+        public async Task<string> GetLicenseUsageLimitKeyAsync(string smintIoKey)
+        {
+            if (_licenseUsageLimitCache != null && _licenseUsageLimitCache.ContainsKey(smintIoKey))
+
+                if (_licenseUsageLimitCache == null)
+                    _licenseUsageLimitCache = await _syncTarget.GetLicenseUsageLimitKeyMappingsAsync();
+
+            if (_licenseUsageLimitCache == null)
+                throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return Smint.io license usage limit key mappings!"
+                 );
+
+            if (_licenseUsageLimitCache.ContainsKey(smintIoKey))
+                return _licenseUsageLimitCache[smintIoKey];
+
+            throw new SmintIoSyncJobException(
+                     SmintIoSyncJobException.SyncJobError.Generic,
+                     $"SyncTarget did not return key mapping covering Smint.io license usage limit key {smintIoKey}!"
+                 );
         }
 
         private void CreateTempFolder(string folderName)
@@ -749,6 +1099,29 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
         {
             if (Directory.Exists(folderName))
                 Directory.Delete(folderName, true);
+        }
+
+        private void ClearGenericMetadataCaches()
+        {
+            _contentProviderCache = null;
+
+            _contentTypeCache = null;
+            _binaryTypeCache = null;
+
+            _contentCategoryCache = null;
+
+            _licenseTypeCache = null;
+            _releaseStateCache = null;
+
+            _licenseExclusivityCache = null;
+            _licenseUsageCache = null;
+            _licenseSizeCache = null;
+            _licensePlacementCache = null;
+            _licenseDistributionCache = null;
+            _licenseGeographyCache = null;
+            _licenseIndustryCache = null;
+            _licenseLanguageCache = null;
+            _licenseUsageLimitCache = null;
         }
     }
 }
