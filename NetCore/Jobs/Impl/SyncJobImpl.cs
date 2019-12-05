@@ -372,7 +372,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
         {
             var contentTypeString = !string.IsNullOrEmpty(binary?.ContentType) ? binary.ContentType : rawAsset.ContentType;
 
-            targetAsset.SetTransactionUuid(rawAsset.LicensePurchaseTransactionUuid);
             targetAsset.SetContentElementUuid(rawAsset.ContentElementUuid);
             targetAsset.SetContentProvider(await GetContentProviderKeyAsync(rawAsset.Provider));
             targetAsset.SetContentType(await GetContentTypeKeyAsync(contentTypeString));
@@ -627,10 +626,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetContentProviderKeyAsync(string smintIoKey)
         {
-            if (_contentProviderCache != null && _contentProviderCache.ContainsKey(smintIoKey))
-
-                if (_contentProviderCache == null)
-                    _contentProviderCache = await _syncTarget.GetContentProviderKeyMappingsAsync();
+            if (_contentProviderCache == null)
+                _contentProviderCache = await _syncTarget.GetContentProviderKeyMappingsAsync();
 
             if (_contentProviderCache == null)
                 throw new SmintIoSyncJobException(
@@ -649,10 +646,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetContentTypeKeyAsync(string smintIoKey)
         {
-            if (_contentTypeCache != null && _contentTypeCache.ContainsKey(smintIoKey))
-
-                if (_contentTypeCache == null)
-                    _contentTypeCache = await _syncTarget.GetContentTypeKeyMappingsAsync();
+            if (_contentTypeCache == null)
+                _contentTypeCache = await _syncTarget.GetContentTypeKeyMappingsAsync();
 
             if (_contentTypeCache == null)
                 throw new SmintIoSyncJobException(
@@ -671,10 +666,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetContentCategoryKeyAsync(string smintIoKey)
         {
-            if (_contentCategoryCache != null && _contentCategoryCache.ContainsKey(smintIoKey))
-
-                if (_contentCategoryCache == null)
-                    _contentCategoryCache = await _syncTarget.GetContentCategoryKeyMappingsAsync();
+            if (_contentCategoryCache == null)
+                _contentCategoryCache = await _syncTarget.GetContentCategoryKeyMappingsAsync();
 
             if (_contentCategoryCache == null)
                 throw new SmintIoSyncJobException(
@@ -693,10 +686,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetBinaryTypeKeyAsync(string smintIoKey)
         {
-            if (_binaryTypeCache != null && _binaryTypeCache.ContainsKey(smintIoKey))
-
-                if (_binaryTypeCache == null)
-                    _binaryTypeCache = await _syncTarget.GetBinaryTypeKeyMappingsAsync();
+            if (_binaryTypeCache == null)
+                _binaryTypeCache = await _syncTarget.GetBinaryTypeKeyMappingsAsync();
 
             if (_binaryTypeCache == null)
                 throw new SmintIoSyncJobException(
@@ -715,10 +706,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetLicenseTypeKeyAsync(string smintIoKey)
         {
-            if (_licenseTypeCache != null && _licenseTypeCache.ContainsKey(smintIoKey))
-
-                if (_licenseTypeCache == null)
-                    _licenseTypeCache = await _syncTarget.GetLicenseTypeKeyMappingsAsync();
+            if (_licenseTypeCache == null)
+                _licenseTypeCache = await _syncTarget.GetLicenseTypeKeyMappingsAsync();
 
             if (_licenseTypeCache == null)
                 throw new SmintIoSyncJobException(
@@ -737,10 +726,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetReleaseStateKeyAsync(string smintIoKey)
         {
-            if (_releaseStateCache != null && _releaseStateCache.ContainsKey(smintIoKey))
-
-                if (_releaseStateCache == null)
-                    _releaseStateCache = await _syncTarget.GetReleaseStateKeyMappingsAsync();
+            if (_releaseStateCache == null)
+                _releaseStateCache = await _syncTarget.GetReleaseStateKeyMappingsAsync();
 
             if (_releaseStateCache == null)
                 throw new SmintIoSyncJobException(
@@ -774,10 +761,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetLicenseExclusivityKeyAsync(string smintIoKey)
         {
-            if (_licenseExclusivityCache != null && _licenseExclusivityCache.ContainsKey(smintIoKey))
-
-                if (_licenseExclusivityCache == null)
-                    _licenseExclusivityCache = await _syncTarget.GetLicenseExclusivityKeyMappingsAsync();
+            if (_licenseExclusivityCache == null)
+                _licenseExclusivityCache = await _syncTarget.GetLicenseExclusivityKeyMappingsAsync();
 
             if (_licenseExclusivityCache == null)
                 throw new SmintIoSyncJobException(
@@ -811,10 +796,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetLicenseUsageKeyAsync(string smintIoKey)
         {
-            if (_licenseUsageCache != null && _licenseUsageCache.ContainsKey(smintIoKey))
-
-                if (_licenseUsageCache == null)
-                    _licenseUsageCache = await _syncTarget.GetLicenseUsageKeyMappingsAsync();
+            if (_licenseUsageCache == null)
+                _licenseUsageCache = await _syncTarget.GetLicenseUsageKeyMappingsAsync();
 
             if (_licenseUsageCache == null)
                 throw new SmintIoSyncJobException(
@@ -848,10 +831,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetLicenseSizeKeyAsync(string smintIoKey)
         {
-            if (_licenseSizeCache != null && _licenseSizeCache.ContainsKey(smintIoKey))
-
-                if (_licenseSizeCache == null)
-                    _licenseSizeCache = await _syncTarget.GetLicenseSizeKeyMappingsAsync();
+            if (_licenseSizeCache == null)
+                _licenseSizeCache = await _syncTarget.GetLicenseSizeKeyMappingsAsync();
 
             if (_licenseSizeCache == null)
                 throw new SmintIoSyncJobException(
@@ -885,10 +866,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetLicensePlacementKeyAsync(string smintIoKey)
         {
-            if (_licensePlacementCache != null && _licensePlacementCache.ContainsKey(smintIoKey))
-
-                if (_licensePlacementCache == null)
-                    _licensePlacementCache = await _syncTarget.GetLicensePlacementKeyMappingsAsync();
+            if (_licensePlacementCache == null)
+                _licensePlacementCache = await _syncTarget.GetLicensePlacementKeyMappingsAsync();
 
             if (_licensePlacementCache == null)
                 throw new SmintIoSyncJobException(
@@ -922,10 +901,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetLicenseDistributionKeyAsync(string smintIoKey)
         {
-            if (_licenseDistributionCache != null && _licenseDistributionCache.ContainsKey(smintIoKey))
-
-                if (_licenseDistributionCache == null)
-                    _licenseDistributionCache = await _syncTarget.GetLicenseDistributionKeyMappingsAsync();
+            if (_licenseDistributionCache == null)
+                _licenseDistributionCache = await _syncTarget.GetLicenseDistributionKeyMappingsAsync();
 
             if (_licenseDistributionCache == null)
                 throw new SmintIoSyncJobException(
@@ -959,10 +936,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetLicenseGeographyKeyAsync(string smintIoKey)
         {
-            if (_licenseGeographyCache != null && _licenseGeographyCache.ContainsKey(smintIoKey))
-
-                if (_licenseGeographyCache == null)
-                    _licenseGeographyCache = await _syncTarget.GetLicenseGeographyKeyMappingsAsync();
+            if (_licenseGeographyCache == null)
+                _licenseGeographyCache = await _syncTarget.GetLicenseGeographyKeyMappingsAsync();
 
             if (_licenseGeographyCache == null)
                 throw new SmintIoSyncJobException(
@@ -996,10 +971,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetLicenseIndustryKeyAsync(string smintIoKey)
         {
-            if (_licenseIndustryCache != null && _licenseIndustryCache.ContainsKey(smintIoKey))
-
-                if (_licenseIndustryCache == null)
-                    _licenseIndustryCache = await _syncTarget.GetLicenseIndustryKeyMappingsAsync();
+            if (_licenseIndustryCache == null)
+                _licenseIndustryCache = await _syncTarget.GetLicenseIndustryKeyMappingsAsync();
 
             if (_licenseIndustryCache == null)
                 throw new SmintIoSyncJobException(
@@ -1033,10 +1006,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetLicenseLanguageKeyAsync(string smintIoKey)
         {
-            if (_licenseLanguageCache != null && _licenseLanguageCache.ContainsKey(smintIoKey))
-
-                if (_licenseLanguageCache == null)
-                    _licenseLanguageCache = await _syncTarget.GetLicenseLanguageKeyMappingsAsync();
+            if (_licenseLanguageCache == null)
+                _licenseLanguageCache = await _syncTarget.GetLicenseLanguageKeyMappingsAsync();
 
             if (_licenseLanguageCache == null)
                 throw new SmintIoSyncJobException(
@@ -1070,10 +1041,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<string> GetLicenseUsageLimitKeyAsync(string smintIoKey)
         {
-            if (_licenseUsageLimitCache != null && _licenseUsageLimitCache.ContainsKey(smintIoKey))
-
-                if (_licenseUsageLimitCache == null)
-                    _licenseUsageLimitCache = await _syncTarget.GetLicenseUsageLimitKeyMappingsAsync();
+            if (_licenseUsageLimitCache == null)
+                _licenseUsageLimitCache = await _syncTarget.GetLicenseUsageLimitKeyMappingsAsync();
 
             if (_licenseUsageLimitCache == null)
                 throw new SmintIoSyncJobException(
