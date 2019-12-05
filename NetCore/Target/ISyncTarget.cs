@@ -84,49 +84,22 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         Task<bool> BeforeGenericMetadataSyncAsync();
 
         Task ImportContentProvidersAsync(IList<SmintIoMetadataElement> contentProviders);
-        Task<Dictionary<string, string>> GetContentProviderKeyMappingsAsync();
-
         Task ImportContentTypesAsync(IList<SmintIoMetadataElement> contentTypes);
-        Task<Dictionary<string, string>> GetContentTypeKeyMappingsAsync();
 
         Task ImportBinaryTypesAsync(IList<SmintIoMetadataElement> binaryTypes);
-        Task<Dictionary<string, string>> GetBinaryTypeKeyMappingsAsync();
-
         Task ImportContentCategoriesAsync(IList<SmintIoMetadataElement> contentCategories);
-        Task<Dictionary<string, string>> GetContentCategoryKeyMappingsAsync();
-
         Task ImportLicenseTypesAsync(IList<SmintIoMetadataElement> licenseTypes);
-        Task<Dictionary<string, string>> GetLicenseTypeKeyMappingsAsync();
-
         Task ImportReleaseStatesAsync(IList<SmintIoMetadataElement> releaseStates);
-        Task<Dictionary<string, string>> GetReleaseStateKeyMappingsAsync();
 
         Task ImportLicenseExclusivitiesAsync(IList<SmintIoMetadataElement> licenseExclusivities);
-        Task<Dictionary<string, string>> GetLicenseExclusivityKeyMappingsAsync();
-
         Task ImportLicenseUsagesAsync(IList<SmintIoMetadataElement> licenseUsages);
-        Task<Dictionary<string, string>> GetLicenseUsageKeyMappingsAsync();
-
         Task ImportLicenseSizesAsync(IList<SmintIoMetadataElement> licenseSizes);
-        Task<Dictionary<string, string>> GetLicenseSizeKeyMappingsAsync();
-
         Task ImportLicensePlacementsAsync(IList<SmintIoMetadataElement> licensePlacements);
-        Task<Dictionary<string, string>> GetLicensePlacementKeyMappingsAsync();
-
         Task ImportLicenseDistributionsAsync(IList<SmintIoMetadataElement> licenseDistributions);
-        Task<Dictionary<string, string>> GetLicenseDistributionKeyMappingsAsync();
-
         Task ImportLicenseGeographiesAsync(IList<SmintIoMetadataElement> licenseGeographies);
-        Task<Dictionary<string, string>> GetLicenseGeographyKeyMappingsAsync();
-
         Task ImportLicenseIndustriesAsync(IList<SmintIoMetadataElement> licenseIndustries);
-        Task<Dictionary<string, string>> GetLicenseIndustryKeyMappingsAsync();
-
         Task ImportLicenseLanguagesAsync(IList<SmintIoMetadataElement> licenseLanguages);
-        Task<Dictionary<string, string>> GetLicenseLanguageKeyMappingsAsync();
-
         Task ImportLicenseUsageLimitsAsync(IList<SmintIoMetadataElement> licenseUsageLimits);
-        Task<Dictionary<string, string>> GetLicenseUsageLimitKeyMappingsAsync();
 
         TSyncAsset CreateSyncAsset();
         TSyncLicenseOption CreateSyncLicenseOption();

@@ -126,7 +126,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                     return;
                 }
 
-                if (synchronizeGenericMetadata)
+                if (synchronizeGenericMetadata ||
+                    _contentProviderCache == null)
                 {
                     await SynchronizeGenericMetadataAsync();
                 }
@@ -163,6 +164,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
         {
             _logger.LogInformation("Starting Smint.io generic metadata synchronization...");
 
+            ClearGenericMetadataCaches();
+
             var cancelMetadataSync = !await _syncTarget.BeforeGenericMetadataSyncAsync();
             if (cancelMetadataSync)
             {
@@ -174,31 +177,70 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             var genericMetadata = await _smintIoClient.GetGenericMetadataAsync();
 
             await _syncTarget.ImportContentProvidersAsync(genericMetadata.ContentProviders);
+            _contentProviderCache = MapTargetMetadataUuids(genericMetadata.ContentProviders);
 
             await _syncTarget.ImportContentTypesAsync(genericMetadata.ContentTypes);
+            _contentTypeCache = MapTargetMetadataUuids(genericMetadata.ContentTypes);
+
             await _syncTarget.ImportBinaryTypesAsync(genericMetadata.BinaryTypes);
+            _binaryTypeCache = MapTargetMetadataUuids(genericMetadata.BinaryTypes);
 
             await _syncTarget.ImportContentCategoriesAsync(genericMetadata.ContentCategories);
+            _contentCategoryCache = MapTargetMetadataUuids(genericMetadata.ContentCategories);
 
             await _syncTarget.ImportLicenseTypesAsync(genericMetadata.LicenseTypes);
+            _licenseTypeCache = MapTargetMetadataUuids(genericMetadata.LicenseTypes);
 
             await _syncTarget.ImportReleaseStatesAsync(genericMetadata.ReleaseStates);
+            _releaseStateCache = MapTargetMetadataUuids(genericMetadata.ReleaseStates);
 
             await _syncTarget.ImportLicenseExclusivitiesAsync(genericMetadata.LicenseExclusivities);
+            _licenseExclusivityCache = MapTargetMetadataUuids(genericMetadata.LicenseExclusivities);
+
             await _syncTarget.ImportLicenseUsagesAsync(genericMetadata.LicenseUsages);
+            _licenseUsageCache = MapTargetMetadataUuids(genericMetadata.LicenseUsages);
+
             await _syncTarget.ImportLicenseSizesAsync(genericMetadata.LicenseSizes);
+            _licenseSizeCache = MapTargetMetadataUuids(genericMetadata.LicenseSizes);
+
             await _syncTarget.ImportLicensePlacementsAsync(genericMetadata.LicensePlacements);
+            _licensePlacementCache = MapTargetMetadataUuids(genericMetadata.LicensePlacements);
+
             await _syncTarget.ImportLicenseDistributionsAsync(genericMetadata.LicenseDistributions);
+            _licenseDistributionCache = MapTargetMetadataUuids(genericMetadata.LicenseDistributions);
+
             await _syncTarget.ImportLicenseGeographiesAsync(genericMetadata.LicenseGeographies);
+            _licenseGeographyCache = MapTargetMetadataUuids(genericMetadata.LicenseGeographies);
+
             await _syncTarget.ImportLicenseIndustriesAsync(genericMetadata.LicenseIndustries);
+            _licenseIndustryCache = MapTargetMetadataUuids(genericMetadata.LicenseIndustries);
+
             await _syncTarget.ImportLicenseLanguagesAsync(genericMetadata.LicenseLanguages);
+            _licenseLanguageCache = MapTargetMetadataUuids(genericMetadata.LicenseLanguages);
+
             await _syncTarget.ImportLicenseUsageLimitsAsync(genericMetadata.LicenseUsageLimits);
+            _licenseUsageLimitCache = MapTargetMetadataUuids(genericMetadata.LicenseUsageLimits);
 
             await _syncTarget.AfterGenericMetadataSyncAsync();
 
-            ClearGenericMetadataCaches();
-
             _logger.LogInformation("Finished Smint.io generic metadata synchronization");
+        }
+
+        private Dictionary<string, string> MapTargetMetadataUuids(IList<SmintIoMetadataElement> metadataElements)
+        {
+            if (metadataElements == null)
+                return new Dictionary<string, string>();
+
+            return metadataElements.ToDictionary(metadataElement => metadataElement.Key,
+                metadataElement => {
+                    if (string.IsNullOrEmpty(metadataElement.TargetMetadataUuid))
+                        throw new SmintIoSyncJobException(
+                            SmintIoSyncJobException.SyncJobError.Generic,
+                            $"SyncTarget did not return target metadata UUID for metadata element key {metadataElement.Key}!"
+                     );
+
+                    return metadataElement.TargetMetadataUuid;
+                });
         }
 
         private async Task SynchronizeAssetsAsync()
@@ -237,7 +279,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                     {
                         CreateTempFolder(folderName);
 
-                        var targetAssets = await TransformAssetsAsync(rawAssets);
+                        var targetAssets = TransformAssets(rawAssets);
 
                         IList<TSyncAsset> newTargetAssets = new List<TSyncAsset>();
                         IList<TSyncAsset> updatedTargetAssets = new List<TSyncAsset>();
@@ -304,8 +346,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                 _logger.LogInformation("Finished Smint.io asset synchronization");
 
                 await _syncTarget.AfterAssetsSyncAsync();
-
-                ClearGenericMetadataCaches();
             }
             finally
             {
@@ -313,7 +353,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             }
         }
 
-        private async Task<IList<TSyncAsset>> TransformAssetsAsync(IList<SmintIoAsset> rawAssets)
+        private IList<TSyncAsset> TransformAssets(IList<SmintIoAsset> rawAssets)
         {
             IList<TSyncAsset> assets = new List<TSyncAsset>();
 
@@ -338,8 +378,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                     targetAsset.SetDownloadUrl(downloadUrl);
 
-                    await SetContentMetadataAsync(targetAsset, rawAsset, binary);
-                    await SetLicenseMetadataAsync(targetAsset, rawAsset);
+                    SetContentMetadata(targetAsset, rawAsset, binary);
+                    SetLicenseMetadata(targetAsset, rawAsset);
 
                     assetPartAssets.Add(targetAsset);
 
@@ -356,8 +396,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                     targetCompoundAsset.SetAssetParts(assetPartAssets);
 
-                    await SetContentMetadataAsync(targetCompoundAsset, rawAsset, null);
-                    await SetLicenseMetadataAsync(targetCompoundAsset, rawAsset);
+                    SetContentMetadata(targetCompoundAsset, rawAsset, null);
+                    SetLicenseMetadata(targetCompoundAsset, rawAsset);
 
                     assets.Add(targetCompoundAsset);
                 }
@@ -368,14 +408,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             return assets;
         }
 
-        private async Task SetContentMetadataAsync(TSyncAsset targetAsset, SmintIoAsset rawAsset, SmintIoBinary binary)
+        private void SetContentMetadata(TSyncAsset targetAsset, SmintIoAsset rawAsset, SmintIoBinary binary)
         {
             var contentTypeString = !string.IsNullOrEmpty(binary?.ContentType) ? binary.ContentType : rawAsset.ContentType;
 
             targetAsset.SetContentElementUuid(rawAsset.ContentElementUuid);
-            targetAsset.SetContentProvider(await GetContentProviderKeyAsync(rawAsset.Provider));
-            targetAsset.SetContentType(await GetContentTypeKeyAsync(contentTypeString));
-            targetAsset.SetContentCategory(await GetContentCategoryKeyAsync(rawAsset.Category));
+            targetAsset.SetContentProvider(GetContentProviderKey(rawAsset.Provider));
+            targetAsset.SetContentType(GetContentTypeKey(contentTypeString));
+            targetAsset.SetContentCategory(GetContentCategoryKey(rawAsset.Category));
             targetAsset.SetSmintIoUrl(rawAsset.SmintIoUrl);
             targetAsset.SetPurchasedAt(rawAsset.PurchasedAt);
             targetAsset.SetCreatedAt(rawAsset.CreatedAt);
@@ -383,7 +423,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             targetAsset.SetHasBeenCancelled(rawAsset.State == Client.Generated.LicensePurchaseTransactionStateEnum.Cancelled);
 
             if (!string.IsNullOrEmpty(binary?.BinaryType))
-                targetAsset.SetBinaryType(await GetBinaryTypeKeyAsync(binary.BinaryType));
+                targetAsset.SetBinaryType(GetBinaryTypeKey(binary.BinaryType));
 
             if (rawAsset.LastUpdatedAt != null)
                 targetAsset.SetLastUpdatedAt((DateTimeOffset)rawAsset.LastUpdatedAt);
@@ -431,9 +471,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             }
         }
 
-        private async Task SetLicenseMetadataAsync(TSyncAsset targetAsset, SmintIoAsset rawAsset)
+        private void SetLicenseMetadata(TSyncAsset targetAsset, SmintIoAsset rawAsset)
         {
-            targetAsset.SetLicenseType(await GetLicenseTypeKeyAsync(rawAsset.LicenseType));
+            targetAsset.SetLicenseType(GetLicenseTypeKey(rawAsset.LicenseType));
 
             targetAsset.SetLicenseeUuid(rawAsset.LicenseeUuid);
             targetAsset.SetLicenseeName(rawAsset.LicenseeName);
@@ -445,7 +485,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                 targetAsset.SetLicenseOptions(GetLicenseOptions(rawAsset.LicenseOptions));
 
             if (rawAsset.LicenseTerms?.Count > 0)
-                targetAsset.SetLicenseTerms(await GetLicenseTermsAsync(rawAsset.LicenseTerms));
+                targetAsset.SetLicenseTerms(GetLicenseTerms(rawAsset.LicenseTerms));
 
             if (rawAsset.DownloadConstraints != null)
             {
@@ -473,11 +513,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                 string modelReleaseState = null;
                 if (!string.IsNullOrEmpty(rawReleaseDetails.ModelReleaseState))
-                    modelReleaseState = await GetReleaseStateKeyAsync(rawReleaseDetails.ModelReleaseState);
+                    modelReleaseState = GetReleaseStateKey(rawReleaseDetails.ModelReleaseState);
 
                 string propertyReleaseState = null;
                 if (!string.IsNullOrEmpty(rawReleaseDetails.PropertyReleaseState))
-                    propertyReleaseState = await GetReleaseStateKeyAsync(rawReleaseDetails.PropertyReleaseState);
+                    propertyReleaseState = GetReleaseStateKey(rawReleaseDetails.PropertyReleaseState);
 
                 if (!string.IsNullOrEmpty(modelReleaseState))
                     targetReleaseDetails.SetModelReleaseState(modelReleaseState);
@@ -519,36 +559,36 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             }).ToList();
         }
 
-        private async Task<IList<TSyncLicenseTerm>> GetLicenseTermsAsync(IList<SmintIoLicenseTerm> rawLicenseTerms)
+        private IList<TSyncLicenseTerm> GetLicenseTerms(IList<SmintIoLicenseTerm> rawLicenseTerms)
         {
             var targetLicenseTerms = new List<TSyncLicenseTerm>();
 
             foreach (var rawLicenseTerm in rawLicenseTerms)
             {
-                var exclusivities = await GetLicenseExclusivitiesKeysAsync(rawLicenseTerm.Exclusivities);
+                var exclusivities = GetLicenseExclusivitiesKeys(rawLicenseTerm.Exclusivities);
 
-                var allowedUsages = await GetLicenseUsagesKeysAsync(rawLicenseTerm.AllowedUsages);
-                var restrictedUsages = await GetLicenseUsagesKeysAsync(rawLicenseTerm.RestrictedUsages);
+                var allowedUsages = GetLicenseUsagesKeys(rawLicenseTerm.AllowedUsages);
+                var restrictedUsages = GetLicenseUsagesKeys(rawLicenseTerm.RestrictedUsages);
 
-                var allowedSizes = await GetLicenseSizesKeysAsync(rawLicenseTerm.AllowedSizes);
-                var restrictedSizes = await GetLicenseSizesKeysAsync(rawLicenseTerm.RestrictedSizes);
+                var allowedSizes = GetLicenseSizesKeys(rawLicenseTerm.AllowedSizes);
+                var restrictedSizes = GetLicenseSizesKeys(rawLicenseTerm.RestrictedSizes);
 
-                var allowedPlacements = await GetLicensePlacementsKeysAsync(rawLicenseTerm.AllowedPlacements);
-                var restrictedPlacements = await GetLicensePlacementsKeysAsync(rawLicenseTerm.RestrictedPlacements);
+                var allowedPlacements = GetLicensePlacementsKeys(rawLicenseTerm.AllowedPlacements);
+                var restrictedPlacements = GetLicensePlacementsKeys(rawLicenseTerm.RestrictedPlacements);
 
-                var allowedDistributions = await GetLicenseDistributionsKeysAsync(rawLicenseTerm.AllowedDistributions);
-                var restrictedDistributions = await GetLicenseDistributionsKeysAsync(rawLicenseTerm.RestrictedDistributions);
+                var allowedDistributions = GetLicenseDistributionsKeys(rawLicenseTerm.AllowedDistributions);
+                var restrictedDistributions = GetLicenseDistributionsKeys(rawLicenseTerm.RestrictedDistributions);
 
-                var allowedGeographies = await GetLicenseGeographiesKeysAsync(rawLicenseTerm.AllowedGeographies);
-                var restrictedGeographies = await GetLicenseGeographiesKeysAsync(rawLicenseTerm.RestrictedGeographies);
+                var allowedGeographies = GetLicenseGeographiesKeys(rawLicenseTerm.AllowedGeographies);
+                var restrictedGeographies = GetLicenseGeographiesKeys(rawLicenseTerm.RestrictedGeographies);
 
-                var allowedIndustries = await GetLicenseIndustriesKeysAsync(rawLicenseTerm.AllowedIndustries);
-                var restrictedIndustries = await GetLicenseIndustriesKeysAsync(rawLicenseTerm.RestrictedIndustries);
+                var allowedIndustries = GetLicenseIndustriesKeys(rawLicenseTerm.AllowedIndustries);
+                var restrictedIndustries = GetLicenseIndustriesKeys(rawLicenseTerm.RestrictedIndustries);
 
-                var allowedLanguages = await GetLicenseLanguagesKeysAsync(rawLicenseTerm.AllowedLanguages);
-                var restrictedLanguages = await GetLicenseLanguagesKeysAsync(rawLicenseTerm.RestrictedLanguages);
+                var allowedLanguages = GetLicenseLanguagesKeys(rawLicenseTerm.AllowedLanguages);
+                var restrictedLanguages = GetLicenseLanguagesKeys(rawLicenseTerm.RestrictedLanguages);
 
-                var usageLimits = await GetLicenseUsageLimitsKeysAsync(rawLicenseTerm.UsageLimits);
+                var usageLimits = GetLicenseUsageLimitsKeys(rawLicenseTerm.UsageLimits);
 
                 var targetLicenseTerm = _syncTarget.CreateSyncLicenseTerm();
 
@@ -624,14 +664,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             return targetLicenseTerms;
         }
 
-        public async Task<string> GetContentProviderKeyAsync(string smintIoKey)
+        private string GetContentProviderKey(string smintIoKey)
         {
-            if (_contentProviderCache == null)
-                _contentProviderCache = await _syncTarget.GetContentProviderKeyMappingsAsync();
-
-            if (_contentProviderCache == null)
-                return smintIoKey;
-
             if (_contentProviderCache.ContainsKey(smintIoKey))
                 return _contentProviderCache[smintIoKey];
 
@@ -641,14 +675,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                  );
         }
 
-        public async Task<string> GetContentTypeKeyAsync(string smintIoKey)
+        private string GetContentTypeKey(string smintIoKey)
         {
-            if (_contentTypeCache == null)
-                _contentTypeCache = await _syncTarget.GetContentTypeKeyMappingsAsync();
-
-            if (_contentTypeCache == null)
-                return smintIoKey;
-
             if (_contentTypeCache.ContainsKey(smintIoKey))
                 return _contentTypeCache[smintIoKey];
 
@@ -658,14 +686,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                  );
         }
 
-        public async Task<string> GetContentCategoryKeyAsync(string smintIoKey)
+        private string GetContentCategoryKey(string smintIoKey)
         {
-            if (_contentCategoryCache == null)
-                _contentCategoryCache = await _syncTarget.GetContentCategoryKeyMappingsAsync();
-
-            if (_contentCategoryCache == null)
-                return smintIoKey;
-
             if (_contentCategoryCache.ContainsKey(smintIoKey))
                 return _contentCategoryCache[smintIoKey];
 
@@ -675,14 +697,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                  );
         }
 
-        public async Task<string> GetBinaryTypeKeyAsync(string smintIoKey)
+        private string GetBinaryTypeKey(string smintIoKey)
         {
-            if (_binaryTypeCache == null)
-                _binaryTypeCache = await _syncTarget.GetBinaryTypeKeyMappingsAsync();
-
-            if (_binaryTypeCache == null)
-                return smintIoKey;
-
             if (_binaryTypeCache.ContainsKey(smintIoKey))
                 return _binaryTypeCache[smintIoKey];
 
@@ -692,14 +708,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                  );
         }
 
-        public async Task<string> GetLicenseTypeKeyAsync(string smintIoKey)
+        private string GetLicenseTypeKey(string smintIoKey)
         {
-            if (_licenseTypeCache == null)
-                _licenseTypeCache = await _syncTarget.GetLicenseTypeKeyMappingsAsync();
-
-            if (_licenseTypeCache == null)
-                return smintIoKey;
-
             if (_licenseTypeCache.ContainsKey(smintIoKey))
                 return _licenseTypeCache[smintIoKey];
 
@@ -709,14 +719,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                  );
         }
 
-        public async Task<string> GetReleaseStateKeyAsync(string smintIoKey)
+        private string GetReleaseStateKey(string smintIoKey)
         {
-            if (_releaseStateCache == null)
-                _releaseStateCache = await _syncTarget.GetReleaseStateKeyMappingsAsync();
-
-            if (_releaseStateCache == null)
-                return smintIoKey;
-
             if (_releaseStateCache.ContainsKey(smintIoKey))
                 return _releaseStateCache[smintIoKey];
 
@@ -726,7 +730,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                  );
         }
 
-        private async Task<IList<string>> GetLicenseExclusivitiesKeysAsync(IList<string> smintIoKeys)
+        private IList<string> GetLicenseExclusivitiesKeys(IList<string> smintIoKeys)
         {
             if (smintIoKeys == null || !smintIoKeys.Any())
                 return null;
@@ -735,20 +739,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await GetLicenseExclusivityKeyAsync(smintIoKey));
+                targetKeys.Add(GetLicenseExclusivityKey(smintIoKey));
             }
 
             return targetKeys;
         }
 
-        public async Task<string> GetLicenseExclusivityKeyAsync(string smintIoKey)
+        private string GetLicenseExclusivityKey(string smintIoKey)
         {
-            if (_licenseExclusivityCache == null)
-                _licenseExclusivityCache = await _syncTarget.GetLicenseExclusivityKeyMappingsAsync();
-
-            if (_licenseExclusivityCache == null)
-                return smintIoKey;
-
             if (_licenseExclusivityCache.ContainsKey(smintIoKey))
                 return _licenseExclusivityCache[smintIoKey];
 
@@ -758,7 +756,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                  );
         }
 
-        private async Task<IList<string>> GetLicenseUsagesKeysAsync(IList<string> smintIoKeys)
+        private IList<string> GetLicenseUsagesKeys(IList<string> smintIoKeys)
         {
             if (smintIoKeys == null || !smintIoKeys.Any())
                 return null;
@@ -767,20 +765,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await GetLicenseUsageKeyAsync(smintIoKey));
+                targetKeys.Add(GetLicenseUsageKey(smintIoKey));
             }
 
             return targetKeys;
         }
 
-        public async Task<string> GetLicenseUsageKeyAsync(string smintIoKey)
+        private string GetLicenseUsageKey(string smintIoKey)
         {
-            if (_licenseUsageCache == null)
-                _licenseUsageCache = await _syncTarget.GetLicenseUsageKeyMappingsAsync();
-
-            if (_licenseUsageCache == null)
-                return smintIoKey;
-
             if (_licenseUsageCache.ContainsKey(smintIoKey))
                 return _licenseUsageCache[smintIoKey];
 
@@ -790,7 +782,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                  );
         }
 
-        private async Task<IList<string>> GetLicenseSizesKeysAsync(IList<string> smintIoKeys)
+        private IList<string> GetLicenseSizesKeys(IList<string> smintIoKeys)
         {
             if (smintIoKeys == null || !smintIoKeys.Any())
                 return null;
@@ -799,20 +791,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await GetLicenseSizeKeyAsync(smintIoKey));
+                targetKeys.Add(GetLicenseSizeKey(smintIoKey));
             }
 
             return targetKeys;
         }
 
-        public async Task<string> GetLicenseSizeKeyAsync(string smintIoKey)
+        private string GetLicenseSizeKey(string smintIoKey)
         {
-            if (_licenseSizeCache == null)
-                _licenseSizeCache = await _syncTarget.GetLicenseSizeKeyMappingsAsync();
-
-            if (_licenseSizeCache == null)
-                return smintIoKey;
-
             if (_licenseSizeCache.ContainsKey(smintIoKey))
                 return _licenseSizeCache[smintIoKey];
 
@@ -822,7 +808,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                  );
         }
 
-        private async Task<IList<string>> GetLicensePlacementsKeysAsync(IList<string> smintIoKeys)
+        private IList<string> GetLicensePlacementsKeys(IList<string> smintIoKeys)
         {
             if (smintIoKeys == null || !smintIoKeys.Any())
                 return null;
@@ -831,20 +817,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await GetLicensePlacementKeyAsync(smintIoKey));
+                targetKeys.Add(GetLicensePlacementKey(smintIoKey));
             }
 
             return targetKeys;
         }
 
-        public async Task<string> GetLicensePlacementKeyAsync(string smintIoKey)
+        private string GetLicensePlacementKey(string smintIoKey)
         {
-            if (_licensePlacementCache == null)
-                _licensePlacementCache = await _syncTarget.GetLicensePlacementKeyMappingsAsync();
-
-            if (_licensePlacementCache == null)
-                return smintIoKey;
-
             if (_licensePlacementCache.ContainsKey(smintIoKey))
                 return _licensePlacementCache[smintIoKey];
 
@@ -854,7 +834,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                  );
         }
 
-        private async Task<IList<string>> GetLicenseDistributionsKeysAsync(IList<string> smintIoKeys)
+        private IList<string> GetLicenseDistributionsKeys(IList<string> smintIoKeys)
         {
             if (smintIoKeys == null || !smintIoKeys.Any())
                 return null;
@@ -863,20 +843,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await GetLicenseDistributionKeyAsync(smintIoKey));
+                targetKeys.Add(GetLicenseDistributionKey(smintIoKey));
             }
 
             return targetKeys;
         }
 
-        public async Task<string> GetLicenseDistributionKeyAsync(string smintIoKey)
+        private string GetLicenseDistributionKey(string smintIoKey)
         {
-            if (_licenseDistributionCache == null)
-                _licenseDistributionCache = await _syncTarget.GetLicenseDistributionKeyMappingsAsync();
-
-            if (_licenseDistributionCache == null)
-                return smintIoKey;
-
             if (_licenseDistributionCache.ContainsKey(smintIoKey))
                 return _licenseDistributionCache[smintIoKey];
 
@@ -886,7 +860,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                  );
         }
 
-        private async Task<IList<string>> GetLicenseGeographiesKeysAsync(IList<string> smintIoKeys)
+        private IList<string> GetLicenseGeographiesKeys(IList<string> smintIoKeys)
         {
             if (smintIoKeys == null || !smintIoKeys.Any())
                 return null;
@@ -895,20 +869,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await GetLicenseGeographyKeyAsync(smintIoKey));
+                targetKeys.Add(GetLicenseGeographyKey(smintIoKey));
             }
 
             return targetKeys;
         }
 
-        public async Task<string> GetLicenseGeographyKeyAsync(string smintIoKey)
+        private string GetLicenseGeographyKey(string smintIoKey)
         {
-            if (_licenseGeographyCache == null)
-                _licenseGeographyCache = await _syncTarget.GetLicenseGeographyKeyMappingsAsync();
-
-            if (_licenseGeographyCache == null)
-                return smintIoKey;
-
             if (_licenseGeographyCache.ContainsKey(smintIoKey))
                 return _licenseGeographyCache[smintIoKey];
 
@@ -918,7 +886,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                  );
         }
 
-        private async Task<IList<string>> GetLicenseIndustriesKeysAsync(IList<string> smintIoKeys)
+        private IList<string> GetLicenseIndustriesKeys(IList<string> smintIoKeys)
         {
             if (smintIoKeys == null || !smintIoKeys.Any())
                 return null;
@@ -927,20 +895,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await GetLicenseIndustryKeyAsync(smintIoKey));
+                targetKeys.Add(GetLicenseIndustryKey(smintIoKey));
             }
 
             return targetKeys;
         }
 
-        public async Task<string> GetLicenseIndustryKeyAsync(string smintIoKey)
+        private string GetLicenseIndustryKey(string smintIoKey)
         {
-            if (_licenseIndustryCache == null)
-                _licenseIndustryCache = await _syncTarget.GetLicenseIndustryKeyMappingsAsync();
-
-            if (_licenseIndustryCache == null)
-                return smintIoKey;
-
             if (_licenseIndustryCache.ContainsKey(smintIoKey))
                 return _licenseIndustryCache[smintIoKey];
 
@@ -950,7 +912,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                  );
         }
 
-        private async Task<IList<string>> GetLicenseLanguagesKeysAsync(IList<string> smintIoKeys)
+        private IList<string> GetLicenseLanguagesKeys(IList<string> smintIoKeys)
         {
             if (smintIoKeys == null || !smintIoKeys.Any())
                 return null;
@@ -959,20 +921,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await GetLicenseLanguageKeyAsync(smintIoKey));
+                targetKeys.Add(GetLicenseLanguageKey(smintIoKey));
             }
 
             return targetKeys;
         }
 
-        public async Task<string> GetLicenseLanguageKeyAsync(string smintIoKey)
+        private string GetLicenseLanguageKey(string smintIoKey)
         {
-            if (_licenseLanguageCache == null)
-                _licenseLanguageCache = await _syncTarget.GetLicenseLanguageKeyMappingsAsync();
-
-            if (_licenseLanguageCache == null)
-                return smintIoKey;
-
             if (_licenseLanguageCache.ContainsKey(smintIoKey))
                 return _licenseLanguageCache[smintIoKey];
 
@@ -982,7 +938,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                  );
         }
 
-        private async Task<IList<string>> GetLicenseUsageLimitsKeysAsync(IList<string> smintIoKeys)
+        private IList<string> GetLicenseUsageLimitsKeys(IList<string> smintIoKeys)
         {
             if (smintIoKeys == null || !smintIoKeys.Any())
                 return null;
@@ -991,20 +947,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             foreach (var smintIoKey in smintIoKeys)
             {
-                targetKeys.Add(await GetLicenseUsageLimitKeyAsync(smintIoKey));
+                targetKeys.Add(GetLicenseUsageLimitKey(smintIoKey));
             }
 
             return targetKeys;
         }
 
-        public async Task<string> GetLicenseUsageLimitKeyAsync(string smintIoKey)
+        private string GetLicenseUsageLimitKey(string smintIoKey)
         {
-            if (_licenseUsageLimitCache == null)
-                _licenseUsageLimitCache = await _syncTarget.GetLicenseUsageLimitKeyMappingsAsync();
-
-            if (_licenseUsageLimitCache == null)
-                return smintIoKey;
-
             if (_licenseUsageLimitCache.ContainsKey(smintIoKey))
                 return _licenseUsageLimitCache[smintIoKey];
 
