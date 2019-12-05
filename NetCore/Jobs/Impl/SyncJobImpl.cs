@@ -164,15 +164,16 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
         {
             _logger.LogInformation("Starting Smint.io generic metadata synchronization...");
 
-            ClearGenericMetadataCaches();
-
             var cancelMetadataSync = !await _syncTarget.BeforeGenericMetadataSyncAsync();
-            if (cancelMetadataSync)
+            if (cancelMetadataSync &&
+                _contentProviderCache != null)
             {
                 _logger.LogInformation("'BeforeGenericMetadataSyncAsync' task aborted meta data sync");
 
                 return;
             }
+
+            ClearGenericMetadataCaches();
 
             var genericMetadata = await _smintIoClient.GetGenericMetadataAsync();
 
