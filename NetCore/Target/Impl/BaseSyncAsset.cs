@@ -10,7 +10,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         where TSyncReleaseDetails : BaseSyncReleaseDetails
         where TSyncDownloadConstraints : BaseSyncDownloadConstraints
     {
-        internal string Uuid { get; set; }
+        public string Uuid { get; set; }
 
         public string TargetAssetUuid { get; set; }
 
