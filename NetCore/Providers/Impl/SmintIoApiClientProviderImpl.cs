@@ -217,7 +217,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             foreach (var lpt in syncLptQueryResult.License_purchase_transactions)
             {
                 bool? isEditorialUse = null;
-                bool? hasLicenseTerms = false;
 
                 foreach (var license_term in lpt.License_terms)
                 {
@@ -239,20 +238,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                                 isEditorialUse = false;
                         }
                     }
-                    
-                    hasLicenseTerms |=
-                        license_term.Restricted_usages?.Count > 0 ||
-                        license_term.Restricted_sizes?.Count > 0 ||
-                        license_term.Restricted_placements?.Count > 0 ||
-                        license_term.Restricted_distributions?.Count > 0 ||
-                        license_term.Restricted_geographies?.Count > 0 ||
-                        license_term.Restricted_industries?.Count > 0 ||
-                        license_term.Restricted_languages?.Count > 0 ||
-                        license_term.Usage_limits?.Count > 0 ||
-                        (license_term.Valid_from != null && license_term.Valid_from > DateTimeOffset.Now) ||
-                        license_term.Valid_until != null ||
-                        license_term.To_be_used_until != null ||
-                        (license_term.Is_editorial_use ?? false);
                 }
 
                 string url = $"https://{settingsDatabaseModel.TenantId}.smint.io/project/{lpt.Project_uuid}/content-element/{lpt.Content_element.Uuid}";
@@ -285,7 +270,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     LicenseTerms = GetLicenseTerms(importLanguages, lpt),
                     DownloadConstraints = GetDownloadConstraints(lpt),
                     IsEditorialUse = isEditorialUse,
-                    HasLicenseTerms = hasLicenseTerms,
+                    HasLicenseTerms = lpt.Has_potentially_restrictive_license_terms ?? false,
                     SmintIoUrl = url,
                     PurchasedAt = lpt.Purchased_at,
                     CreatedAt = (DateTimeOffset)lpt.Created_at,
