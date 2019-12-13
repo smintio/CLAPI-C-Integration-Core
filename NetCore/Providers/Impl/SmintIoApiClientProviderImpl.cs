@@ -25,6 +25,7 @@ using Polly.Retry;
 using SmintIo.CLAPI.Consumer.Client.Generated;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -120,14 +121,20 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
         private IList<SmintIoMetadataElement> GetGroupedMetadataElementsForImportLanguages(string[] importLanguages, LocalizedMetadataElements localizedMetadataElements)
         {
             return localizedMetadataElements
-                .Where(localizedMetadataElement => importLanguages.Contains(localizedMetadataElement.Culture))
+                .Where(localizedMetadataElement => importLanguages.Contains(localizedMetadataElement.Culture) || localizedMetadataElement.Culture == "en")
                 .GroupBy(localizedMetadataElement => localizedMetadataElement.Metadata_element.Key)
                 .Select((group) =>
                 {
                     return new SmintIoMetadataElement()
                     {
                         Key = group.Key,
-                        Values = group.ToDictionary(metadataElement => metadataElement.Culture, metadataElement => metadataElement.Metadata_element.Name)
+                        Values = AddLanguageFallback(
+                            importLanguages,
+                            group.ToDictionary(
+                                metadataElement => metadataElement.Culture,
+                                metadataElement => metadataElement.Metadata_element.Name
+                            )
+                        )
                     };
                 })
                 .ToList();
@@ -448,10 +455,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             if (localizedMetadataElements == null)
                 return null;
 
-            return localizedMetadataElements
-                .Where(localizedMetadataElement => importLanguages.Contains(localizedMetadataElement.Culture))
+            return AddLanguageFallback(importLanguages, localizedMetadataElements
+                .Where(localizedMetadataElement => importLanguages.Contains(localizedMetadataElement.Culture) || localizedMetadataElement.Culture == "en")
                 .GroupBy(localizedMetadataElement => localizedMetadataElement.Culture)
-                .ToDictionary(group => group.Key, group => group.Select(localizedMetadataElement => localizedMetadataElement.Metadata_element.Name).ToArray());
+                .ToDictionary(group => group.Key, group => group.Select(localizedMetadataElement => localizedMetadataElement.Metadata_element.Name).ToArray())
+            );
         }
 
         private IDictionary<string, string> GetValuesForImportLanguages(string[] importLanguages, LocalizedStrings localizedStrings)
@@ -459,9 +467,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             if (localizedStrings == null)
                 return null;
 
-            return localizedStrings
-                .Where(localizedString => importLanguages.Contains(localizedString.Culture))
-                .ToDictionary(localizedString => localizedString.Culture, localizedString => localizedString.Value);
+            return AddLanguageFallback(importLanguages, localizedStrings
+                .Where(localizedString => importLanguages.Contains(localizedString.Culture) || localizedString.Culture == "en")
+                .ToDictionary(localizedString => localizedString.Culture, localizedString => localizedString.Value)
+            );
         }
 
         private async Task SetupClapicOpenApiClientAsync()
@@ -484,6 +493,36 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             }
 
             _disposed = true;
+        }
+
+        private IDictionary<string, T> AddLanguageFallback<T>(
+            string[] importLanguages, IDictionary<string, T> availableValues
+        ) {
+
+            if (importLanguages == null || importLanguages.Length == 0) {
+                return availableValues;
+            }
+
+            if (availableValues == null || availableValues.Count == 0) {
+                return null;
+            }
+
+            bool needEnglishFallback = !importLanguages.Contains("en");
+
+            // copy over all languages to import
+            IDictionary<string, T> result = new Dictionary<string, T>();
+            foreach (var importLanguage in importLanguages) {
+
+                if (availableValues.ContainsKey(importLanguage)) {
+                    result.Add(importLanguage, availableValues[importLanguage]);
+
+                } else if (needEnglishFallback && availableValues.ContainsKey("en")) {
+
+                    // Add English as fallback for all languages not available
+                    result.Add(importLanguage, availableValues["en"]);
+                }
+            }
+            return result;
         }
     }
 }
