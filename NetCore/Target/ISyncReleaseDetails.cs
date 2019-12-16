@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
 {
-    public abstract class BaseSyncReleaseDetails
+    public interface ISyncReleaseDetails
     {
-        public abstract void SetModelReleaseState(string modelReleaseStateKey);
-        public abstract void SetPropertyReleaseState(string propertyReleaseStateKey);
-        public abstract void SetProviderAllowedUseComment(IDictionary<string, string> providerAllowedUseComment);
-        public abstract void SetProviderReleaseComment(IDictionary<string, string> providerReleaseComment);
-        public abstract void SetProviderUsageConstraints(IDictionary<string, string> providerUsageConstraints);
+        void SetModelReleaseState(string modelReleaseStateKey);
+        void SetPropertyReleaseState(string propertyReleaseStateKey);
+        void SetProviderAllowedUseComment(IDictionary<string, string> providerAllowedUseComment);
+        void SetProviderReleaseComment(IDictionary<string, string> providerReleaseComment);
+        void SetProviderUsageConstraints(IDictionary<string, string> providerUsageConstraints);
     }
 }

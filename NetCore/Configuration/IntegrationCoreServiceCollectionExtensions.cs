@@ -26,6 +26,7 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl;
 using SmintIo.CLAPI.Consumer.Integration.Core.Providers;
 using SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl;
 using SmintIo.CLAPI.Consumer.Integration.Core.Services;
+using SmintIo.CLAPI.Consumer.Integration.Core.Target;
 using SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl;
 using System;
 
@@ -35,10 +36,10 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddSmintIoClapicIntegrationCore<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>(this IServiceCollection services)
             where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-            where TSyncLicenseOption : BaseSyncLicenseOption
-            where TSyncLicenseTerm : BaseSyncLicenseTerm
-            where TSyncReleaseDetails : BaseSyncReleaseDetails
-            where TSyncDownloadConstraints : BaseSyncDownloadConstraints
+            where TSyncLicenseOption : ISyncLicenseOption
+            where TSyncLicenseTerm : ISyncLicenseTerm
+            where TSyncReleaseDetails : ISyncReleaseDetails
+            where TSyncDownloadConstraints : ISyncDownloadConstraints
         {            
             Console.WriteLine("Initializing CLAPI-C Integration Core...");
 

@@ -38,10 +38,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 {
     internal class SyncJobImpl<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> : ISyncJob
         where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncLicenseOption : BaseSyncLicenseOption
-        where TSyncLicenseTerm : BaseSyncLicenseTerm
-        where TSyncReleaseDetails : BaseSyncReleaseDetails
-        where TSyncDownloadConstraints : BaseSyncDownloadConstraints
+        where TSyncLicenseOption : ISyncLicenseOption
+        where TSyncLicenseTerm : ISyncLicenseTerm
+        where TSyncReleaseDetails : ISyncReleaseDetails
+        where TSyncDownloadConstraints : ISyncDownloadConstraints
     {
         private const string Folder = "temp";
 

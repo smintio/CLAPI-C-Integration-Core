@@ -5,10 +5,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 {
     public abstract class BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
         where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncLicenseOption : BaseSyncLicenseOption
-        where TSyncLicenseTerm : BaseSyncLicenseTerm
-        where TSyncReleaseDetails : BaseSyncReleaseDetails
-        where TSyncDownloadConstraints : BaseSyncDownloadConstraints
+        where TSyncLicenseOption : ISyncLicenseOption
+        where TSyncLicenseTerm : ISyncLicenseTerm
+        where TSyncReleaseDetails : ISyncReleaseDetails
+        where TSyncDownloadConstraints : ISyncDownloadConstraints
     {
         public string Uuid { get; set; }
 

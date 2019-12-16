@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
 {
-    public abstract class BaseSyncLicenseOption
+    public interface ISyncLicenseOption
     {
-        public abstract void SetLicenseText(IDictionary<string, string> licenseText);
-        public abstract void SetName(IDictionary<string, string> name);
+        void SetLicenseText(IDictionary<string, string> licenseText);
+        void SetName(IDictionary<string, string> name);
     }
 }

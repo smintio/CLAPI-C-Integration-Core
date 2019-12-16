@@ -1,9 +1,9 @@
-﻿namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
+﻿namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
 {
-    public abstract class BaseSyncDownloadConstraints
+    public interface ISyncDownloadConstraints
     {
-        public abstract void SetMaxUsers(int maxUsers);
-        public abstract void SetMaxDownloads(int maxDownloads);
-        public abstract void SetMaxReuses(int maxReuses);
+        void SetMaxUsers(int maxUsers);
+        void SetMaxDownloads(int maxDownloads);
+        void SetMaxReuses(int maxReuses);
     }
 }
