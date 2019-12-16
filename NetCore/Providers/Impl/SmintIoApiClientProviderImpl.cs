@@ -85,7 +85,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             await SetupClapicOpenApiClientAsync();
 
             var syncGenericMetadata = await _retryPolicy.ExecuteAsync(async () =>
-                await _clapicOpenApiClient.GetGenericMetadataForSyncAsync());
+                {
+                    // get a new access token in case it was refreshed
+                    var tokenDatabaseModel = await _tokenDatabaseProvider.GetTokenDatabaseModelAsync();
+                    _clapicOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;
+                    return await _clapicOpenApiClient.GetGenericMetadataForSyncAsync();
+                }
+            );
 
             var smintIoGenericMetadata = new SmintIoGenericMetadata();
 
@@ -209,6 +215,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
 
             SyncLicensePurchaseTransactionQueryResult syncLptQueryResult = await _retryPolicy.ExecuteAsync(async () =>
             {
+                // get a new access token in case it was refreshed
+                var tokenDatabaseModel = await _tokenDatabaseProvider.GetTokenDatabaseModelAsync();
+                _clapicOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;
                 return await _clapicOpenApiClient.GetLicensePurchaseTransactionsForSyncAsync(
                     continuationUuid: continuationUuid,
                     limit: 10);
