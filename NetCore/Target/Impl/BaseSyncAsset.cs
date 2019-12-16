@@ -17,7 +17,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 
         private FileDownloaderDelegate _fileDownloader;
 
-        private FileInfo _downladedFile;
+        private FileInfo _downloadedFile;
 
         public string Uuid { get; set; }
 
@@ -102,14 +102,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
             _fileDownloader = fileDownloader;
         }
 
-        public async Task<FileInfo> GetDownloadedFile()
+        public async Task<FileInfo> GetDownloadedFileAsync()
         {
-            if (_downladedFile == null && _fileDownloader != null)
+            if (_downloadedFile == null && _fileDownloader != null)
             {
-                _downladedFile = await _fileDownloader.Invoke();
+                _downloadedFile = await _fileDownloader.Invoke();
             }
 
-            return _downladedFile;
+            return _downloadedFile;
         }
 
         public abstract void SetTransactionUuid(string transactionUuid);
