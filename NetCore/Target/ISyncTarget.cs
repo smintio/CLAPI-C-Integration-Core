@@ -145,8 +145,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         Task<string> GetTargetCompoundAssetUuidAsync(string smintIoAssetUuid);
         Task<string> GetTargetAssetBinaryUuidAsync(string smintIoAssetUuid, string smintIoBinaryUuid);
 
-        Task ImportNewTargetAssetsAsync(string folderName, IList<TSyncAsset> newTargetAssets);
-        Task UpdateTargetAssetsAsync(string folderName, IList<TSyncAsset> updatedTargetAssets);
+        Task ImportNewTargetAssetsAsync(IList<TSyncAsset> newTargetAssets);
+        Task UpdateTargetAssetsAsync(IList<TSyncAsset> updatedTargetAssets);
 
         Task ImportNewTargetCompoundAssetsAsync(IList<TSyncAsset> newTargetCompoundAssets);
         Task UpdateTargetCompoundAssetsAsync(IList<TSyncAsset> updatedTargetCompoundAssets);
