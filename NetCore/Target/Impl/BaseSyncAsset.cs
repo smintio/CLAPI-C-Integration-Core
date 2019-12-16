@@ -1,15 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 {
+    internal delegate Task<FileInfo> FileDownloaderDelegate();
+
     public abstract class BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
         where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncLicenseOption : BaseSyncLicenseOption
-        where TSyncLicenseTerm : BaseSyncLicenseTerm
-        where TSyncReleaseDetails : BaseSyncReleaseDetails
-        where TSyncDownloadConstraints : BaseSyncDownloadConstraints
+        where TSyncLicenseOption : ISyncLicenseOption
+        where TSyncLicenseTerm : ISyncLicenseTerm
+        where TSyncReleaseDetails : ISyncReleaseDetails
+        where TSyncDownloadConstraints : ISyncDownloadConstraints
     {
+
+        private FileDownloaderDelegate _fileDownloader;
+
+        private FileInfo _downladedFile;
+
         public string Uuid { get; set; }
 
         public string TargetAssetUuid { get; set; }
@@ -22,8 +31,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         public IDictionary<string, string> BinaryUsage { get; set; }
 
         public string RecommendedFileName { get; set; }
-
-        public string DownloadUrl { get; set; }
 
         public string LocalFileName { get; set; }
 
@@ -83,16 +90,26 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
             RecommendedFileName = recommendedFileName;
         }
 
-        internal void SetDownloadUrl(string downloadUrl)
-        {
-            DownloadUrl = downloadUrl;
-        }
-
         internal void SetAssetParts(IList<TSyncAsset> assetParts)
         {
             IsCompoundAsset = assetParts != null ? AssetParts.Count > 0 : false;
 
             AssetParts = assetParts;
+        }
+
+        internal void SetDownloadedFileProvider(FileDownloaderDelegate fileDownloader)
+        {
+            _fileDownloader = fileDownloader;
+        }
+
+        public async Task<FileInfo> GetDownloadedFile()
+        {
+            if (_downladedFile == null && _fileDownloader != null)
+            {
+                _downladedFile = await _fileDownloader.Invoke();
+            }
+
+            return _downladedFile;
         }
 
         public abstract void SetTransactionUuid(string transactionUuid);

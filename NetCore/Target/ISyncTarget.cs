@@ -29,10 +29,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
 {
     public interface ISyncTarget<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
         where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncLicenseOption : BaseSyncLicenseOption
-        where TSyncLicenseTerm : BaseSyncLicenseTerm
-        where TSyncReleaseDetails : BaseSyncReleaseDetails
-        where TSyncDownloadConstraints : BaseSyncDownloadConstraints
+        where TSyncLicenseOption : ISyncLicenseOption
+        where TSyncLicenseTerm : ISyncLicenseTerm
+        where TSyncReleaseDetails : ISyncReleaseDetails
+        where TSyncDownloadConstraints : ISyncDownloadConstraints
     {
         /// <summary>
         /// Provides information about features this sync target supports and thus is capable of.
@@ -145,10 +145,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         Task<string> GetTargetCompoundAssetUuidAsync(string smintIoAssetUuid);
         Task<string> GetTargetAssetBinaryUuidAsync(string smintIoAssetUuid, string smintIoBinaryUuid);
 
-        Task CreateTargetAssetsAsync(string folderName, IList<TSyncAsset> newTargetAssets);
-        Task UpdateTargetAssetsAsync(string folderName, IList<TSyncAsset> updatedTargetAssets);
+        Task ImportNewTargetAssetsAsync(IList<TSyncAsset> newTargetAssets);
+        Task UpdateTargetAssetsAsync(IList<TSyncAsset> updatedTargetAssets);
 
-        Task CreateTargetCompoundAssetsAsync(IList<TSyncAsset> newTargetCompoundAssets);
+        Task ImportNewTargetCompoundAssetsAsync(IList<TSyncAsset> newTargetCompoundAssets);
         Task UpdateTargetCompoundAssetsAsync(IList<TSyncAsset> updatedTargetCompoundAssets);
 
         /// <summary>

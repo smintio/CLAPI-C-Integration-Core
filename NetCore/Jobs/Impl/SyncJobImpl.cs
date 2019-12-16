@@ -26,6 +26,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using System.Net;
 using SmintIo.CLAPI.Consumer.Integration.Core.Contracts;
 using SmintIo.CLAPI.Consumer.Integration.Core.Providers;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
@@ -38,10 +39,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 {
     internal class SyncJobImpl<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> : ISyncJob
         where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncLicenseOption : BaseSyncLicenseOption
-        where TSyncLicenseTerm : BaseSyncLicenseTerm
-        where TSyncReleaseDetails : BaseSyncReleaseDetails
-        where TSyncDownloadConstraints : BaseSyncDownloadConstraints
+        where TSyncLicenseOption : ISyncLicenseOption
+        where TSyncLicenseTerm : ISyncLicenseTerm
+        where TSyncReleaseDetails : ISyncReleaseDetails
+        where TSyncDownloadConstraints : ISyncDownloadConstraints
     {
         private const string Folder = "temp";
 
@@ -280,7 +281,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                     {
                         CreateTempFolder(folderName);
 
-                        var targetAssets = TransformAssets(rawAssets);
+                        var targetAssets = TransformAssets(rawAssets, folderName);
 
                         IList<TSyncAsset> newTargetAssets = new List<TSyncAsset>();
                         IList<TSyncAsset> updatedTargetAssets = new List<TSyncAsset>();
@@ -322,13 +323,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                         }
 
                         if (newTargetAssets.Count > 0)
-                            await _syncTarget.CreateTargetAssetsAsync(folderName, newTargetAssets);
+                            await _syncTarget.ImportNewTargetAssetsAsync(newTargetAssets);
 
                         if (updatedTargetAssets.Count > 0)
-                            await _syncTarget.UpdateTargetAssetsAsync(folderName, updatedTargetAssets);
+                            await _syncTarget.UpdateTargetAssetsAsync(updatedTargetAssets);
 
                         if (newTargetCompoundAssets.Count > 0)
-                            await _syncTarget.CreateTargetCompoundAssetsAsync(newTargetCompoundAssets);
+                            await _syncTarget.ImportNewTargetCompoundAssetsAsync(newTargetCompoundAssets);
 
                         if (updatedTargetCompoundAssets.Count > 0)
                             await _syncTarget.UpdateTargetCompoundAssetsAsync(updatedTargetCompoundAssets);
@@ -354,7 +355,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             }
         }
 
-        private IList<TSyncAsset> TransformAssets(IList<SmintIoAsset> rawAssets)
+        private IList<TSyncAsset> TransformAssets(IList<SmintIoAsset> rawAssets, string temporaryFolder)
         {
             IList<TSyncAsset> assets = new List<TSyncAsset>();
 
@@ -377,7 +378,32 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                     targetAsset.SetRecommendedFileName(recommendedFileName);
 
-                    targetAsset.SetDownloadUrl(downloadUrl);
+                    string localFileName = $"{temporaryFolder}/{targetAsset.WorldwideUniqueBinaryUuid}_{recommendedFileName}";
+                    var targetFile = new FileInfo(localFileName);
+                    targetAsset.SetDownloadedFileProvider(async () =>
+                    {
+                        _logger.LogInformation($"Downloading file UUID {targetAsset.WorldwideUniqueBinaryUuid} to {localFileName}...");
+
+                        if (downloadUrl == null)
+                        {
+                            return null;
+                        }
+
+                        try
+                        {
+                            WebClient wc = new WebClient();
+                            await wc.DownloadFileTaskAsync(downloadUrl, targetFile.FullName);
+                        }
+                        catch (WebException we)
+                        {
+                            _logger.LogError(we, "Error downloading asset");
+                            throw;
+                        }
+
+                        _logger.LogInformation($"Downloaded file UUID {targetAsset.WorldwideUniqueBinaryUuid} to {localFileName}");
+
+                        return targetFile;
+                    });
 
                     SetContentMetadata(targetAsset, rawAsset, binary);
                     SetLicenseMetadata(targetAsset, rawAsset);
