@@ -322,13 +322,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                         }
 
                         if (newTargetAssets.Count > 0)
-                            await _syncTarget.CreateTargetAssetsAsync(folderName, newTargetAssets);
+                            await _syncTarget.ImportNewTargetAssetsAsync(folderName, newTargetAssets);
 
                         if (updatedTargetAssets.Count > 0)
                             await _syncTarget.UpdateTargetAssetsAsync(folderName, updatedTargetAssets);
 
                         if (newTargetCompoundAssets.Count > 0)
-                            await _syncTarget.CreateTargetCompoundAssetsAsync(newTargetCompoundAssets);
+                            await _syncTarget.ImportNewTargetCompoundAssetsAsync(newTargetCompoundAssets);
 
                         if (updatedTargetCompoundAssets.Count > 0)
                             await _syncTarget.UpdateTargetCompoundAssetsAsync(updatedTargetCompoundAssets);
