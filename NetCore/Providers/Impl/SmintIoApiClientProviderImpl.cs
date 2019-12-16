@@ -497,13 +497,15 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
 
         private IDictionary<string, T> AddLanguageFallback<T>(
             string[] importLanguages, IDictionary<string, T> availableValues
-        ) {
-
-            if (importLanguages == null || importLanguages.Length == 0) {
+        )
+        {
+            if (importLanguages == null || importLanguages.Length == 0)
+            {
                 return availableValues;
             }
 
-            if (availableValues == null || availableValues.Count == 0) {
+            if (availableValues == null || availableValues.Count == 0)
+            {
                 return null;
             }
 
@@ -511,14 +513,17 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
 
             // copy over all languages to import
             IDictionary<string, T> result = new Dictionary<string, T>();
-            foreach (var importLanguage in importLanguages) {
 
-                if (availableValues.ContainsKey(importLanguage)) {
+            foreach (var importLanguage in importLanguages)
+            {
+                if (availableValues.ContainsKey(importLanguage))
+                {
                     result.Add(importLanguage, availableValues[importLanguage]);
-
-                } else if (needEnglishFallback && availableValues.ContainsKey("en")) {
-
+                }
+                else if (needEnglishFallback && availableValues.ContainsKey("en"))
+                {
                     // Add English as fallback for all languages not available
+
                     result.Add(importLanguage, availableValues["en"]);
                 }
             }
