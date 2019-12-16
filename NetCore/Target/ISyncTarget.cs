@@ -101,12 +101,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         Task ImportLicenseLanguagesAsync(IList<SmintIoMetadataElement> licenseLanguages);
         Task ImportLicenseUsageLimitsAsync(IList<SmintIoMetadataElement> licenseUsageLimits);
 
-        TSyncAsset CreateSyncAsset();
-        TSyncLicenseOption CreateSyncLicenseOption();
-        TSyncLicenseTerm CreateSyncLicenseTerm();
-        TSyncReleaseDetails CreateSyncReleaseDetails();
-        TSyncDownloadConstraints CreateSyncDownloadConstraints();
-
         /// <summary>
         /// After the synchronisation of all generic meta data this is called, before any syncing of assets with
         /// <see cref="ImportAssetsAsync"/>.

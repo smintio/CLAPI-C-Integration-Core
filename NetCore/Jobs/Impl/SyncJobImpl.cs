@@ -54,6 +54,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private readonly ISmintIoApiClientProvider _smintIoClient;
 
+        private readonly ISyncTargetDataFactory<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> _syncTargetDataFactory;
         private readonly ISyncTarget<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> _syncTarget;
 
         private readonly ILogger _logger;
@@ -83,6 +84,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             ITokenDatabaseProvider tokenDatabaseProvider,
             ISyncDatabaseProvider syncDatabaseProvider,            
             ISmintIoApiClientProvider smintIoClient,
+            ISyncTargetDataFactory<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> syncTargetDataFactory,
             ISyncTarget<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> syncTarget,
             ILogger<SyncJobImpl<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>> logger)
         {
@@ -92,6 +94,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             _smintIoClient = smintIoClient;
 
+            _syncTargetDataFactory = syncTargetDataFactory;
             _syncTarget = syncTarget;
 
             _logger = logger;
@@ -372,7 +375,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                     var downloadUrl = binary.DownloadUrl;
                     var recommendedFileName = binary.RecommendedFileName;
 
-                    var targetAsset = _syncTarget.CreateSyncAsset();
+                    var targetAsset = _syncTargetDataFactory.CreateSyncBinaryAsset();
 
                     targetAsset.SetUuid(rawAsset.LicensePurchaseTransactionUuid);
 
@@ -417,7 +420,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                 {
                     // we have a compound asset, consisting of more than one asset part
 
-                    var targetCompoundAsset = _syncTarget.CreateSyncAsset();
+                    var targetCompoundAsset = _syncTargetDataFactory.CreateSyncCompoundAsset();
 
                     targetCompoundAsset.SetUuid(rawAsset.LicensePurchaseTransactionUuid);
 
@@ -518,7 +521,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             {
                 var rawDownloadConstraints = rawAsset.DownloadConstraints;
 
-                var targetDownloadConstraints = _syncTarget.CreateSyncDownloadConstraints();
+                var targetDownloadConstraints = _syncTargetDataFactory.CreateSyncDownloadConstraints();
 
                 if (rawDownloadConstraints.MaxDownloads != null)
                     targetDownloadConstraints.SetMaxDownloads((int)rawDownloadConstraints.MaxDownloads);
@@ -536,7 +539,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             {
                 var rawReleaseDetails = rawAsset.ReleaseDetails;
 
-                var targetReleaseDetails = _syncTarget.CreateSyncReleaseDetails();
+                var targetReleaseDetails = _syncTargetDataFactory.CreateSyncReleaseDetails();
 
                 string modelReleaseState = null;
                 if (!string.IsNullOrEmpty(rawReleaseDetails.ModelReleaseState))
@@ -575,7 +578,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
         {
             return rawLicenseOptions.Select(rawLicenseOption =>
             {
-                var targetLicenseOption = _syncTarget.CreateSyncLicenseOption();
+                var targetLicenseOption = _syncTargetDataFactory.CreateSyncLicenseOption();
 
                 targetLicenseOption.SetName(rawLicenseOption.OptionName);
 
@@ -617,7 +620,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                 var usageLimits = GetLicenseUsageLimitsKeys(rawLicenseTerm.UsageLimits);
 
-                var targetLicenseTerm = _syncTarget.CreateSyncLicenseTerm();
+                var targetLicenseTerm = _syncTargetDataFactory.CreateSyncLicenseTerm();
 
                 if (rawLicenseTerm.SequenceNumber != null)
                     targetLicenseTerm.SetSequenceNumber((int)rawLicenseTerm.SequenceNumber);
