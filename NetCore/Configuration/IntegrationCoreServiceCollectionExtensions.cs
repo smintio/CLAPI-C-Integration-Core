@@ -45,6 +45,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<ISyncJob, SyncJobImpl<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>>();
 
+            services.AddSingleton<ISyncJobExecutionQueue, DefaultSyncJobExecutionQueue>();
             services.AddSingleton<ISmintIoApiClientProvider, SmintIoApiClientProviderImpl>();            
 
             services.AddHostedService<TimedSynchronizerService>();

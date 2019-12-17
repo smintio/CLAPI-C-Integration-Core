@@ -46,8 +46,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
     {
         private const string Folder = "temp";
 
-        private static readonly SemaphoreSlim Semaphore = new SemaphoreSlim(1, 1);
-
         private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
         private readonly ITokenDatabaseProvider _tokenDatabaseProvider;
         private readonly ISyncDatabaseProvider _syncDatabaseProvider;
@@ -102,8 +100,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task SynchronizeAsync(bool synchronizeGenericMetadata)
         {
-            await Semaphore.WaitAsync();
-
             try
             {
                 var settingsDatabaseModel = await _settingsDatabaseProvider.GetSettingsDatabaseModelAsync();
@@ -157,10 +153,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                 _logger.LogError(e, "Error in sync job");
 
                 await _syncTarget.HandleSyncJobExceptionAsync(new SmintIoSyncJobException(SmintIoSyncJobException.SyncJobError.Generic, e.Message));
-            }
-            finally
-            {
-                Semaphore.Release();
             }
         }
 

@@ -30,6 +30,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 {
     internal class TimedSynchronizerService : IHostedService, IDisposable
     {
+        private readonly ISyncJobExecutionQueue _jobExecutionQueue;
         private readonly ISyncJob _syncJob;
 
         private Timer _timer;
@@ -37,9 +38,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
         private readonly ILogger _logger;
 
         public TimedSynchronizerService(
+            ISyncJobExecutionQueue jobExecutionQueue,
             ISyncJob syncJob,
             ILogger<TimedSynchronizerService> logger)
         {
+            _jobExecutionQueue = jobExecutionQueue;
             _syncJob = syncJob;
 
             _logger = logger;
@@ -54,7 +57,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
         {
             _logger.LogInformation("Starting timed synchronizer service...");
 
-            _timer = new Timer(DoWorkAsync, null, TimeSpan.Zero, TimeSpan.FromMinutes(30));
+            _timer = new Timer(TriggerSyncJobExecution, null, TimeSpan.Zero, TimeSpan.FromMinutes(30));
 
             _logger.LogInformation("Started timed synchronizer service");
 
@@ -72,11 +75,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
             return Task.CompletedTask;
         }
 
-        private async void DoWorkAsync(object state)
+        private void TriggerSyncJobExecution(object state)
         {
             // sync generic metadata, because this is our regular, lazy job
 
-            await _syncJob.SynchronizeAsync(synchronizeGenericMetadata: true);
+            _jobExecutionQueue.AddJobForScheduleEvent(async () =>
+                await _syncJob.SynchronizeAsync(synchronizeGenericMetadata: true)
+            );
         }
     }
 }

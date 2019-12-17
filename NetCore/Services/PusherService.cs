@@ -38,6 +38,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 
         private Channel _channel;
 
+        private readonly ISyncJobExecutionQueue _jobExecutionQueue;
         private readonly ISyncJob _syncJob;
 
         private readonly ILogger _logger;
@@ -45,12 +46,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
         public PusherService(
             ISettingsDatabaseProvider settingsDatabaseProvider,
             ITokenDatabaseProvider tokenDatabaseProvider,            
+            ISyncJobExecutionQueue jobExecutionQueue,
             ISyncJob syncJob,
             ILogger<PusherService> logger)
         {
             _settingsDatabaseProvider = settingsDatabaseProvider;
             _tokenDatabaseProvider = tokenDatabaseProvider;
 
+            _jobExecutionQueue = jobExecutionQueue;
             _syncJob = syncJob;
 
             _logger = logger;
@@ -122,13 +125,15 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
         {
             _channel = _pusher.SubscribeAsync($"private-2-{channelId}").GetAwaiter().GetResult();
 
-            _channel.Bind("global-transaction-history-update", async (payload) =>
+            _channel.Bind("global-transaction-history-update", (payload) =>
             {
                 _logger.LogInformation("Received Pusher event");
 
                 // do not sync generic metadata, because we need to be fast here
 
-                await _syncJob.SynchronizeAsync(synchronizeGenericMetadata: false);
+                _jobExecutionQueue.AddJobForPushEvent(async () =>
+                    await _syncJob.SynchronizeAsync(synchronizeGenericMetadata: false)
+                );
             });
         }
 
