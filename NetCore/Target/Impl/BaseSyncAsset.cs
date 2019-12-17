@@ -32,8 +32,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 
         public string RecommendedFileName { get; set; }
 
-        public string LocalFileName { get; set; }
-
         public bool IsCompoundAsset { get; set; }
 
         public IList<TSyncAsset> AssetParts { get; set; }

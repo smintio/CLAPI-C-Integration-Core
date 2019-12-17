@@ -24,9 +24,6 @@ using System.Threading.Tasks;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs
 {
-
-    internal delegate void Job();
-
     /// <summary>
     /// Handles collision of execution of jobs to copy data from Smint.io platform to sync targets.
     /// </summary>
@@ -60,9 +57,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs
         /// </para>
         ///
         /// </remarks>
-        /// <param name="job">the job to run.</param>
+        /// <param name="job">the async job to run.</param>
         /// <returns><c>this</c></returns>
-        ISyncJobExecutionQueue AddJobForScheduleEvent(Job job);
+        ISyncJobExecutionQueue AddJobForScheduleEvent(Func<Task> job);
 
 
         /// <summary>
@@ -75,9 +72,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs
         /// </para>
         ///
         /// </remarks>
-        /// <param name="job">the job to run.</param>
+        /// <param name="job">the async job to run.</param>
         /// <returns><c>this</c></returns>
-        ISyncJobExecutionQueue AddJobForPushEvent(Job job);
+        ISyncJobExecutionQueue AddJobForPushEvent(Func<Task> job);
 
         /// <summary>
         /// Adds a job.
@@ -91,9 +88,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs
         ///
         /// </remarks>
         /// <param name="isPushEventJob">whether this is job, that has been triggered by a push event, or not.</param>
-        /// <param name="job">the job to run.</param>
+        /// <param name="job">the async job to run.</param>
         /// <returns><c>this</c></returns>
-        ISyncJobExecutionQueue AddJob(bool isPushEventJob, Job job);
+        ISyncJobExecutionQueue AddJob(bool isPushEventJob, Func<Task> job);
 
 
         /// <summary>
@@ -132,31 +129,5 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs
         /// </remarks>
         /// <returns><c>true</c> if at least one job is waiting or <c>false</c> otherwise.</returns>
         bool IsRunning();
-
-
-        /// <summary>
-        /// Add a callback to be called as soon as the currently running job has finished.
-        /// </summary>
-        ///
-        /// <remarks>
-        /// <para>
-        /// In case no job is currently running, the callback will be called as soon as the next scheduled job has been
-        /// run. The callback will be called immediately in case no job has been added to the queue and no job is being
-        /// executed. This will avoid starvation with no more jobs on the queue.
-        /// </para>
-        ///
-        /// <para>
-        /// The consumer function will receive the flag, whether the job was started as a push notification
-        /// (<c>false</c>) or a regular schedule (<c>true</c>).
-        /// </para>
-        ///
-        /// <code>
-        /// callback.Invoke(wasCalledAsRegularSchedule);
-        /// </code>
-        ///
-        /// </remarks>
-        /// <param name="callback">the action to call as soon as the job has finished.</param>
-        /// <returns><c>this</c>.</returns>
-        ISyncJobExecutionQueue NotifyWhenFinished(Action<bool> callback);
     }
 }

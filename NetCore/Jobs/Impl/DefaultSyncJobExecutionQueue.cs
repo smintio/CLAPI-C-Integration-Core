@@ -20,242 +20,173 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Threading;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 {
-
     internal class DefaultSyncJobExecutionQueue : ISyncJobExecutionQueue
     {
-
         private static readonly int JobQueueLength = 1;
         private static readonly int JobQueueExtraSlots = 1;
         private static readonly int JobQueueMaxLength = JobQueueLength + JobQueueExtraSlots;
 
-
         private JobDescription _runningJob;
-        private readonly IList<JobDescription> _jobWaitingQueue = new List<JobDescription>();
+        private readonly ConcurrentQueue<JobDescription> _jobWaitingQueue = new ConcurrentQueue<JobDescription>();
         private readonly object _runningJobSemaphore = new object();
 
-        private readonly IList<Action<bool>> _waitingForNotification = new List<Action<bool>>();
-
-        public ISyncJobExecutionQueue AddJobForScheduleEvent(Job job)
+        public ISyncJobExecutionQueue AddJobForScheduleEvent(Func<Task> job)
         {
             if (job == null)
             {
                 return this;
             }
 
-            lock (this._jobWaitingQueue)
+            lock (_jobWaitingQueue)
             {
-                if (this._jobWaitingQueue.Count >= JobQueueMaxLength)
+                if (_jobWaitingQueue.Count >= JobQueueMaxLength)
                 {
                     return this;
 
                 }
-                else if (this._jobWaitingQueue.Count == JobQueueLength)
+                else if (_jobWaitingQueue.Count == JobQueueLength)
                 {
-
                     // check for the last element to be a job triggered by push event
-                    JobDescription lastJob = this._jobWaitingQueue[this._jobWaitingQueue.Count - 1];
-                    if (lastJob != null && !lastJob.IsPushEventJob)
+
+                    JobDescription lastJob = null;
+
+                    if (_jobWaitingQueue.TryPeek(out lastJob))
                     {
-                        return this;
+                        if (lastJob != null && !lastJob.IsPushEventJob)
+                        {
+                            return this;
+                        }
                     }
                 }
 
                 // add this job
-                this._jobWaitingQueue.Add(new JobDescription().WithJob(job).WithIsPushEvent(false));
+                _jobWaitingQueue.Enqueue(new JobDescription()
+                {
+                    Job = job,
+                    IsPushEventJob = false
+                });
+
+                TryRunNextJob();
             }
 
             return this;
-
         }
 
-        public ISyncJobExecutionQueue AddJobForPushEvent(Job job)
+        public ISyncJobExecutionQueue AddJobForPushEvent(Func<Task> job)
         {
             if (job == null)
             {
                 return this;
             }
 
-            lock (this._jobWaitingQueue)
+            lock (_jobWaitingQueue)
             {
-                if (this._jobWaitingQueue.Count >= JobQueueLength)
+                if (_jobWaitingQueue.Count >= JobQueueLength)
                 {
                     return this;
                 }
 
-                this._jobWaitingQueue.Add(new JobDescription().WithJob(job).WithIsPushEvent(true));
+                _jobWaitingQueue.Enqueue(new JobDescription()
+                {
+                    Job = job,
+                    IsPushEventJob = true
+                });
+
+                TryRunNextJob();
             }
 
             return this;
         }
 
-        public ISyncJobExecutionQueue AddJob(bool isPushEventJob, Job job)
+        public ISyncJobExecutionQueue AddJob(bool isPushEventJob, Func<Task> job)
         {
             if (isPushEventJob)
             {
-                return this.AddJobForPushEvent(job);
+                return AddJobForPushEvent(job);
             }
             else
             {
-                return this.AddJobForScheduleEvent(job);
+                return AddJobForScheduleEvent(job);
             }
         }
 
-
-        public Task<ISyncJobExecutionQueue> RunAsync()
+        private void TryRunNextJob()
         {
-            if (this.IsRunning())
+            Task.Run(async () =>
             {
-                return Task.FromResult<ISyncJobExecutionQueue>(this);
+                await RunAsync();
+            });
+        }
+
+        public async Task<ISyncJobExecutionQueue> RunAsync()
+        {
+            if (IsRunning())
+            {
+                return this;
             }
 
             JobDescription nextJob = null;
-            lock (this._jobWaitingQueue)
+            lock (_jobWaitingQueue)
             {
-                if (this._jobWaitingQueue.Count > 0)
+                if (!_jobWaitingQueue.TryDequeue(out nextJob))
                 {
-                    nextJob = this._jobWaitingQueue[0];
-                    this._jobWaitingQueue.RemoveAt(0);
+                    return this;
                 }
             }
 
-            if (nextJob?.Job == null)
+            lock (_runningJobSemaphore)
             {
-                return Task.FromResult<ISyncJobExecutionQueue>(this);
+                _runningJob = nextJob;
             }
-
-            lock (this._runningJobSemaphore)
-            {
-                this._runningJob = nextJob;
-            }
-
 
             // run outside of semaphore to avoid blocking other calls to run()
             JobDescription currentJob = nextJob;
             try
             {
-                currentJob.Job.Invoke();
+                await currentJob.Job.Invoke();
             }
             finally
             {
-                lock (currentJob)
+                // remove the "running" flag AFTER reading all consumers waiting for notification
+                lock (_runningJobSemaphore)
                 {
-                    Monitor.PulseAll(currentJob);
-                }
-
-                // notify all waiting callback of ending job
-                if (this._waitingForNotification.Count != 0)
-                {
-                    IList<Action<bool>> notifications = new List<Action<bool>>();
-                    foreach (var action in this._waitingForNotification)
+                    if (_runningJob == currentJob)
                     {
-                        notifications.Add(action);
-                    }
-                    this._waitingForNotification.Clear();
-
-                    if (notifications.Count > 0)
-                    {
-                        Task.Run(() =>
-                            {
-                                foreach (var notify in notifications)
-                                {
-                                    try
-                                    {
-                                        notify.Invoke(!currentJob.IsPushEventJob);
-                                    }
-                                    catch (Exception)
-                                    {
-                                        // ignore
-                                    }
-                                }
-                            }
-                        );
-                    }
-
-                    // remove the "running" flag AFTER reading all consumers waiting for notification
-                    lock (this._runningJobSemaphore)
-                    {
-                        if (this._runningJob == currentJob)
-                        {
-                            this._runningJob = null;
-                        }
+                        _runningJob = null;
                     }
                 }
             }
 
-            return Task.FromResult<ISyncJobExecutionQueue>(this);
-        }
-
-
-        public bool HasWaitingJob()
-        {
-            lock (this._jobWaitingQueue)
-            {
-                return this._jobWaitingQueue.Count > 0;
-            }
-        }
-
-
-        public bool IsRunning()
-        {
-            return this._jobWaitingQueue != null;
-        }
-
-
-        public ISyncJobExecutionQueue NotifyWhenFinished(Action<bool> callback)
-        {
-            if (callback == null)
-            {
-                return this;
-            }
-
-            bool executeImmediately = false;
-            lock (this._runningJobSemaphore)
-            {
-                executeImmediately |= this._runningJob == null;
-            }
-
-            lock (this._jobWaitingQueue)
-            {
-                executeImmediately |= this._jobWaitingQueue.Count == 0;
-            }
-
-            if (executeImmediately)
-            {
-                Task.Run(() => callback.Invoke(true));
-
-            }
-            else
-            {
-                this._waitingForNotification.Add(callback);
-            }
+            TryRunNextJob();
 
             return this;
         }
 
+        public bool HasWaitingJob()
+        {
+            lock (_jobWaitingQueue)
+            {
+                return !_jobWaitingQueue.IsEmpty;
+            }
+        }
+
+        public bool IsRunning()
+        {
+            lock (_runningJobSemaphore)
+            {
+                return _runningJob != null;
+            }
+        }
 
         private class JobDescription
         {
-
-            public Job Job { get; private set; }
-            public bool IsPushEventJob { get; private set; }
-
-            public JobDescription WithJob(Job job)
-            {
-                this.Job = job;
-                return this;
-            }
-
-            public JobDescription WithIsPushEvent(bool isPushEvent)
-            {
-                this.IsPushEventJob = isPushEvent;
-                return this;
-            }
+            public Func<Task> Job { get; set; }
+            public bool IsPushEventJob { get; set; }
         }
     }
 }
