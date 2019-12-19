@@ -67,7 +67,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
         public SmintIoDownloadConstraints DownloadConstraints { get; set; }
 
         public bool? IsEditorialUse { get; set; }
-        public bool? HasLicenseTerms { get; set; }
+        public bool? HasRestrictiveLicenseTerms { get; set; }
 
         public List<SmintIoBinary> Binaries { get; set; }
 

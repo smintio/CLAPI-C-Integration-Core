@@ -148,7 +148,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         public abstract void SetCopyrightNotices(IDictionary<string, string> copyrightNotices);
 
         public abstract void SetIsEditorialUse(bool isEditorialUse);
-        public abstract void SetHasLicenseTerms(bool hasLicenseTerms);
+        public abstract void SetHasRestrictiveLicenseTerms(bool hasRestrictiveLicenseTerms);
 
         public abstract void SetLicenseType(string licenseTypeKey);
 

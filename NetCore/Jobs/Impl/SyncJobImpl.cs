@@ -562,8 +562,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (rawAsset.IsEditorialUse != null)
                 targetAsset.SetIsEditorialUse((bool)rawAsset.IsEditorialUse);
 
-            if (rawAsset.HasLicenseTerms != null)
-                targetAsset.SetHasLicenseTerms((bool)rawAsset.HasLicenseTerms);
+            if (rawAsset.HasRestrictiveLicenseTerms != null)
+                targetAsset.SetHasRestrictiveLicenseTerms((bool)rawAsset.HasRestrictiveLicenseTerms);
         }
 
         private IList<TSyncLicenseOption> GetLicenseOptions(IList<SmintIoLicenseOptions> rawLicenseOptions)
