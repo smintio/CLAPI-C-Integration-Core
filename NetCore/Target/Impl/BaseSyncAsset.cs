@@ -36,8 +36,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 
         public IList<TSyncAsset> AssetParts { get; set; }
 
-        public string WorldwideUniqueBinaryUuid { get => $"{Uuid}_{BinaryUuid}"; }
-
         public BaseSyncAsset()
         {
             IsCompoundAsset = false;

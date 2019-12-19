@@ -373,11 +373,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                     targetAsset.SetRecommendedFileName(recommendedFileName);
 
-                    string localFileName = $"{temporaryFolder}/{targetAsset.WorldwideUniqueBinaryUuid}_{recommendedFileName}";
+                    string localFileName = $"{temporaryFolder}/{recommendedFileName}";
                     var targetFile = new FileInfo(localFileName);
                     targetAsset.SetDownloadedFileProvider(async () =>
                     {
-                        _logger.LogInformation($"Downloading file UUID {targetAsset.WorldwideUniqueBinaryUuid} to {localFileName}...");
+                        _logger.LogInformation($"Downloading file UUID {targetAsset.RecommendedFileName} to {localFileName}...");
 
                         if (downloadUrl == null)
                         {
@@ -395,7 +395,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                             throw;
                         }
 
-                        _logger.LogInformation($"Downloaded file UUID {targetAsset.WorldwideUniqueBinaryUuid} to {localFileName}");
+                        _logger.LogInformation($"Downloaded file UUID {targetAsset.RecommendedFileName} to {localFileName}");
 
                         return targetFile;
                     });
