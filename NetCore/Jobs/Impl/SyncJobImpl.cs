@@ -37,9 +37,8 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 {
-    internal class SyncJobImpl<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> : ISyncJob
-        where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncLicenseOption : ISyncLicenseOption
+    internal class SyncJobImpl<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> : ISyncJob
+        where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
         where TSyncLicenseTerm : ISyncLicenseTerm
         where TSyncReleaseDetails : ISyncReleaseDetails
         where TSyncDownloadConstraints : ISyncDownloadConstraints
@@ -52,8 +51,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private readonly ISmintIoApiClientProvider _smintIoClient;
 
-        private readonly ISyncTargetDataFactory<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> _syncTargetDataFactory;
-        private readonly ISyncTarget<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> _syncTarget;
+        private readonly ISyncTargetDataFactory<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> _syncTargetDataFactory;
+        private readonly ISyncTarget<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> _syncTarget;
 
         private readonly ILogger _logger;
 
@@ -82,9 +81,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             ITokenDatabaseProvider tokenDatabaseProvider,
             ISyncDatabaseProvider syncDatabaseProvider,            
             ISmintIoApiClientProvider smintIoClient,
-            ISyncTargetDataFactory<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> syncTargetDataFactory,
-            ISyncTarget<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> syncTarget,
-            ILogger<SyncJobImpl<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>> logger)
+            ISyncTargetDataFactory<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> syncTargetDataFactory,
+            ISyncTarget<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> syncTarget,
+            ILogger<SyncJobImpl<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>> logger)
         {
             _settingsDatabaseProvider = settingsDatabaseProvider;
             _tokenDatabaseProvider = tokenDatabaseProvider;
@@ -503,9 +502,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (rawAsset.LicenseText?.Count > 0)
                 targetAsset.SetLicenseText(rawAsset.LicenseText);
 
-            if (rawAsset.LicenseOptions?.Count > 0)
-                targetAsset.SetLicenseOptions(GetLicenseOptions(rawAsset.LicenseOptions));
-
             if (rawAsset.LicenseTerms?.Count > 0)
                 targetAsset.SetLicenseTerms(GetLicenseTerms(rawAsset.LicenseTerms));
 
@@ -564,21 +560,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             if (rawAsset.HasRestrictiveLicenseTerms != null)
                 targetAsset.SetHasRestrictiveLicenseTerms((bool)rawAsset.HasRestrictiveLicenseTerms);
-        }
-
-        private IList<TSyncLicenseOption> GetLicenseOptions(IList<SmintIoLicenseOptions> rawLicenseOptions)
-        {
-            return rawLicenseOptions.Select(rawLicenseOption =>
-            {
-                var targetLicenseOption = _syncTargetDataFactory.CreateSyncLicenseOption();
-
-                targetLicenseOption.SetName(rawLicenseOption.OptionName);
-
-                if (rawLicenseOption.LicenseText?.Count > 0)
-                    targetLicenseOption.SetLicenseText(rawLicenseOption.LicenseText);
-
-                return targetLicenseOption;
-            }).ToList();
         }
 
         private IList<TSyncLicenseTerm> GetLicenseTerms(IList<SmintIoLicenseTerm> rawLicenseTerms)

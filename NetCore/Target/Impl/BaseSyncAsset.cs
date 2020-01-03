@@ -7,9 +7,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 {
     internal delegate Task<FileInfo> FileDownloaderDelegate();
 
-    public abstract class BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncLicenseOption : ISyncLicenseOption
+    public abstract class BaseSyncAsset<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
+        where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
         where TSyncLicenseTerm : ISyncLicenseTerm
         where TSyncReleaseDetails : ISyncReleaseDetails
         where TSyncDownloadConstraints : ISyncDownloadConstraints
@@ -155,7 +154,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 
         public abstract void SetLicenseText(IDictionary<string, string> licenseText);
 
-        public abstract void SetLicenseOptions(IList<TSyncLicenseOption> licenseOptions);
         public abstract void SetLicenseTerms(IList<TSyncLicenseTerm> licenseTerms);
 
         public abstract void SetDownloadConstraints(TSyncDownloadConstraints downloadConstraints);

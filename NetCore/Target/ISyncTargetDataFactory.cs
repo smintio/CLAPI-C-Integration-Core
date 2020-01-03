@@ -39,9 +39,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
     /// </para>
     /// 
     /// </remarks>
-    public interface ISyncTargetDataFactory<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncLicenseOption : ISyncLicenseOption
+    public interface ISyncTargetDataFactory<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
+        where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
         where TSyncLicenseTerm : ISyncLicenseTerm
         where TSyncReleaseDetails : ISyncReleaseDetails
         where TSyncDownloadConstraints : ISyncDownloadConstraints
@@ -55,7 +54,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         /// <para>
         /// The newly created instance MUST NOT be stored automatically on the sync target prior to returning it.
         /// For storing this instance, it will be passed to this sync target via
-        /// <see cref="ISyncTarget{TSyncAsset,TSyncLicenseOption,TSyncLicenseTerm,TSyncReleaseDetails,TSyncDownloadConstraints}.ImportNewTargetAssetsAsync" />.
+        /// <see cref="ISyncTarget{TSyncAsset,TSyncLicenseTerm,TSyncReleaseDetails,TSyncDownloadConstraints}.ImportNewTargetAssetsAsync" />.
         /// </para>
         /// 
         /// </remarks>
@@ -71,7 +70,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         /// <para>
         /// The newly created instance MUST NOT be stored automatically on the sync target prior to returning it. For
         /// storing this instance, it will be passed to this sync target via
-        /// <see cref="ISyncTarget{TSyncAsset,TSyncLicenseOption,TSyncLicenseTerm,TSyncReleaseDetails,TSyncDownloadConstraints}.ImportNewTargetCompoundAssetsAsync" />.
+        /// <see cref="ISyncTarget{TSyncAsset,TSyncLicenseTerm,TSyncReleaseDetails,TSyncDownloadConstraints}.ImportNewTargetCompoundAssetsAsync" />.
         /// </para>
         /// 
         /// </remarks>
@@ -79,7 +78,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         /// @see BaseSyncAsset
         TSyncAsset CreateSyncCompoundAsset();
 
-        TSyncLicenseOption CreateSyncLicenseOption();
         TSyncLicenseTerm CreateSyncLicenseTerm();
         TSyncReleaseDetails CreateSyncReleaseDetails();
         TSyncDownloadConstraints CreateSyncDownloadConstraints();

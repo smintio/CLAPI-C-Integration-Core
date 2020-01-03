@@ -281,8 +281,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     LicenseeUuid = lpt.Licensee_uuid,
                     LicenseeName = lpt.Licensee_name,
                     LicenseType = lpt.Offering.License_type,
-                    LicenseText = GetValuesForImportLanguages(importLanguages, lpt.Offering.License_text.Effective_text),
-                    LicenseOptions = GetLicenseOptions(importLanguages, lpt),
+                    LicenseText = GetValuesForImportLanguages(importLanguages, lpt.License_text.Effective_text),
                     LicenseTerms = GetLicenseTerms(importLanguages, lpt),
                     DownloadConstraints = GetDownloadConstraints(lpt),
                     IsEditorialUse = isEditorialUse,
@@ -359,27 +358,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             }
 
             return smintIoBinaries;
-        }
-
-        private List<SmintIoLicenseOptions> GetLicenseOptions(string[] importLanguages, SyncLicensePurchaseTransaction lpt)
-        {
-            if (!(lpt.Offering.Has_options ?? false))
-            {
-                return null;
-            }
-
-            List<SmintIoLicenseOptions> options = new List<SmintIoLicenseOptions>();
-
-            foreach (var option in lpt.Offering.Options)
-            {
-                options.Add(new SmintIoLicenseOptions()
-                {
-                    OptionName = GetValuesForImportLanguages(importLanguages, option.Option_name),
-                    LicenseText = GetValuesForImportLanguages(importLanguages, option.License_text.Effective_text)
-                });
-            }
-
-            return options;
         }
 
         private List<SmintIoLicenseTerm> GetLicenseTerms(string[] importLanguages, SyncLicensePurchaseTransaction lpt)

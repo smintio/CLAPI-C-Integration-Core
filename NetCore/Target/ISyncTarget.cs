@@ -27,9 +27,8 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
 {
-    public interface ISyncTarget<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseOption, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
-        where TSyncLicenseOption : ISyncLicenseOption
+    public interface ISyncTarget<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
+        where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
         where TSyncLicenseTerm : ISyncLicenseTerm
         where TSyncReleaseDetails : ISyncReleaseDetails
         where TSyncDownloadConstraints : ISyncDownloadConstraints
