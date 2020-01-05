@@ -154,6 +154,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 
         public abstract void SetLicenseText(IDictionary<string, string> licenseText);
 
+        public abstract void SetLicenseUrls(IDictionary<string, string[]> licenseUrls);
+
         public abstract void SetLicenseTerms(IList<TSyncLicenseTerm> licenseTerms);
 
         public abstract void SetDownloadConstraints(TSyncDownloadConstraints downloadConstraints);

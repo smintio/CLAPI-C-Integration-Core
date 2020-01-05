@@ -282,6 +282,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     LicenseeName = lpt.Licensee_name,
                     LicenseType = lpt.Offering.License_type,
                     LicenseText = GetValuesForImportLanguages(importLanguages, lpt.License_text.Effective_text),
+                    LicenseUrls = GetGroupedUrlValuesForImportLanguages(importLanguages, lpt.Offering.License_urls),
                     LicenseTerms = GetLicenseTerms(importLanguages, lpt),
                     DownloadConstraints = GetDownloadConstraints(lpt),
                     IsEditorialUse = isEditorialUse,
@@ -446,6 +447,18 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                 .Where(localizedMetadataElement => importLanguages.Contains(localizedMetadataElement.Culture) || localizedMetadataElement.Culture == "en")
                 .GroupBy(localizedMetadataElement => localizedMetadataElement.Culture)
                 .ToDictionary(group => group.Key, group => group.Select(localizedMetadataElement => localizedMetadataElement.Metadata_element.Name).ToArray())
+            );
+        }
+
+        private IDictionary<string, string[]> GetGroupedUrlValuesForImportLanguages(string[] importLanguages, LocalizedMetadataElements localizedMetadataElements)
+        {
+            if (localizedMetadataElements == null)
+                return null;
+
+            return AddLanguageFallback(importLanguages, localizedMetadataElements
+                .Where(localizedMetadataElement => importLanguages.Contains(localizedMetadataElement.Culture) || localizedMetadataElement.Culture == "en")
+                .GroupBy(localizedMetadataElement => localizedMetadataElement.Culture)
+                .ToDictionary(group => group.Key, group => group.Select(localizedMetadataElement => localizedMetadataElement.Metadata_element.Url).ToArray())
             );
         }
 

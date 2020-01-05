@@ -62,6 +62,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
 
         public IDictionary<string, string> LicenseText { get; set; }
 
+        public IDictionary<string, string[]> LicenseUrls { get; set; }
+
         public IList<SmintIoLicenseTerm> LicenseTerms { get; set; }
         public SmintIoDownloadConstraints DownloadConstraints { get; set; }
 

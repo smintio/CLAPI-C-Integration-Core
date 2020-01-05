@@ -502,6 +502,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (rawAsset.LicenseText?.Count > 0)
                 targetAsset.SetLicenseText(rawAsset.LicenseText);
 
+            if (rawAsset.LicenseUrls?.Count > 0)
+                targetAsset.SetLicenseUrls(rawAsset.LicenseUrls);
+
             if (rawAsset.LicenseTerms?.Count > 0)
                 targetAsset.SetLicenseTerms(GetLicenseTerms(rawAsset.LicenseTerms));
 
