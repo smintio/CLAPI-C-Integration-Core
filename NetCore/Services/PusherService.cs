@@ -91,7 +91,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 
             tokenDatabaseModel.ValidateForPusher();
 
-            var authorizer = new Client.Pusher.HttpAuthorizer(pusherAuthEndpoint, tokenDatabaseModel.AccessToken);
+            var authorizer = new HttpAuthorizer(pusherAuthEndpoint, tokenDatabaseModel.AccessToken);
 
             _pusher = new Pusher("32f31c26a83e09dc401b", new PusherOptions()
             {
