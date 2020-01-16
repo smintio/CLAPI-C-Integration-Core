@@ -226,7 +226,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Browser
 
                 await ctx.Response.WriteAsync("<h1>You can now return to the application.</h1>");
 
-                ctx.Response.Body.Flush();
+                await ctx.Response.Body.FlushAsync();
 
                 _source.TrySetResult(value);
             }
