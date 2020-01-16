@@ -237,7 +237,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Browser
 
                 await ctx.Response.WriteAsync("<h1>Invalid request.</h1>");
 
-                ctx.Response.Body.Flush();
+                await ctx.Response.Body.FlushAsync();
             }
         }
 
