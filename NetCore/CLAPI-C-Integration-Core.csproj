@@ -7,8 +7,7 @@
 
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <RuntimeFrameworkVersion>2.2.4</RuntimeFrameworkVersion>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>SmintIo.CLAPI.Consumer.Integration.Core</RootNamespace>
     <PackageId>SmintIo.CLAPI.Consumer.Integration.Core</PackageId>
     <Authors>Smint.io</Authors>
@@ -47,8 +46,6 @@
 
   <ItemGroup>
     <PackageReference Include="IdentityModel.OidcClient" Version="3.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.2.0" />
