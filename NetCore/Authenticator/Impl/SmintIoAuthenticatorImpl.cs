@@ -69,7 +69,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             request.AddParameter("client_id", settingsDatabaseModel.ClientId);
             request.AddParameter("client_secret", settingsDatabaseModel.ClientSecret);
 
-            var response = await client.ExecuteTaskAsync<RefreshTokenResultModel>(request);
+            var response = await client.ExecuteAsync<RefreshTokenResultModel>(request);
 
             var result = response.Data;
 
