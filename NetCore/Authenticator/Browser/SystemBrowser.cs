@@ -179,7 +179,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Browser
 
         public void Dispose()
         {
+#pragma warning disable VSTHRD110 // Observe result of async calls
             Task.Run(async () =>
+#pragma warning restore VSTHRD110 // Observe result of async calls
             {
                 await Task.Delay(500);
 
@@ -243,7 +245,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Browser
 
         public Task<string> WaitForCallbackAsync(int timeoutInSeconds = DefaultTimeout)
         {
+#pragma warning disable VSTHRD110 // Observe result of async calls
             Task.Run(async () =>
+#pragma warning restore VSTHRD110 // Observe result of async calls
             {
                 await Task.Delay(timeoutInSeconds * 1000);
 

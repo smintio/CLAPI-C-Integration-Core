@@ -117,7 +117,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private void TryRunNextJob()
         {
+#pragma warning disable VSTHRD110 // Observe result of async calls
             Task.Run(async () =>
+#pragma warning restore VSTHRD110 // Observe result of async calls
             {
                 await RunAsync();
             });

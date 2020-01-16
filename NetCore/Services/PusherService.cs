@@ -102,11 +102,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
             _pusher.ConnectionStateChanged += ConnectionStateChanged;
             _pusher.Error += PusherError;
 
-            var connectionState = _pusher.ConnectAsync().GetAwaiter().GetResult();
+            var connectionState = await _pusher.ConnectAsync();
 
             if (connectionState == ConnectionState.Connected)
             {
-                SubscribeToPusherChannel((int)settingsDatabaseModel.ChannelId);
+                await SubscribeToPusherChannelAsync((int)settingsDatabaseModel.ChannelId);
             }
         }
 
@@ -115,15 +115,17 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
             _channel?.UnbindAll();
             _channel?.Unsubscribe();
 
-            _pusher.DisconnectAsync();
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
+            _pusher.DisconnectAsync().Wait();
+#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
 
             _pusher.ConnectionStateChanged -= ConnectionStateChanged;
             _pusher.Error -= PusherError;
         }
 
-        private void SubscribeToPusherChannel(int channelId)
+        private async Task SubscribeToPusherChannelAsync(int channelId)
         {
-            _channel = _pusher.SubscribeAsync($"private-2-{channelId}").GetAwaiter().GetResult();
+            _channel = await _pusher.SubscribeAsync($"private-2-{channelId}");
 
             _channel.Bind("global-transaction-history-update", (payload) =>
             {
