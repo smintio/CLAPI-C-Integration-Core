@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 {
-    internal delegate Task<FileInfo> FileDownloaderDelegate();
+    public delegate Task<FileInfo> FileDownloaderDelegate();
 
     public abstract class BaseSyncAsset<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
         where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
@@ -38,6 +38,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         public BaseSyncAsset()
         {
             IsCompoundAsset = false;
+        }
+        
+        public BaseSyncAsset(FileDownloaderDelegate downloader)
+        {
+            this._fileDownloader = downloader;
         }
 
         internal void SetUuid(string uuid)
