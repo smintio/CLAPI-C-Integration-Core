@@ -85,7 +85,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 
             settingsDatabaseModel.ValidateForPusher();
 
-            var pusherAuthEndpoint = $"https://{settingsDatabaseModel.TenantId}-clapi.smint.io/consumer/v1/notifications/pusher/auth";
+            var pusherAuthEndpoint = $"https://{settingsDatabaseModel.TenantId}.clapi.smint.io/consumer/v1/notifications/pusher/auth";
 
             var tokenDatabaseModel = await _tokenDatabaseProvider.GetTokenDatabaseModelAsync();
 

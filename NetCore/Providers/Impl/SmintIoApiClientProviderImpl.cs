@@ -478,7 +478,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             var settingsDatabaseModel = await _settingsDatabaseProvider.GetSettingsDatabaseModelAsync();
             var tokenDatabaseModel = await _tokenDatabaseProvider.GetTokenDatabaseModelAsync();
 
-            _clapicOpenApiClient.BaseUrl = $"https://{settingsDatabaseModel.TenantId}-clapi.smint.io/consumer/v1";
+            _clapicOpenApiClient.BaseUrl = $"https://{settingsDatabaseModel.TenantId}.clapi.smint.io/consumer/v1";
             _clapicOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;
         }
 
