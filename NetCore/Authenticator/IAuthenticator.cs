@@ -23,12 +23,18 @@ using System.Threading.Tasks;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator
 {
-    public interface ISmintIoAuthenticator : IAuthenticationRefresher
+    /// <summary>
+    /// An authenticator authenticates the user with a remote system and stores all required data to access resources on
+    /// the remote system subsequently.
+    /// </summary>
+    public interface IAuthenticator : IAuthenticationRefresher
     {
         /// <summary>
-        /// Refresh the authentication data with remote systems.
+        /// Performs an authentication with the remote system.
+        /// <remarks>All required data to perform the authentication must be provided elsewhere as it is implementation
+        /// dependent, what is needed.</remarks>
         /// </summary>
-        /// <returns>A task to wait for finishing or not.</returns>
-        Task RefreshSmintIoTokenAsync();
+        /// <returns>A task to wait for finishing the process or not.</returns>
+        Task InitializeAuthenticationAsync();
     }
 }
