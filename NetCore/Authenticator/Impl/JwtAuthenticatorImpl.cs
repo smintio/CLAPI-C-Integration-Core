@@ -44,35 +44,37 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
         private readonly IRemoteAuthDatabaseProvider _remoteAuthDataProvider;
         private readonly ILogger<JwtAuthenticatorImpl> _logger;
 
-        public Uri JwtTokenEndpoint { get; set; }
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
+        private JwtAuthOptions AuthenticationOptions { get; }
 
 
         public JwtAuthenticatorImpl(
             IRemoteAuthDatabaseProvider remoteAuthDataProvider,
-            ILogger<JwtAuthenticatorImpl> logger)
+            ILogger<JwtAuthenticatorImpl> logger,
+            JwtAuthOptions authOptions)
         {
             _remoteAuthDataProvider = remoteAuthDataProvider;
             _logger = logger;
+            AuthenticationOptions = authOptions;
         }
 
         public virtual async Task RefreshAuthenticationAsync()
         {
-            var _ = JwtTokenEndpoint?.ToString() ?? throw new NullReferenceException("No token endpoint defined!");
+            var _ = AuthenticationOptions?.JwtTokenEndpoint
+                    ?? throw new NullReferenceException("No token endpoint defined!");
 
             _logger.LogInformation("Refreshing OAuth token for remote system");
 
-            var client = new RestClient(JwtTokenEndpoint.ToString());
-            var request = new RestRequest(Method.POST);
+            var client = new RestClient(AuthenticationOptions?.JwtTokenEndpoint.ToString());
+            var request = new RestRequest(AuthenticationOptions.UsePost ? Method.POST : Method.GET);
 
-            client.Authenticator = new HttpBasicAuthenticator(ClientId, ClientSecret ?? String.Empty);
+            client.Authenticator = new HttpBasicAuthenticator(
+                AuthenticationOptions?.ClientId,
+                AuthenticationOptions?.ClientSecret ?? String.Empty
+            );
 
             request.AddParameter("grant_type", "password");
-            request.AddParameter("username", Username);
-            request.AddParameter("password", Password);
+            request.AddParameter("username", AuthenticationOptions?.Username);
+            request.AddParameter("password", AuthenticationOptions?.Password);
 
             var response = await client.ExecuteAsync<RefreshTokenResultModel>(request).ConfigureAwait(false);
             var result = response.Data;
@@ -96,7 +98,5 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
         }
 
         public Task InitializeAuthenticationAsync() => RefreshAuthenticationAsync();
-
-        protected IRemoteAuthDatabaseProvider AuthDataProvider => _remoteAuthDataProvider;
     }
 }
