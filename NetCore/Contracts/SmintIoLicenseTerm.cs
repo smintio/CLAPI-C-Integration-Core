@@ -28,7 +28,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
     {
         public int? SequenceNumber { get; set; }
 
-        public IDictionary<string, string> Name { get; set; }
+        public TranslatedDictionary<string> Name { get; set; }
 
         public IList<string> Exclusivities { get; set; }
 

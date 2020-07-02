@@ -28,10 +28,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
         public string ModelReleaseState { get; set; }
         public string PropertyReleaseState { get; set; }
 
-        public IDictionary<string, string> ProviderAllowedUseComment { get; set; }
+        public TranslatedDictionary<string> ProviderAllowedUseComment { get; set; }
 
-        public IDictionary<string, string> ProviderReleaseComment { get; set; }
+        public TranslatedDictionary<string> ProviderReleaseComment { get; set; }
 
-        public IDictionary<string, string> ProviderUsageConstraints { get; set; }
+        public TranslatedDictionary<string> ProviderUsageConstraints { get; set; }
     }
 }

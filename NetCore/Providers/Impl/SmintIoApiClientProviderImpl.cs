@@ -136,10 +136,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                         Key = group.Key,
                         Values = AddLanguageFallback(
                             importLanguages,
-                            group.ToDictionary(
+                            new TranslatedDictionary<string>(group.ToDictionary(
                                 metadataElement => metadataElement.Culture,
                                 metadataElement => metadataElement.Metadata_element.Name
-                            )
+                            ))
                         )
                     };
                 })
@@ -438,39 +438,39 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             };
         }
 
-        private IDictionary<string, string[]> GetGroupedValuesForImportLanguages(string[] importLanguages, LocalizedMetadataElements localizedMetadataElements)
+        private TranslatedDictionary<string[]> GetGroupedValuesForImportLanguages(string[] importLanguages, LocalizedMetadataElements localizedMetadataElements)
         {
             if (localizedMetadataElements == null)
                 return null;
 
-            return AddLanguageFallback(importLanguages, localizedMetadataElements
+            return AddLanguageFallback(importLanguages, new TranslatedDictionary<string[]>(localizedMetadataElements
                 .Where(localizedMetadataElement => importLanguages.Contains(localizedMetadataElement.Culture) || localizedMetadataElement.Culture == "en")
                 .GroupBy(localizedMetadataElement => localizedMetadataElement.Culture)
                 .ToDictionary(group => group.Key, group => group.Select(localizedMetadataElement => localizedMetadataElement.Metadata_element.Name).ToArray())
-            );
+            ));
         }
 
-        private IDictionary<string, string[]> GetGroupedUrlValuesForImportLanguages(string[] importLanguages, LocalizedMetadataElements localizedMetadataElements)
+        private TranslatedDictionary<string[]> GetGroupedUrlValuesForImportLanguages(string[] importLanguages, LocalizedMetadataElements localizedMetadataElements)
         {
             if (localizedMetadataElements == null)
                 return null;
 
-            return AddLanguageFallback(importLanguages, localizedMetadataElements
+            return AddLanguageFallback(importLanguages, new TranslatedDictionary<string[]>(localizedMetadataElements
                 .Where(localizedMetadataElement => importLanguages.Contains(localizedMetadataElement.Culture) || localizedMetadataElement.Culture == "en")
                 .GroupBy(localizedMetadataElement => localizedMetadataElement.Culture)
                 .ToDictionary(group => group.Key, group => group.Select(localizedMetadataElement => localizedMetadataElement.Metadata_element.Url).ToArray())
-            );
+            ));
         }
 
-        private IDictionary<string, string> GetValuesForImportLanguages(string[] importLanguages, LocalizedStrings localizedStrings)
+        private TranslatedDictionary<string> GetValuesForImportLanguages(string[] importLanguages, LocalizedStrings localizedStrings)
         {
             if (localizedStrings == null)
                 return null;
 
-            return AddLanguageFallback(importLanguages, localizedStrings
+            return AddLanguageFallback(importLanguages, new TranslatedDictionary<string>(localizedStrings
                 .Where(localizedString => importLanguages.Contains(localizedString.Culture) || localizedString.Culture == "en")
                 .ToDictionary(localizedString => localizedString.Culture, localizedString => localizedString.Value)
-            );
+            ));
         }
 
         private async Task SetupClapicOpenApiClientAsync()
@@ -495,8 +495,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             _disposed = true;
         }
 
-        private IDictionary<string, T> AddLanguageFallback<T>(
-            string[] importLanguages, IDictionary<string, T> availableValues
+        private TranslatedDictionary<T> AddLanguageFallback<T>(
+            string[] importLanguages, TranslatedDictionary<T> availableValues
         )
         {
             if (importLanguages == null || importLanguages.Length == 0)
@@ -512,7 +512,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             bool needEnglishFallback = !importLanguages.Contains("en");
 
             // copy over all languages to import
-            IDictionary<string, T> result = new Dictionary<string, T>();
+            TranslatedDictionary<T> result = new TranslatedDictionary<T>();
 
             foreach (var importLanguage in importLanguages)
             {
