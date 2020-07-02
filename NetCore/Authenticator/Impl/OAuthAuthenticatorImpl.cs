@@ -31,11 +31,11 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
-    public abstract class OAuthAuthenticatorImpl : OAuthAuthenticationRefresherImpl, IAuthenticator<TokenDatabaseModel>
+    public class OAuthAuthenticatorImpl : OAuthAuthenticationRefresherImpl, IOAuthAuthenticator
     {
         private readonly ILogger<OAuthAuthenticatorImpl> _logger;
 
-        public Uri OAuthAuthorityEndpoint { get; set; }
+        public Uri AuthorityEndpoint { get; set; }
 
         public string Scope { get; set; }
 
@@ -53,7 +53,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
         {
             _logger.LogInformation("Authenticating with Smint.io through system browser...");
 
-            var authority = OAuthAuthorityEndpoint?.ToString()
+            var authority = AuthorityEndpoint?.ToString()
                             ?? throw new NullReferenceException("No OAuth identity endpoint defined!");
 
             try
@@ -65,7 +65,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                     ClientId = ClientId,
                     ClientSecret = ClientSecret,
                     Scope = Scope,
-                    RedirectUri = TargetRedirectionUrl.ToString()
+                    RedirectUri = TargetRedirectionUrl?.ToString()
                                   ?? throw new NullReferenceException("No redirection URL defined!"),
                     FilterClaims = false,
                     Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,

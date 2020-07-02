@@ -30,15 +30,15 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
-    public abstract class OAuthAuthenticationRefresherImpl : IAuthenticationRefresher<TokenDatabaseModel>
+    public class OAuthAuthenticationRefresherImpl : IOAuthAuthenticationRefresher
     {
         private readonly ITokenDatabaseProvider _tokenDatabaseProvider;
 
         private readonly ILogger<OAuthAuthenticationRefresherImpl> _logger;
 
-        public Uri OAuthTokenEndPoint { get; set; }
-        public String ClientId { get; set; }
-        public String ClientSecret { get; set; }
+        public Uri TokenEndPointUri { get; set; }
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
 
 
         public OAuthAuthenticationRefresherImpl(
@@ -51,7 +51,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public virtual async Task RefreshAuthenticationAsync()
         {
-            var _ = OAuthTokenEndPoint?.ToString() ?? throw new NullReferenceException("No OAuth endpoint defined!");
+            var _ = TokenEndPointUri?.ToString() ?? throw new NullReferenceException("No OAuth endpoint defined!");
 
             _logger.LogInformation("Refreshing OAuth token for remote system");
 
@@ -60,7 +60,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
             tokenDatabaseModel.ValidateForTokenRefresh();
 
-            var client = new RestClient(OAuthTokenEndPoint.ToString());
+            var client = new RestClient(TokenEndPointUri.ToString());
             var request = new RestRequest(Method.POST);
 
             request.AddParameter("grant_type", "refresh_token");

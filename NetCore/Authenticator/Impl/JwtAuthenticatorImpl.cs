@@ -40,7 +40,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
     /// <para>Because of the reduced complexity, the JWT Authentication refresher can be used as authenticator too,
     /// as refreshing is the same operation as requesting a JWT token initially.</para></remarks>
     /// </summary>
-    public class JwtAuthenticatorImpl : IAuthenticator<RemoteAuthDatabaseModel>
+    public class JwtAuthenticatorImpl : IJwtAuthenticator
     {
         private readonly IRemoteAuthDatabaseProvider<RemoteAuthDatabaseModel> _remoteAuthDataProvider;
         private readonly ILogger<JwtAuthenticatorImpl> _logger;
