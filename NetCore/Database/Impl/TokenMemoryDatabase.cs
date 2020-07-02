@@ -21,7 +21,6 @@
 
 
 using System.Threading.Tasks;
-using SmintIo.CLAPI.Consumer.Integration.Core.Database;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
@@ -33,24 +32,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
     /// would be needed to re-done for every run. In such situations, please consider to store the authentication
     /// data in some database or in file system.</remarks>
     /// </summary>
-    public class TokenMemoryDatabase : ITokenDatabaseProvider
+    public class TokenMemoryDatabase : AuthDataMemoryDatabase<TokenDatabaseModel>, ITokenDatabaseProvider
     {
-        private TokenDatabaseModel _tokenDatabaseModel;
+        public Task<TokenDatabaseModel> GetTokenDatabaseModelAsync() => GetAuthenticationDataAsync();
 
-        public TokenMemoryDatabase()
-        {
-            _tokenDatabaseModel = new TokenDatabaseModel();
-        }
-
-        public virtual Task<TokenDatabaseModel> GetTokenDatabaseModelAsync()
-        {
-            return Task.FromResult(_tokenDatabaseModel);
-        }
-
-        public virtual Task SetTokenDatabaseModelAsync(TokenDatabaseModel tokenDatabaseModel)
-        {
-            _tokenDatabaseModel = tokenDatabaseModel;
-            return Task.FromResult<dynamic>(null);
-        }
+        public Task SetTokenDatabaseModelAsync(TokenDatabaseModel tokenDatabaseModel)
+            => SetAuthenticationDataAsync(tokenDatabaseModel);
     }
 }

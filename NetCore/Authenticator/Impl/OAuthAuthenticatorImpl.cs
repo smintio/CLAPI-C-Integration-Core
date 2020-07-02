@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 // MIT License
 //
 // Copyright (c) 2019 Smint.io GmbH
@@ -26,11 +26,12 @@ using System;
 using System.Threading.Tasks;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Browser;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
-    public abstract class OAuthAuthenticatorImpl : OAuthAuthenticationRefresherImpl, IAuthenticator
+    public abstract class OAuthAuthenticatorImpl : OAuthAuthenticationRefresherImpl, IAuthenticator<TokenDatabaseModel>
     {
         private readonly ILogger<OAuthAuthenticatorImpl> _logger;
 
@@ -76,7 +77,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
                 var result = await LoginAsync(TargetRedirectionUrl, clientOptions).ConfigureAwait(false);
 
-                var tokenDatabaseModel = await TokenDatabaseProvider.GetTokenDatabaseModelAsync().ConfigureAwait(false);
+                var tokenDatabaseModel = await GetAuthenticationDataProvider().GetAuthenticationDataAsync().ConfigureAwait(false);
 
                 tokenDatabaseModel.Success = !result.IsError;
                 tokenDatabaseModel.ErrorMessage = result.Error;
@@ -85,7 +86,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                 tokenDatabaseModel.IdentityToken = result.IdentityToken;
                 tokenDatabaseModel.Expiration = result.AccessTokenExpiration;
 
-                await TokenDatabaseProvider.SetTokenDatabaseModelAsync(tokenDatabaseModel).ConfigureAwait(false);
+                await GetAuthenticationDataProvider().SetAuthenticationDataAsync(tokenDatabaseModel).ConfigureAwait(false);
 
                 if (!tokenDatabaseModel.Success)
                 {

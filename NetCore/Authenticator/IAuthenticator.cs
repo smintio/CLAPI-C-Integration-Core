@@ -27,7 +27,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator
     /// An authenticator authenticates the user with a remote system and stores all required data to access resources on
     /// the remote system subsequently.
     /// </summary>
-    public interface IAuthenticator : IAuthenticationRefresher
+    /// <typeparam name="T">Is passed to <see cref="IAuthenticationRefresher{T}"/> and defines the type of the
+    /// authentication storage that is used with the authenticator.</typeparam>
+    public interface IAuthenticator<T> : IAuthenticationRefresher<T>
     {
         /// <summary>
         /// Performs an authentication with the remote system.

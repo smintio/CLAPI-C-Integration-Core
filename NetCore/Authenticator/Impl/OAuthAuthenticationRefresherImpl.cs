@@ -25,11 +25,12 @@ using Microsoft.Extensions.Logging;
 using RestSharp;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
-    public abstract class OAuthAuthenticationRefresherImpl : IAuthenticationRefresher
+    public abstract class OAuthAuthenticationRefresherImpl : IAuthenticationRefresher<TokenDatabaseModel>
     {
         private readonly ITokenDatabaseProvider _tokenDatabaseProvider;
 
@@ -90,6 +91,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             _logger.LogInformation("Successfully refreshed token for OAuth");
         }
 
-        protected ITokenDatabaseProvider TokenDatabaseProvider => _tokenDatabaseProvider;
+        public IAuthenticationDataProvider<TokenDatabaseModel> GetAuthenticationDataProvider() => _tokenDatabaseProvider;
     }
 }

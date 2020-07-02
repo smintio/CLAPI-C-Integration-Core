@@ -20,10 +20,11 @@
 #endregion
 
 using System.Threading.Tasks;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator
 {
-    public interface ISmintIoAuthenticator : IAuthenticationRefresher
+    public interface ISmintIoAuthenticator : IAuthenticationRefresher<TokenDatabaseModel>
     {
         /// <summary>
         /// Refresh the authentication data with remote systems.

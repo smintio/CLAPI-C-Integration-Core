@@ -21,8 +21,6 @@
 
 
 using System.Threading.Tasks;
-using SmintIo.CLAPI.Consumer.Integration.Core.Database;
-using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
 {
@@ -33,21 +31,23 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
     /// would be needed to re-created for every run. In such situations, please consider to store the authentication
     /// data in some database or in file system.</remarks>
     /// </summary>
-    public class RemoteAuthMemoryDatabase : IRemoteAuthDatabaseProvider
+    /// <typeparam name="T">Is passed to <see cref="IRemoteAuthDatabaseProvider{T}"/> and defines the type of the
+    /// authentication data that is used with the authenticator.</typeparam>
+    public class RemoteAuthMemoryDatabase<T> : IRemoteAuthDatabaseProvider<T> where T : class, new()
     {
-        private RemoteAuthDatabaseModel _remoteAuthDatabaseModel;
+        private T _remoteAuthDatabaseModel;
 
         public RemoteAuthMemoryDatabase()
         {
-            _remoteAuthDatabaseModel = new RemoteAuthDatabaseModel();
+            _remoteAuthDatabaseModel = new T();
         }
 
-        public Task<RemoteAuthDatabaseModel> GetAuthDatabaseModelAsync()
+        public Task<T> GetAuthenticationDataAsync()
         {
             return Task.FromResult(_remoteAuthDatabaseModel);
         }
 
-        public Task SetAuthDatabaseModelAsync(RemoteAuthDatabaseModel authDatabaseModel)
+        public Task SetAuthenticationDataAsync(T authDatabaseModel)
         {
             _remoteAuthDatabaseModel = authDatabaseModel;
             return Task.FromResult<dynamic>(null);

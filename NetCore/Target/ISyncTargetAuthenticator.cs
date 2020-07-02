@@ -29,7 +29,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
     /// Hence a separate interface must be used for instances in order to avoid multiple implementations for a
     /// a single interface.</remarks>
     /// </summary>
-    public interface ISyncTargetAuthenticator : IAuthenticator
+    public interface ISyncTargetAuthenticator<T> : IAuthenticator<T>
     {
     }
 }

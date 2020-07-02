@@ -20,18 +20,33 @@
 #endregion
 
 using System.Threading.Tasks;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator
 {
     /// <summary>
     /// Defines a refresher of authentication data to be used with remote systems to authenticate.
     /// </summary>
-    public interface IAuthenticationRefresher
+    /// <typeparam name="T">Defines the type of the authentication storage that is used with the authenticator.
+    /// </typeparam>
+    public interface IAuthenticationRefresher<T>
     {
         /// <summary>
         /// Refresh the authentication data with remote systems.
         /// </summary>
         /// <returns>A task to wait for finishing or not.</returns>
         Task RefreshAuthenticationAsync();
+
+        /// <summary>
+        /// Provides the token database provider that is used to store the authentication data of this authenticator.
+        /// </summary>
+        ///
+        /// <remarks>Supporting multiple synchronising clients for multiple tenants and multiple targets may lead
+        /// to insecurity, which token database provider really is used with the authenticators.
+        /// Solely relying on dependency injection does not resolve this as it decouples token storage from
+        /// authenticator from an outside perspective. Utilizing this property ensures, the same instance is used
+        /// by the authentication consumer and its producer.</remarks>
+        /// <returns>The token database model provider that is used to store the authentication data.</returns>
+        IAuthenticationDataProvider<T> GetAuthenticationDataProvider();
     }
 }

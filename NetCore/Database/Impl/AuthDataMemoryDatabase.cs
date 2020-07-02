@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 // MIT License
 //
 // Copyright (c) 2019 Smint.io GmbH
@@ -19,20 +19,37 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
+
+using System.Threading.Tasks;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Database
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
 {
     /// <summary>
-    /// Implementors store authentication data for remote integration targets.
-    ///
-    /// <remarks>Remote integration targets might use various type of authentication schemes and authentication
-    /// data. This data need to be stored, which is done by this interface. It looks similar to the
-    /// <see cref="ITokenDatabaseProvider"/> , which it is. Nonetheless, since .NET does not support named
-    /// type dependency injection, a new class is required to distinguish between Smint.io authentication data
-    /// and remote target authentication data.</remarks>
+    /// A dummy default memory only implementation of the authentication data database.
+    /// <remarks>This is ephemeral, memory only database. In case the sync target is kept in memory, it is sufficient.
+    /// However, if the sync target client is released frequently, then it will not suffice, as the authentication
+    /// would be needed to re-done for every run. In such situations, please consider to store the authentication
+    /// data in some database or in file system.</remarks>
     /// </summary>
-    public interface IRemoteAuthDatabaseProvider<T> : IAuthenticationDataProvider<T>
+    public class AuthDataMemoryDatabase<T> : IAuthenticationDataProvider<T> where T : class, new()
     {
+        private T _tokenDatabaseModel;
+
+        public AuthDataMemoryDatabase()
+        {
+            _tokenDatabaseModel = new T();
+        }
+
+        public virtual Task<T> GetAuthenticationDataAsync()
+        {
+            return Task.FromResult(_tokenDatabaseModel);
+        }
+
+        public virtual Task SetAuthenticationDataAsync(T tokenDatabaseModel)
+        {
+            _tokenDatabaseModel = tokenDatabaseModel;
+            return Task.FromResult<dynamic>(null);
+        }
     }
 }

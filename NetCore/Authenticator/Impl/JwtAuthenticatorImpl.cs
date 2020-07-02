@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 // MIT License
 //
 // Copyright (c) 2019 Smint.io GmbH
@@ -26,6 +26,7 @@ using RestSharp;
 using RestSharp.Authenticators;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
@@ -39,16 +40,16 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
     /// <para>Because of the reduced complexity, the JWT Authentication refresher can be used as authenticator too,
     /// as refreshing is the same operation as requesting a JWT token initially.</para></remarks>
     /// </summary>
-    public class JwtAuthenticatorImpl : IAuthenticator
+    public class JwtAuthenticatorImpl : IAuthenticator<RemoteAuthDatabaseModel>
     {
-        private readonly IRemoteAuthDatabaseProvider _remoteAuthDataProvider;
+        private readonly IRemoteAuthDatabaseProvider<RemoteAuthDatabaseModel> _remoteAuthDataProvider;
         private readonly ILogger<JwtAuthenticatorImpl> _logger;
 
         private JwtAuthOptions AuthenticationOptions { get; }
 
 
         public JwtAuthenticatorImpl(
-            IRemoteAuthDatabaseProvider remoteAuthDataProvider,
+            IRemoteAuthDatabaseProvider<RemoteAuthDatabaseModel> remoteAuthDataProvider,
             ILogger<JwtAuthenticatorImpl> logger,
             JwtAuthOptions authOptions)
         {
@@ -79,14 +80,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             var response = await client.ExecuteAsync<RefreshTokenResultModel>(request).ConfigureAwait(false);
             var result = response.Data;
 
-            var authData = await _remoteAuthDataProvider.GetAuthDatabaseModelAsync().ConfigureAwait(false);
+            var authData = await _remoteAuthDataProvider.GetAuthenticationDataAsync().ConfigureAwait(false);
 
             authData.Success = result.Success;
             authData.ErrorMessage = result.ErrorMsg;
             authData.AuthData = result.AccessToken;
             authData.Expiration = result.Expiration;
 
-            await _remoteAuthDataProvider.SetAuthDatabaseModelAsync(authData).ConfigureAwait(false);
+            await _remoteAuthDataProvider.SetAuthenticationDataAsync(authData).ConfigureAwait(false);
 
             if (!result.Success)
             {
@@ -96,6 +97,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
             _logger.LogInformation("Successfully refreshed token for OAuth");
         }
+
+        public IAuthenticationDataProvider<RemoteAuthDatabaseModel> GetAuthenticationDataProvider()
+            => _remoteAuthDataProvider;
 
         public Task InitializeAuthenticationAsync() => RefreshAuthenticationAsync();
     }

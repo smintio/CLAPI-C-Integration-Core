@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Database
 {
-    public interface ITokenDatabaseProvider
+    public interface ITokenDatabaseProvider : IAuthenticationDataProvider<TokenDatabaseModel>
     {
         Task<TokenDatabaseModel> GetTokenDatabaseModelAsync();
 
