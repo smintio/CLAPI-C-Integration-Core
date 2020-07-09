@@ -30,7 +30,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Models
     /// is stored as string value. Target integration implementation will need to take care to serialize or deserialize
     /// the data to and from JSON, if more complex data structures are needed.</remarks>
     /// </summary>
-    public class RemoteAuthDatabaseModel
+    public class SyncTargetAuthenticationDatabaseModel
     {
         public bool Success { get; set; }
 

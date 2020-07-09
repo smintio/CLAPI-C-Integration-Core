@@ -46,7 +46,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
         private const string Folder = "temp";
 
         private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
-        private readonly ITokenDatabaseProvider _tokenDatabaseProvider;
+        private readonly ISmintIoTokenDatabaseProvider _smintIoTokenDatabaseProvider;
         private readonly ISyncDatabaseProvider _syncDatabaseProvider;
 
         private readonly ISmintIoApiClientProvider _smintIoClient;
@@ -78,7 +78,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public SyncJobImpl(
             ISettingsDatabaseProvider settingsDatabaseProvider,
-            ITokenDatabaseProvider tokenDatabaseProvider,
+            ISmintIoTokenDatabaseProvider smintIoTokenDatabaseProvider,
             ISyncDatabaseProvider syncDatabaseProvider,            
             ISmintIoApiClientProvider smintIoClient,
             ISyncTargetDataFactory<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> syncTargetDataFactory,
@@ -86,7 +86,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             ILogger<SyncJobImpl<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>> logger)
         {
             _settingsDatabaseProvider = settingsDatabaseProvider;
-            _tokenDatabaseProvider = tokenDatabaseProvider;
+            _smintIoTokenDatabaseProvider = smintIoTokenDatabaseProvider;
             _syncDatabaseProvider = syncDatabaseProvider;
 
             _smintIoClient = smintIoClient;
@@ -113,8 +113,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                     );
                 }
 
-                var tokenDatabaseModel = await _tokenDatabaseProvider.GetTokenDatabaseModelAsync();
-                tokenDatabaseModel.ValidateForSync();
+                var smintIoTokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();
+                smintIoTokenDatabaseModel.ValidateForSync();
 
                 var cancelTask = !await _syncTarget.BeforeSyncAsync();
                 

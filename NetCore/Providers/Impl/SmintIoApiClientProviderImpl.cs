@@ -25,7 +25,6 @@ using Polly.Retry;
 using SmintIo.CLAPI.Consumer.Client.Generated;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;

@@ -47,19 +47,19 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
     /// </summary>
     public class JwtAuthenticatorImpl : IJwtAuthenticator
     {
-        private readonly IRemoteAuthDatabaseProvider<RemoteAuthDatabaseModel> _remoteAuthDataProvider;
+        private readonly ISyncTargetAuthenticationDatabaseProvider<SyncTargetAuthenticationDatabaseModel> _syncTargetAuthenticationDatabaseProvider;
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<JwtAuthenticatorImpl> _logger;
 
         public JwtAuthOptions AuthenticationOptions { get; set;  }
 
         public JwtAuthenticatorImpl(
-            IRemoteAuthDatabaseProvider<RemoteAuthDatabaseModel> remoteAuthDataProvider,
+            ISyncTargetAuthenticationDatabaseProvider<SyncTargetAuthenticationDatabaseModel> syncTargetAuthenticationDatabaseProvider,
             JwtAuthOptions authOptions,
             IServiceProvider serviceProvider,
             ILogger<JwtAuthenticatorImpl> logger)
         {
-            _remoteAuthDataProvider = remoteAuthDataProvider;
+            _syncTargetAuthenticationDatabaseProvider = syncTargetAuthenticationDatabaseProvider;
             _serviceProvider = serviceProvider;
             _logger = logger;
             AuthenticationOptions = authOptions;
@@ -67,10 +67,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public virtual async Task RefreshAuthenticationAsync()
         {
-            var authData = await _remoteAuthDataProvider.GetAuthenticationDataAsync().ConfigureAwait(false);
-            if (authData != null && authData.Success && !string.IsNullOrEmpty(authData.AuthData) &&
-                (authData.Expiration == null ||
-                    DateTimeOffset.Compare((DateTimeOffset) authData.Expiration, DateTimeOffset.Now) > 0)
+            var authenticationDatabaseModel = await _syncTargetAuthenticationDatabaseProvider.GetAuthenticationDatabaseModelAsync().ConfigureAwait(false);
+            if (authenticationDatabaseModel != null && authenticationDatabaseModel.Success && !string.IsNullOrEmpty(authenticationDatabaseModel.AuthData) &&
+                (authenticationDatabaseModel.Expiration == null ||
+                    DateTimeOffset.Compare((DateTimeOffset)authenticationDatabaseModel.Expiration, DateTimeOffset.Now) > 0)
             )
             {
                 // no refresh needed - skip
@@ -131,25 +131,26 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                 );
 
                 isAuthSuccessful = responseData.Success;
-                authData.Success = isAuthSuccessful;
-                authData.ErrorMessage = responseData.ErrorMsg;
-                authData.AuthData = responseData.AccessToken;
-                authData.Expiration = responseData.Expiration;
 
-                await _remoteAuthDataProvider.SetAuthenticationDataAsync(authData).ConfigureAwait(false);
+                authenticationDatabaseModel.Success = isAuthSuccessful;
+                authenticationDatabaseModel.ErrorMessage = responseData.ErrorMsg;
+                authenticationDatabaseModel.AuthData = responseData.AccessToken;
+                authenticationDatabaseModel.Expiration = responseData.Expiration;
+
+                await _syncTargetAuthenticationDatabaseProvider.SetAuthenticationDatabaseModelAsync(authenticationDatabaseModel).ConfigureAwait(false);
             }
 
             if (!isAuthSuccessful)
             {
                 throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.CannotRefreshSmintIoToken,
-                    $"Refreshing the JWT access token failed: {authData.ErrorMessage}");
+                    $"Refreshing the JWT access token failed: {authenticationDatabaseModel.ErrorMessage}");
             }
 
             _logger.LogInformation("Successfully refreshed token for OAuth");
         }
 
-        public IAuthenticationDataProvider<RemoteAuthDatabaseModel> GetAuthenticationDataProvider()
-            => _remoteAuthDataProvider;
+        public IAuthenticationDatabaseProvider<SyncTargetAuthenticationDatabaseModel> GetAuthenticationDatabaseProvider()
+            => _syncTargetAuthenticationDatabaseProvider;
 
         public Task InitializeAuthenticationAsync() => RefreshAuthenticationAsync();
 

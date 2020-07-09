@@ -26,7 +26,6 @@ using System;
 using System.Threading.Tasks;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Browser;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
-using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
@@ -51,7 +50,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public virtual async Task InitializeAuthenticationAsync()
         {
-            _logger.LogInformation("Authenticating with Smint.io through system browser...");
+            _logger.LogInformation("Authenticating OAuth through system browser...");
 
             var authority = AuthorityEndpoint?.ToString()
                             ?? throw new NullReferenceException("No OAuth identity endpoint defined!");
@@ -77,7 +76,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
                 var result = await LoginAsync(TargetRedirectionUrl, clientOptions).ConfigureAwait(false);
 
-                var tokenDatabaseModel = await GetAuthenticationDataProvider().GetAuthenticationDataAsync().ConfigureAwait(false);
+                var tokenDatabaseModel = await GetAuthenticationDatabaseProvider().GetAuthenticationDatabaseModelAsync().ConfigureAwait(false);
 
                 tokenDatabaseModel.Success = !result.IsError;
                 tokenDatabaseModel.ErrorMessage = result.Error;
@@ -86,7 +85,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                 tokenDatabaseModel.IdentityToken = result.IdentityToken;
                 tokenDatabaseModel.Expiration = result.AccessTokenExpiration;
 
-                await GetAuthenticationDataProvider().SetAuthenticationDataAsync(tokenDatabaseModel).ConfigureAwait(false);
+                await GetAuthenticationDatabaseProvider().SetAuthenticationDatabaseModelAsync(tokenDatabaseModel).ConfigureAwait(false);
 
                 if (!tokenDatabaseModel.Success)
                 {
@@ -94,11 +93,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                         $"Acquiring the OAuth access token failed: {tokenDatabaseModel.ErrorMessage}");
                 }
 
-                _logger.LogInformation("Successfully authenticated with Smint.io through system browser");
+                _logger.LogInformation("Successfully authenticated OAuth through system browser");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error authenticating with Smint.io through system browser");
+                _logger.LogError(ex, "Error authenticating OAuth through system browser");
                 throw;
             }
         }

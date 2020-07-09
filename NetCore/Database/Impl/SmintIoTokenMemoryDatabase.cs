@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 // MIT License
 //
 // Copyright (c) 2019 Smint.io GmbH
@@ -19,16 +19,24 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models;
+
+using System.Threading.Tasks;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
 {
     /// <summary>
-    /// Defines the authenticator and authentication data needed for JWT token access based on HTTP authentication
+    /// A dummy default memory only implementation of the Smint.io authentication data database.
+    /// <remarks>This is ephemeral, memory only database. In case the sync target is kept in memory, it is sufficient.
+    /// However, if the sync target client is released frequently, then it will not suffice, as the authentication
+    /// would be needed to re-done for every run. In such situations, please consider to store the authentication
+    /// data in some database or in file system.</remarks>
     /// </summary>
-    public interface IJwtAuthenticator : IAuthenticator<SyncTargetAuthenticationDatabaseModel>
+    public class SmintIoTokenMemoryDatabase : AuthenticationDataMemoryDatabase<TokenDatabaseModel>, ISmintIoTokenDatabaseProvider
     {
-        public JwtAuthOptions AuthenticationOptions { get; set; }
+        public Task<TokenDatabaseModel> GetTokenDatabaseModelAsync() => GetAuthenticationDatabaseModelAsync();
+
+        public Task SetTokenDatabaseModelAsync(TokenDatabaseModel tokenDatabaseModel)
+            => SetAuthenticationDatabaseModelAsync(tokenDatabaseModel);
     }
 }

@@ -90,6 +90,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             _logger.LogInformation("Successfully refreshed token for OAuth");
         }
 
-        public IAuthenticationDataProvider<TokenDatabaseModel> GetAuthenticationDataProvider() => _tokenDatabaseProvider;
+        public IAuthenticationDatabaseProvider<TokenDatabaseModel> GetAuthenticationDatabaseProvider() => _tokenDatabaseProvider;
     }
 }

@@ -47,6 +47,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator
         /// authenticator from an outside perspective. Utilizing this property ensures, the same instance is used
         /// by the authentication consumer and its producer.</remarks>
         /// <returns>The token database model provider that is used to store the authentication data.</returns>
-        IAuthenticationDataProvider<T> GetAuthenticationDataProvider();
+        IAuthenticationDatabaseProvider<T> GetAuthenticationDatabaseProvider();
     }
 }

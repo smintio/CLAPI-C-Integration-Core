@@ -26,17 +26,30 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
 {
     /// <summary>
-    /// A dummy default memory only implementation of the Smint.io authentication data database.
+    /// A dummy default memory only implementation of the authentication data database.
     /// <remarks>This is ephemeral, memory only database. In case the sync target is kept in memory, it is sufficient.
     /// However, if the sync target client is released frequently, then it will not suffice, as the authentication
     /// would be needed to re-done for every run. In such situations, please consider to store the authentication
     /// data in some database or in file system.</remarks>
     /// </summary>
-    public class TokenMemoryDatabase : AuthDataMemoryDatabase<TokenDatabaseModel>, ITokenDatabaseProvider
+    public class AuthenticationDataMemoryDatabase<T> : IAuthenticationDatabaseProvider<T> where T : class, new()
     {
-        public Task<TokenDatabaseModel> GetTokenDatabaseModelAsync() => GetAuthenticationDataAsync();
+        private T _authenticationDatabaseModel;
 
-        public Task SetTokenDatabaseModelAsync(TokenDatabaseModel tokenDatabaseModel)
-            => SetAuthenticationDataAsync(tokenDatabaseModel);
+        public AuthenticationDataMemoryDatabase()
+        {
+            _authenticationDatabaseModel = new T();
+        }
+
+        public virtual Task<T> GetAuthenticationDatabaseModelAsync()
+        {
+            return Task.FromResult(_authenticationDatabaseModel);
+        }
+
+        public virtual Task SetAuthenticationDatabaseModelAsync(T authenticationDatabaseModel)
+        {
+            _authenticationDatabaseModel = authenticationDatabaseModel;
+            return Task.FromResult<dynamic>(null);
+        }
     }
 }

@@ -33,23 +33,23 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
     /// </summary>
     /// <typeparam name="T">Is passed to <see cref="IRemoteAuthDatabaseProvider{T}"/> and defines the type of the
     /// authentication data that is used with the authenticator.</typeparam>
-    public class RemoteAuthMemoryDatabase<T> : IRemoteAuthDatabaseProvider<T> where T : class, new()
+    public class SyncTargetAuthenticationDataMemoryDatabase<T> : ISyncTargetAuthenticationDatabaseProvider<T> where T : class, new()
     {
-        private T _remoteAuthDatabaseModel;
+        private T _syncTargetAuthenticationDatabaseModel;
 
-        public RemoteAuthMemoryDatabase()
+        public SyncTargetAuthenticationDataMemoryDatabase()
         {
-            _remoteAuthDatabaseModel = new T();
+            _syncTargetAuthenticationDatabaseModel = new T();
         }
 
-        public Task<T> GetAuthenticationDataAsync()
+        public Task<T> GetAuthenticationDatabaseModelAsync()
         {
-            return Task.FromResult(_remoteAuthDatabaseModel);
+            return Task.FromResult(_syncTargetAuthenticationDatabaseModel);
         }
 
-        public Task SetAuthenticationDataAsync(T authDatabaseModel)
+        public Task SetAuthenticationDatabaseModelAsync(T syncTargetAuthenticationDatabaseModel)
         {
-            _remoteAuthDatabaseModel = authDatabaseModel;
+            _syncTargetAuthenticationDatabaseModel = syncTargetAuthenticationDatabaseModel;
             return Task.FromResult<dynamic>(null);
         }
     }

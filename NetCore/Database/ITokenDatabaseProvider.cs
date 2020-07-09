@@ -1,4 +1,4 @@
-#region copyright
+﻿#region copyright
 // MIT License
 //
 // Copyright (c) 2019 Smint.io GmbH
@@ -19,37 +19,15 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-
-using System.Threading.Tasks;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
+using System.Threading.Tasks;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Database
 {
-    /// <summary>
-    /// A dummy default memory only implementation of the authentication data database.
-    /// <remarks>This is ephemeral, memory only database. In case the sync target is kept in memory, it is sufficient.
-    /// However, if the sync target client is released frequently, then it will not suffice, as the authentication
-    /// would be needed to re-done for every run. In such situations, please consider to store the authentication
-    /// data in some database or in file system.</remarks>
-    /// </summary>
-    public class AuthDataMemoryDatabase<T> : IAuthenticationDataProvider<T> where T : class, new()
+    public interface ITokenDatabaseProvider : IAuthenticationDatabaseProvider<TokenDatabaseModel>
     {
-        private T _tokenDatabaseModel;
+        Task<TokenDatabaseModel> GetTokenDatabaseModelAsync();
 
-        public AuthDataMemoryDatabase()
-        {
-            _tokenDatabaseModel = new T();
-        }
-
-        public virtual Task<T> GetAuthenticationDataAsync()
-        {
-            return Task.FromResult(_tokenDatabaseModel);
-        }
-
-        public virtual Task SetAuthenticationDataAsync(T tokenDatabaseModel)
-        {
-            _tokenDatabaseModel = tokenDatabaseModel;
-            return Task.FromResult<dynamic>(null);
-        }
+        Task SetTokenDatabaseModelAsync(TokenDatabaseModel tokenDatabaseModel);
     }
 }

@@ -59,9 +59,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             _logger.LogInformation("Successfully refreshed token for Smint.io");
         }
 
-        public IAuthenticationDataProvider<TokenDatabaseModel> GetAuthenticationDataProvider()
+        public IAuthenticationDatabaseProvider<TokenDatabaseModel> GetAuthenticationDatabaseProvider()
         {
-            return _oAuthAuthenticator.GetAuthenticationDataProvider();
+            return _oAuthAuthenticator.GetAuthenticationDatabaseProvider();
         }
 
         private async Task ConfigureOAuthAsync()
