@@ -19,19 +19,25 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using System.Collections.Generic;
+using System;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Models
 {
-    public class SmintIoReleaseDetails
+    /// <summary>
+    /// Authentication data of remote targets to integrate with and sync to.
+    /// <remarks>Since the needs of authentication data for remote target systems is very diverse, it is best each
+    /// target integration handles the structure itself. In order to support any kind of data, the authentication data
+    /// is stored as string value. Target integration implementation will need to take care to serialize or deserialize
+    /// the data to and from JSON, if more complex data structures are needed.</remarks>
+    /// </summary>
+    public class RemoteAuthDatabaseModel
     {
-        public string ModelReleaseState { get; set; }
-        public string PropertyReleaseState { get; set; }
+        public bool Success { get; set; }
 
-        public TranslatedDictionary<string> ProviderAllowedUseComment { get; set; }
+        public string ErrorMessage { get; set; }
 
-        public TranslatedDictionary<string> ProviderReleaseComment { get; set; }
+        public string AuthData { get; set; }
 
-        public TranslatedDictionary<string> ProviderUsageConstraints { get; set; }
+        public DateTimeOffset? Expiration { get; set; }
     }
 }

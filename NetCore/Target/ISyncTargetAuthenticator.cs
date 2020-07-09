@@ -19,19 +19,17 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using System.Collections.Generic;
+using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
 {
-    public class SmintIoReleaseDetails
+    /// <summary>
+    /// This is a marker class for the dependency injection.
+    /// <remarks>Dependency injection in .NET does not support named injection in order to maintain strong typing.
+    /// Hence a separate interface must be used for instances in order to avoid multiple implementations for a
+    /// a single interface.</remarks>
+    /// </summary>
+    public interface ISyncTargetAuthenticator<T> : IAuthenticator<T>
     {
-        public string ModelReleaseState { get; set; }
-        public string PropertyReleaseState { get; set; }
-
-        public TranslatedDictionary<string> ProviderAllowedUseComment { get; set; }
-
-        public TranslatedDictionary<string> ProviderReleaseComment { get; set; }
-
-        public TranslatedDictionary<string> ProviderUsageConstraints { get; set; }
     }
 }

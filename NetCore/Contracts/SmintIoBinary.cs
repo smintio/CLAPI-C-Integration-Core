@@ -30,10 +30,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
         public string ContentType { get; set; }
         public string BinaryType { get; set; }
 
-        public IDictionary<string, string> Name { get; set; }
-        public IDictionary<string, string> Description { get; set; }
+        public TranslatedDictionary<string> Name { get; set; }
+        public TranslatedDictionary<string> Description { get; set; }
 
-        public IDictionary<string, string> Usage { get; set; }
+        public TranslatedDictionary<string> Usage { get; set; }
 
         public string DownloadUrl { get; set; }
 

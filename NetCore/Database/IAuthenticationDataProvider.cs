@@ -24,10 +24,27 @@ using System.Threading.Tasks;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Database
 {
-    public interface ITokenDatabaseProvider : IAuthenticationDataProvider<TokenDatabaseModel>
+    /// <summary>
+    /// A common interface for authentication data providers.
+    /// </summary>
+    ///
+    /// <remarks>Authentication data is used with the CLAPI-C platform and possibly with remote target systems.
+    /// Both need different authentication data. Whereas the CLAPI-C platform is well known, remote target systems
+    /// are too diverse to set a specific type of authentication data. Hence a generic type is used.</remarks>
+    /// <typeparam name="T">The type of data the authentication data provider will provide.</typeparam>
+    public interface IAuthenticationDataProvider<T>
     {
-        Task<TokenDatabaseModel> GetTokenDatabaseModelAsync();
+        /// <summary>
+        /// Returns the authentication data read from some storage system or maybe created on-the-fly.
+        /// </summary>
+        /// <returns>Authentication data or <c>null</c> if none is available.</returns>
+        Task<T> GetAuthenticationDataAsync();
 
-        Task SetTokenDatabaseModelAsync(TokenDatabaseModel tokenDatabaseModel);
+        /// <summary>
+        /// Save authentication data or even store it to some storage system.
+        /// </summary>
+        /// <param name="authenticationData">The authentication data to save or store.</param>
+        /// <returns></returns>
+        Task SetAuthenticationDataAsync(T authenticationData);
     }
 }

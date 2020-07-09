@@ -27,7 +27,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
     {
         public string Key { get; set; }
 
-        public IDictionary<string, string> Values { get; set; }
+        public TranslatedDictionary<string> Values { get; set; }
 
         public string TargetMetadataUuid { get; set; }
     }

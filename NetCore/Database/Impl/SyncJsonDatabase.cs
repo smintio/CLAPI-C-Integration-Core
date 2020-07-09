@@ -19,19 +19,27 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using System.Collections.Generic;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
+using System.Threading.Tasks;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
 {
-    public class SmintIoReleaseDetails
+    /// <summary>
+    /// Stores the sync database into a JSON file named "sync_database.json" in the current working directory of the
+    /// process.
+    /// </summary>
+    public class SyncJsonDatabase : JsonFileDatabase<SyncDatabaseModel>, ISyncDatabaseProvider
     {
-        public string ModelReleaseState { get; set; }
-        public string PropertyReleaseState { get; set; }
+        public SyncJsonDatabase() : base("sync_database.json") {}
 
-        public TranslatedDictionary<string> ProviderAllowedUseComment { get; set; }
+        public async Task<SyncDatabaseModel> GetSyncDatabaseModelAsync()
+        {
+            return await LoadDataAsync().ConfigureAwait(false);
+        }
 
-        public TranslatedDictionary<string> ProviderReleaseComment { get; set; }
-
-        public TranslatedDictionary<string> ProviderUsageConstraints { get; set; }
+        public async Task SetSyncDatabaseModelAsync(SyncDatabaseModel syncDatabaseModel)
+        {
+            await this.StoreDataAsync(syncDatabaseModel).ConfigureAwait(false);
+        }
     }
 }

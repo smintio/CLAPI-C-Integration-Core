@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 // MIT License
 //
 // Copyright (c) 2019 Smint.io GmbH
@@ -19,19 +19,24 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using System.Collections.Generic;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
+using System.Threading.Tasks;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
+
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
 {
-    public class SmintIoReleaseDetails
+    /// <summary>
+    /// A dummy default memory only implementation of the Smint.io authentication data database.
+    /// <remarks>This is ephemeral, memory only database. In case the sync target is kept in memory, it is sufficient.
+    /// However, if the sync target client is released frequently, then it will not suffice, as the authentication
+    /// would be needed to re-done for every run. In such situations, please consider to store the authentication
+    /// data in some database or in file system.</remarks>
+    /// </summary>
+    public class TokenMemoryDatabase : AuthDataMemoryDatabase<TokenDatabaseModel>, ITokenDatabaseProvider
     {
-        public string ModelReleaseState { get; set; }
-        public string PropertyReleaseState { get; set; }
+        public Task<TokenDatabaseModel> GetTokenDatabaseModelAsync() => GetAuthenticationDataAsync();
 
-        public TranslatedDictionary<string> ProviderAllowedUseComment { get; set; }
-
-        public TranslatedDictionary<string> ProviderReleaseComment { get; set; }
-
-        public TranslatedDictionary<string> ProviderUsageConstraints { get; set; }
+        public Task SetTokenDatabaseModelAsync(TokenDatabaseModel tokenDatabaseModel)
+            => SetAuthenticationDataAsync(tokenDatabaseModel);
     }
 }

@@ -19,19 +19,19 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using System.Collections.Generic;
+using Microsoft.Extensions.Hosting;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 {
-    public class SmintIoReleaseDetails
+    public interface ITimedSynchronizerService : IHostedService
     {
-        public string ModelReleaseState { get; set; }
-        public string PropertyReleaseState { get; set; }
-
-        public TranslatedDictionary<string> ProviderAllowedUseComment { get; set; }
-
-        public TranslatedDictionary<string> ProviderReleaseComment { get; set; }
-
-        public TranslatedDictionary<string> ProviderUsageConstraints { get; set; }
+        /// <summary>
+        /// Adds an execution of the sync job to the execution queue.
+        /// </summary>
+        /// <remarks>If another execution of the job ias already waiting in the queue, then no new job would be queued
+        /// as this is not necessary and redundant. The waiting job will perform the same task as the current one.
+        /// </remarks>
+        /// <param name="state">Is used internally, can be set to <c>null</c> safely and should be.</param>
+        public void TriggerSyncJobExecution(object state = null);
     }
 }

@@ -19,19 +19,20 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using System.Collections.Generic;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Database
 {
-    public class SmintIoReleaseDetails
+    /// <summary>
+    /// Implementors store authentication data for remote integration targets.
+    ///
+    /// <remarks>Remote integration targets might use various type of authentication schemes and authentication
+    /// data. This data need to be stored, which is done by this interface. It looks similar to the
+    /// <see cref="ITokenDatabaseProvider"/> , which it is. Nonetheless, since .NET does not support named
+    /// type dependency injection, a new class is required to distinguish between Smint.io authentication data
+    /// and remote target authentication data.</remarks>
+    /// </summary>
+    public interface IRemoteAuthDatabaseProvider<T> : IAuthenticationDataProvider<T>
     {
-        public string ModelReleaseState { get; set; }
-        public string PropertyReleaseState { get; set; }
-
-        public TranslatedDictionary<string> ProviderAllowedUseComment { get; set; }
-
-        public TranslatedDictionary<string> ProviderReleaseComment { get; set; }
-
-        public TranslatedDictionary<string> ProviderUsageConstraints { get; set; }
     }
 }

@@ -29,7 +29,7 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Database;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 {
-    internal class PusherService : IHostedService
+    internal class PusherService : IPusherService, IHostedService
     {
         private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
         private readonly ITokenDatabaseProvider _tokenDatabaseProvider;

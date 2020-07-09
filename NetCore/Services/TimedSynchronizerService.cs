@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 {
-    internal class TimedSynchronizerService : IHostedService, IDisposable
+    internal class TimedSynchronizerService : ITimedSynchronizerService, IHostedService, IDisposable
     {
         private readonly ISyncJobExecutionQueue _jobExecutionQueue;
         private readonly ISyncJob _syncJob;
@@ -75,7 +75,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
             return Task.CompletedTask;
         }
 
-        private void TriggerSyncJobExecution(object state)
+        public void TriggerSyncJobExecution(object state)
         {
             // sync generic metadata, because this is our regular, lazy job
 

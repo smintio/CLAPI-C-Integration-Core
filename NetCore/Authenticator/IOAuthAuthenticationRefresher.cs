@@ -19,19 +19,20 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using System.Collections.Generic;
+using System;
+using System.Threading.Tasks;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator
 {
-    public class SmintIoReleaseDetails
+    /// <summary>
+    /// Defines the refresher and authentication data needed for OAuth authentication and authorization.
+    /// </summary>
+    public interface IOAuthAuthenticationRefresher : IAuthenticationRefresher<TokenDatabaseModel>
     {
-        public string ModelReleaseState { get; set; }
-        public string PropertyReleaseState { get; set; }
-
-        public TranslatedDictionary<string> ProviderAllowedUseComment { get; set; }
-
-        public TranslatedDictionary<string> ProviderReleaseComment { get; set; }
-
-        public TranslatedDictionary<string> ProviderUsageConstraints { get; set; }
+        public Uri TokenEndPointUri { get; set; }
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
     }
 }

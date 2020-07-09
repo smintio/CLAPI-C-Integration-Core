@@ -19,19 +19,24 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator
 {
-    public class SmintIoReleaseDetails
+    /// <summary>
+    /// An authenticator authenticates the user with a remote system and stores all required data to access resources on
+    /// the remote system subsequently.
+    /// </summary>
+    /// <typeparam name="T">Is passed to <see cref="IAuthenticationRefresher{T}"/> and defines the type of the
+    /// authentication storage that is used with the authenticator.</typeparam>
+    public interface IAuthenticator<T> : IAuthenticationRefresher<T>
     {
-        public string ModelReleaseState { get; set; }
-        public string PropertyReleaseState { get; set; }
-
-        public TranslatedDictionary<string> ProviderAllowedUseComment { get; set; }
-
-        public TranslatedDictionary<string> ProviderReleaseComment { get; set; }
-
-        public TranslatedDictionary<string> ProviderUsageConstraints { get; set; }
+        /// <summary>
+        /// Performs an authentication with the remote system.
+        /// <remarks>All required data to perform the authentication must be provided elsewhere as it is implementation
+        /// dependent, what is needed.</remarks>
+        /// </summary>
+        /// <returns>A task to wait for finishing the process or not.</returns>
+        Task InitializeAuthenticationAsync();
     }
 }
