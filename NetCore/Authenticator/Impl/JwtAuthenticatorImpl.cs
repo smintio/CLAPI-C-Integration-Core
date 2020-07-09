@@ -20,10 +20,15 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using RestSharp;
-using RestSharp.Authenticators;
+using Newtonsoft.Json;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
@@ -43,53 +48,98 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
     public class JwtAuthenticatorImpl : IJwtAuthenticator
     {
         private readonly IRemoteAuthDatabaseProvider<RemoteAuthDatabaseModel> _remoteAuthDataProvider;
+        private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<JwtAuthenticatorImpl> _logger;
 
-        private JwtAuthOptions AuthenticationOptions { get; }
-
+        public JwtAuthOptions AuthenticationOptions { get; set;  }
 
         public JwtAuthenticatorImpl(
             IRemoteAuthDatabaseProvider<RemoteAuthDatabaseModel> remoteAuthDataProvider,
-            ILogger<JwtAuthenticatorImpl> logger,
-            JwtAuthOptions authOptions)
+            JwtAuthOptions authOptions,
+            IServiceProvider serviceProvider,
+            ILogger<JwtAuthenticatorImpl> logger)
         {
             _remoteAuthDataProvider = remoteAuthDataProvider;
+            _serviceProvider = serviceProvider;
             _logger = logger;
             AuthenticationOptions = authOptions;
         }
 
         public virtual async Task RefreshAuthenticationAsync()
         {
+            var authData = await _remoteAuthDataProvider.GetAuthenticationDataAsync().ConfigureAwait(false);
+            if (authData != null && authData.Success && !string.IsNullOrEmpty(authData.AuthData) &&
+                (authData.Expiration == null ||
+                    DateTimeOffset.Compare((DateTimeOffset) authData.Expiration, DateTimeOffset.Now) > 0)
+            )
+            {
+                // no refresh needed - skip
+                return;
+            }
+
             var _ = AuthenticationOptions?.JwtTokenEndpoint
                     ?? throw new NullReferenceException("No token endpoint defined!");
 
             _logger.LogInformation("Refreshing OAuth token for remote system");
 
-            var client = new RestClient(AuthenticationOptions?.JwtTokenEndpoint.ToString());
-            var request = new RestRequest(AuthenticationOptions.UsePost ? Method.POST : Method.GET);
-
-            client.Authenticator = new HttpBasicAuthenticator(
-                AuthenticationOptions?.ClientId,
-                AuthenticationOptions?.ClientSecret ?? String.Empty
+            var credentials = new BasicAuthenticationHeaderValue(
+                AuthenticationOptions?.ClientId, AuthenticationOptions?.ClientSecret ?? String.Empty
             );
 
-            request.AddParameter("grant_type", "password");
-            request.AddParameter("username", AuthenticationOptions?.Username);
-            request.AddParameter("password", AuthenticationOptions?.Password);
+            var requestUri = AuthenticationOptions?.JwtTokenEndpoint;
+            if (!AuthenticationOptions.UsePost)
+            {
+                // add the user credential data to the query parameters
+                var queryData = QueryHelpers.ParseQuery(requestUri.Query);
 
-            var response = await client.ExecuteAsync<RefreshTokenResultModel>(request).ConfigureAwait(false);
-            var result = response.Data;
+                var queryItems = queryData.SelectMany(
+                    x => x.Value,
+                    (col, value) => new KeyValuePair<string, string>(col.Key, value)
+                ).ToList();
 
-            var authData = await _remoteAuthDataProvider.GetAuthenticationDataAsync().ConfigureAwait(false);
+                requestUri = new UriBuilder(requestUri)
+                {
+                    Query = new QueryBuilder(queryItems)
+                    {
+                        {"grant_type", "password"},
+                        {"username", AuthenticationOptions?.Username},
+                        {"password", AuthenticationOptions?.Password}
+                    }.ToQueryString().ToString(),
+                }.Uri;
+            }
 
-            authData.Success = result.Success;
-            authData.ErrorMessage = result.ErrorMsg;
-            authData.AuthData = result.AccessToken;
-            authData.Expiration = result.Expiration;
+            bool isAuthSuccessful;
+            var method = AuthenticationOptions.UsePost ? HttpMethod.Post : HttpMethod.Get;
+            using (var client = _serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient())
+            {
+                using var request = new HttpRequestMessage(method, requestUri);
+                request.Headers.Authorization = credentials;
 
-            await _remoteAuthDataProvider.SetAuthenticationDataAsync(authData).ConfigureAwait(false);
+                if (AuthenticationOptions.UsePost)
+                {
+                    request.Content = CreatePostContent(AuthenticationOptions);
+                }
 
-            if (!result.Success)
+                using var response = await client
+                    .SendAsync(request, HttpCompletionOption.ResponseContentRead)
+                    .ConfigureAwait(false);
+
+                response.EnsureSuccessStatusCode();
+
+                var responseData = JsonConvert.DeserializeObject<JwtRefreshTokenResultModel>(
+                    await response.Content.ReadAsStringAsync().ConfigureAwait(false)
+                );
+
+                isAuthSuccessful = responseData.Success;
+                authData.Success = isAuthSuccessful;
+                authData.ErrorMessage = responseData.ErrorMsg;
+                authData.AuthData = responseData.AccessToken;
+                authData.Expiration = responseData.Expiration;
+
+                await _remoteAuthDataProvider.SetAuthenticationDataAsync(authData).ConfigureAwait(false);
+            }
+
+            if (!isAuthSuccessful)
             {
                 throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.CannotRefreshSmintIoToken,
                     $"Refreshing the JWT access token failed: {authData.ErrorMessage}");
@@ -102,5 +152,72 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             => _remoteAuthDataProvider;
 
         public Task InitializeAuthenticationAsync() => RefreshAuthenticationAsync();
+
+        /// <summary>
+        /// Creates POST body with form data encoding to simulate a form authentication.
+        /// </summary>
+        /// <remarks><para>Other implementation could use JSON instead.</para>
+        /// <para>This is only called in case a POST request is performed as requested in the authentication
+        /// options <see cref="JwtAuthOptions"/>.</para>
+        /// <code>
+        /// var json = JsonConvert.SerializeObject(new JsonObject()
+        /// {
+        ///     {"grant_type", "password"},
+        ///     {"username", authOptions?.Username},
+        ///     {"password", authOptions?.Password}
+        /// });
+        ///
+        /// return new StringContent(json, Encoding.UTF8, "application/json");
+        /// </code>
+        /// </remarks>
+        /// <param name="authOptions">The authentication options usable to create the request body.</param>
+        /// <returns></returns>
+        protected virtual HttpContent CreatePostContent(JwtAuthOptions authOptions)
+        {
+            return new FormUrlEncodedContent(new Dictionary<string, string>()
+            {
+                {"grant_type", "password"},
+                {"username", authOptions?.Username},
+                {"password", authOptions?.Password}
+            });
+        }
     }
+
+    internal class JwtRefreshTokenResultModel : RefreshTokenResultModel
+    {
+        public JwtRefreshTokenResultModel()
+        {
+            Success = true;
+        }
+
+        [JsonProperty("access_token")]
+        public string CustomAccessToken
+        {
+            set
+            {
+                AccessToken = value;
+                Success = Success && !string.IsNullOrEmpty(value);
+            }
+        }
+
+        [JsonProperty("token_type")]
+        public string TokenType { set => Success = Success && string.Equals("Bearer", value); }
+
+        [JsonProperty("error")]
+        public string CustomErrorFlag { set => Success = Success && string.IsNullOrEmpty(value); }
+
+        [JsonProperty("error_description")]
+        private string ErrorDescription
+        {
+            set
+            {
+                ErrorMsg = value;
+                Success = false;
+            }
+        }
+
+        [JsonProperty("expires_in")]
+        private int ExpiresIn { set => Expiration = DateTimeOffset.Now.Add(TimeSpan.FromSeconds(value)); }
+    }
+
 }
