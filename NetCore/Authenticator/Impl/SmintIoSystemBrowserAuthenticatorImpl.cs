@@ -19,35 +19,31 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using IdentityModel.OidcClient;
-using IdentityModel.OidcClient.Browser;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Browser;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
-using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
-    public class SmintIoSystemBrowserAuthenticatorImpl : OAuthAuthenticatorImpl
+    public class SmintIoSystemBrowserAuthenticatorImpl : SmintIoAuthenticatorImpl
     {
         private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
-
+        private readonly IOAuthAuthenticator _oAuthAuthenticator;
         private readonly ILogger _logger;
 
         public SmintIoSystemBrowserAuthenticatorImpl(
             ISettingsDatabaseProvider settingsDatabaseProvider,
-            ITokenDatabaseProvider tokenDatabaseProvider,
+            IOAuthAuthenticator oAuthAuthenticator,
             ILogger<SmintIoSystemBrowserAuthenticatorImpl> logger)
-            : base(tokenDatabaseProvider, logger)
+            : base(settingsDatabaseProvider, oAuthAuthenticator, logger)
         {
             _settingsDatabaseProvider = settingsDatabaseProvider;
-
+            _oAuthAuthenticator = oAuthAuthenticator;
             _logger = logger;
         }
 
-        public virtual async Task InitSmintIoAuthenticationAsync()
+        public async Task InitSmintIoAuthenticationAsync()
         {
             _logger.LogInformation("Authenticating with Smint.io through system browser...");
 
@@ -55,13 +51,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
             settingsDatabaseModel.ValidateForAuthenticator();
 
-            OAuthAuthorityEndpoint = new Uri($"https://{settingsDatabaseModel.TenantId}.smint.io/.well-known/openid-configuration");
+            _oAuthAuthenticator.AuthorityEndpoint = new Uri($"https://{settingsDatabaseModel.TenantId}.smint.io/.well-known/openid-configuration");
+            _oAuthAuthenticator.ClientId = settingsDatabaseModel.ClientId;
+            _oAuthAuthenticator.ClientSecret = settingsDatabaseModel.ClientSecret;
+            _oAuthAuthenticator.Scope = "smintio.full openid profile offline_access";
+            _oAuthAuthenticator.TargetRedirectionUrl = new Uri(settingsDatabaseModel.RedirectUri);
 
-            ClientId = settingsDatabaseModel.ClientId;
-            ClientSecret = settingsDatabaseModel.ClientSecret;
-            Scope = "smintio.full openid profile offline_access";
-
-            await InitializeAuthenticationAsync().ConfigureAwait(false);
+            await _oAuthAuthenticator.InitializeAuthenticationAsync().ConfigureAwait(false);
 
             _logger.LogInformation("Successfully authenticated with Smint.io through system browser");
         }

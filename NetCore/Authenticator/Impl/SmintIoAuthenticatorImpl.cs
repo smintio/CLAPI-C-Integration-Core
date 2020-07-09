@@ -23,40 +23,57 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
-    public class SmintIoAuthenticatorImpl : OAuthAuthenticationRefresherImpl, ISmintIoAuthenticator
+    public class SmintIoAuthenticatorImpl : ISmintIoAuthenticator
     {
-        private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
+        private readonly IOAuthAuthenticationRefresher _oAuthAuthenticator;
 
+        private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
         private readonly ILogger<SmintIoAuthenticatorImpl> _logger;
 
         public SmintIoAuthenticatorImpl(
             ISettingsDatabaseProvider settingsDatabaseProvider,
-            ITokenDatabaseProvider tokenDatabaseProvider,
-            ILogger<SmintIoAuthenticatorImpl> logger) : base(tokenDatabaseProvider, logger)
+            IOAuthAuthenticationRefresher oAuthAuthenticator,
+            ILogger<SmintIoAuthenticatorImpl> logger)
         {
             _settingsDatabaseProvider = settingsDatabaseProvider;
-
             _logger = logger;
+            _oAuthAuthenticator = oAuthAuthenticator;
         }
 
-        public virtual async Task RefreshSmintIoTokenAsync()
+        public virtual Task RefreshSmintIoTokenAsync()
+        {
+            return RefreshAuthenticationAsync();
+        }
+
+        public async Task RefreshAuthenticationAsync()
         {
             _logger.LogInformation("Refreshing token for Smint.io");
+
+            await ConfigureOAuthAsync().ConfigureAwait(false);
+            await _oAuthAuthenticator.RefreshAuthenticationAsync();
+
+            _logger.LogInformation("Successfully refreshed token for Smint.io");
+        }
+
+        public IAuthenticationDataProvider<TokenDatabaseModel> GetAuthenticationDataProvider()
+        {
+            return _oAuthAuthenticator.GetAuthenticationDataProvider();
+        }
+
+        private async Task ConfigureOAuthAsync()
+        {
 
             var settingsDatabaseModel = await _settingsDatabaseProvider.GetSettingsDatabaseModelAsync().ConfigureAwait(false);
 
             settingsDatabaseModel.ValidateForAuthenticator();
 
-            OAuthTokenEndPoint = new Uri($"https://{settingsDatabaseModel.TenantId}.smint.io/connect/token");
-            ClientId = settingsDatabaseModel.ClientId;
-            ClientSecret = settingsDatabaseModel.ClientSecret;
-
-            await RefreshAuthenticationAsync().ConfigureAwait(false);
-
-            _logger.LogInformation("Successfully refreshed token for Smint.io");
+            _oAuthAuthenticator.TokenEndPointUri = new Uri($"https://{settingsDatabaseModel.TenantId}.smint.io/connect/token");
+            _oAuthAuthenticator.ClientId = settingsDatabaseModel.ClientId;
+            _oAuthAuthenticator.ClientSecret = settingsDatabaseModel.ClientSecret;
         }
     }
 }
