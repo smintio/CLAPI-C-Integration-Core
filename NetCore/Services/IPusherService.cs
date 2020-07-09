@@ -24,5 +24,7 @@ using Microsoft.Extensions.Hosting;
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 {
     public interface IPusherService : IHostedService
-    { }
+    { 
+
+    }
 }

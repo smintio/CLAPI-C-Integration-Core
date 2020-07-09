@@ -42,9 +42,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
         private const int MaxRetryAttempts = 5;
 
         private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
-        private readonly ITokenDatabaseProvider _tokenDatabaseProvider;
+        private readonly ISmintIoTokenDatabaseProvider _smintIoTokenDatabaseProvider;
 
-        private readonly ISmintIoAuthenticator _authenticator;
+        private readonly ISmintIoAuthenticationRefresher _smintIoAuthenticationRefresher;
 
         private readonly HttpClient _http;
 
@@ -58,14 +58,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
 
         public SmintIoApiClientProviderImpl(
             ISettingsDatabaseProvider settingsDatabaseProvider,
-            ITokenDatabaseProvider tokenDatabaseProvider,
+            ISmintIoTokenDatabaseProvider smintIoTokenDatabaseProvider,
             ILogger<SmintIoApiClientProviderImpl> logger,
-            ISmintIoAuthenticator authenticator)
+            ISmintIoAuthenticationRefresher smintIoAuthenticationRefresher)
         {
             _settingsDatabaseProvider = settingsDatabaseProvider;
-            _tokenDatabaseProvider = tokenDatabaseProvider;
+            _smintIoTokenDatabaseProvider = smintIoTokenDatabaseProvider;
 
-            _authenticator = authenticator;
+            _smintIoAuthenticationRefresher = smintIoAuthenticationRefresher;
             
             _disposed = false;
 
@@ -87,7 +87,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             var syncGenericMetadata = await _retryPolicy.ExecuteAsync(async () =>
                 {
                     // get a new access token in case it was refreshed
-                    var tokenDatabaseModel = await _tokenDatabaseProvider.GetTokenDatabaseModelAsync();
+                    var tokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();
                     _clapicOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;
                     return await _clapicOpenApiClient.GetGenericMetadataForSyncAsync();
                 }
@@ -183,7 +183,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                         {
                             if (apiEx.StatusCode == (int)HttpStatusCode.Forbidden || apiEx.StatusCode == (int)HttpStatusCode.Unauthorized)
                             {
-                                await _authenticator.RefreshSmintIoTokenAsync();
+                                await _smintIoAuthenticationRefresher.RefreshSmintIoTokenAsync();
 
                                 // backoff and try again 
 
@@ -216,7 +216,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
             SyncLicensePurchaseTransactionQueryResult syncLptQueryResult = await _retryPolicy.ExecuteAsync(async () =>
             {
                 // get a new access token in case it was refreshed
-                var tokenDatabaseModel = await _tokenDatabaseProvider.GetTokenDatabaseModelAsync();
+                var tokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();
                 _clapicOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;
                 return await _clapicOpenApiClient.GetLicensePurchaseTransactionsForSyncAsync(
                     continuationUuid: continuationUuid,
@@ -476,7 +476,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
         private async Task SetupClapicOpenApiClientAsync()
         {
             var settingsDatabaseModel = await _settingsDatabaseProvider.GetSettingsDatabaseModelAsync();
-            var tokenDatabaseModel = await _tokenDatabaseProvider.GetTokenDatabaseModelAsync();
+            var tokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();
 
             _clapicOpenApiClient.BaseUrl = $"https://{settingsDatabaseModel.TenantId}.clapi.smint.io/consumer/v1";
             _clapicOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;

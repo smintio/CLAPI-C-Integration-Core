@@ -20,14 +20,19 @@
 #endregion
 
 using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
-using System.Threading.Tasks;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Database
 {
-    public interface ITokenDatabaseProvider : IAuthenticationDataProvider<TokenDatabaseModel>
+    /// <summary>
+    /// Implementors store authentication data for remote integration targets.
+    ///
+    /// <remarks>Remote integration targets might use various type of authentication schemes and authentication
+    /// data. This data need to be stored, which is done by this interface. It looks similar to the
+    /// <see cref="ITokenDatabaseProvider"/> , which it is. Nonetheless, since .NET does not support named
+    /// type dependency injection, a new class is required to distinguish between Smint.io authentication data
+    /// and remote target authentication data.</remarks>
+    /// </summary>
+    public interface ISyncTargetAuthenticationDatabaseProvider<T> : IAuthenticationDatabaseProvider<T>
     {
-        Task<TokenDatabaseModel> GetTokenDatabaseModelAsync();
-
-        Task SetTokenDatabaseModelAsync(TokenDatabaseModel tokenDatabaseModel);
     }
 }

@@ -79,7 +79,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
                 // the client holds references to all required instances after creation.
                 _syncClient = _syncClientFactory.CreateSyncClient(_clientScope);
 
-                var authenticator = _clientScope.Resolve<ISmintIoAuthenticator>() as SmintIoSystemBrowserAuthenticatorImpl;
+                var authenticator = _clientScope.Resolve<ISmintIoAuthenticationRefresher>() as SmintIoSystemBrowserAuthenticatorImpl;
                 Debug.Assert(authenticator != null, nameof(authenticator) + " != null");
 
                 // we have a system browser based authenticator here, which will work synchronously

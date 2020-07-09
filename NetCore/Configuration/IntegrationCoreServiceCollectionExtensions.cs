@@ -50,7 +50,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddHostedService<TimedSynchronizerService>();
             services.AddHostedService<PusherService>();
 
-            services.AddSingleton<ISmintIoAuthenticator, SmintIoAuthenticatorImpl>();
+            services.AddSingleton<ISmintIoAuthenticationRefresher, SmintIoAuthenticationRefresherImpl>();
 
             Console.WriteLine("CLAPI-C Integration Core initialized successfully");
 

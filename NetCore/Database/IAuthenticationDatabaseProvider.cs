@@ -19,20 +19,31 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
+using System.Threading.Tasks;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Database
 {
     /// <summary>
-    /// Implementors store authentication data for remote integration targets.
-    ///
-    /// <remarks>Remote integration targets might use various type of authentication schemes and authentication
-    /// data. This data need to be stored, which is done by this interface. It looks similar to the
-    /// <see cref="ITokenDatabaseProvider"/> , which it is. Nonetheless, since .NET does not support named
-    /// type dependency injection, a new class is required to distinguish between Smint.io authentication data
-    /// and remote target authentication data.</remarks>
+    /// A common interface for authentication data providers.
     /// </summary>
-    public interface IRemoteAuthDatabaseProvider<T> : IAuthenticationDataProvider<T>
+    ///
+    /// <remarks>Authentication data is used with the CLAPI-C platform and possibly with remote target systems.
+    /// Both need different authentication data. Whereas the CLAPI-C platform is well known, remote target systems
+    /// are too diverse to set a specific type of authentication data. Hence a generic type is used.</remarks>
+    /// <typeparam name="T">The type of data the authentication data provider will provide.</typeparam>
+    public interface IAuthenticationDatabaseProvider<T>
     {
+        /// <summary>
+        /// Returns the authentication data read from some storage system or maybe created on-the-fly.
+        /// </summary>
+        /// <returns>Authentication data or <c>null</c> if none is available.</returns>
+        Task<T> GetAuthenticationDatabaseModelAsync();
+
+        /// <summary>
+        /// Save authentication data or even store it to some storage system.
+        /// </summary>
+        /// <param name="authenticationData">The authentication data to save or store.</param>
+        /// <returns></returns>
+        Task SetAuthenticationDatabaseModelAsync(T authenticationData);
     }
 }

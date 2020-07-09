@@ -26,7 +26,7 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Database;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
-    public class SmintIoSystemBrowserAuthenticatorImpl : SmintIoAuthenticatorImpl
+    public class SmintIoSystemBrowserAuthenticatorImpl : SmintIoAuthenticationRefresherImpl
     {
         private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
         private readonly IOAuthAuthenticator _oAuthAuthenticator;

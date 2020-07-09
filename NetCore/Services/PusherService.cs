@@ -32,7 +32,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
     internal class PusherService : IPusherService, IHostedService
     {
         private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
-        private readonly ITokenDatabaseProvider _tokenDatabaseProvider;
+        private readonly ISmintIoTokenDatabaseProvider _smintIoTokenDatabaseProvider;
 
         private Pusher _pusher;
 
@@ -45,13 +45,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 
         public PusherService(
             ISettingsDatabaseProvider settingsDatabaseProvider,
-            ITokenDatabaseProvider tokenDatabaseProvider,            
+            ISmintIoTokenDatabaseProvider smintIoTokenDatabaseProvider,            
             ISyncJobExecutionQueue jobExecutionQueue,
             ISyncJob syncJob,
             ILogger<PusherService> logger)
         {
             _settingsDatabaseProvider = settingsDatabaseProvider;
-            _tokenDatabaseProvider = tokenDatabaseProvider;
+            _smintIoTokenDatabaseProvider = smintIoTokenDatabaseProvider;
 
             _jobExecutionQueue = jobExecutionQueue;
             _syncJob = syncJob;
@@ -87,7 +87,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 
             var pusherAuthEndpoint = $"https://{settingsDatabaseModel.TenantId}.clapi.smint.io/consumer/v1/notifications/pusher/auth";
 
-            var tokenDatabaseModel = await _tokenDatabaseProvider.GetTokenDatabaseModelAsync();
+            var tokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();
 
             tokenDatabaseModel.ValidateForPusher();
 

@@ -19,17 +19,15 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using System.Threading.Tasks;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
+using System.Threading.Tasks;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Database
 {
-    public interface ISmintIoAuthenticator : IAuthenticationRefresher<TokenDatabaseModel>
+    public interface ISmintIoTokenDatabaseProvider : IAuthenticationDatabaseProvider<TokenDatabaseModel>
     {
-        /// <summary>
-        /// Refresh the authentication data with remote systems.
-        /// </summary>
-        /// <returns>A task to wait for finishing or not.</returns>
-        Task RefreshSmintIoTokenAsync();
+        Task<TokenDatabaseModel> GetTokenDatabaseModelAsync();
+
+        Task SetTokenDatabaseModelAsync(TokenDatabaseModel tokenDatabaseModel);
     }
 }

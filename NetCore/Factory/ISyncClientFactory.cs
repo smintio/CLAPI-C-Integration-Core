@@ -71,7 +71,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Factory
         /// <returns>A worker task to synchronize tenant's asset with a target DAM.</returns>
         ISyncClientFactory ConfigureContainerBuilder(ContainerBuilder containerBuilder);
 
-
         /// <summary>
         /// The name of the synchronisation target that is covered by the implementation of the interface.
         /// </summary>

@@ -27,17 +27,17 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
-    public class SmintIoAuthenticatorImpl : ISmintIoAuthenticator
+    public class SmintIoAuthenticationRefresherImpl : ISmintIoAuthenticationRefresher
     {
         private readonly IOAuthAuthenticationRefresher _oAuthAuthenticator;
 
         private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
-        private readonly ILogger<SmintIoAuthenticatorImpl> _logger;
+        private readonly ILogger<SmintIoAuthenticationRefresherImpl> _logger;
 
-        public SmintIoAuthenticatorImpl(
+        public SmintIoAuthenticationRefresherImpl(
             ISettingsDatabaseProvider settingsDatabaseProvider,
             IOAuthAuthenticationRefresher oAuthAuthenticator,
-            ILogger<SmintIoAuthenticatorImpl> logger)
+            ILogger<SmintIoAuthenticationRefresherImpl> logger)
         {
             _settingsDatabaseProvider = settingsDatabaseProvider;
             _logger = logger;
@@ -66,7 +66,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         private async Task ConfigureOAuthAsync()
         {
-
             var settingsDatabaseModel = await _settingsDatabaseProvider.GetSettingsDatabaseModelAsync().ConfigureAwait(false);
 
             settingsDatabaseModel.ValidateForAuthenticator();

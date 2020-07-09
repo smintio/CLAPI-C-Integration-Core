@@ -75,7 +75,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Factory
             return this;
         }
 
-
         /// <summary>
         /// The name of the synchronisation target that is covered by the implementation of the interface.
         /// </summary>

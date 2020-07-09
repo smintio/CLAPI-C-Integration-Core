@@ -46,7 +46,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.SyncClient.Impl
         private readonly ITimedSynchronizerService _timedService;
         private readonly IPusherService _pusherService;
         
-        
         protected BaseSyncClient(
             ITimedSynchronizerService timedService, 
             IPusherService pusherService)

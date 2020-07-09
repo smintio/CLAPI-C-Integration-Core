@@ -19,17 +19,17 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator;
+using System.Threading.Tasks;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator
 {
-    /// <summary>
-    /// This is a marker class for the dependency injection.
-    /// <remarks>Dependency injection in .NET does not support named injection in order to maintain strong typing.
-    /// Hence a separate interface must be used for instances in order to avoid multiple implementations for a
-    /// a single interface.</remarks>
-    /// </summary>
-    public interface ISyncTargetAuthenticator<T> : IAuthenticator<T>
+    public interface ISmintIoAuthenticationRefresher : IAuthenticationRefresher<TokenDatabaseModel>
     {
+        /// <summary>
+        /// Refresh the authentication data with remote systems.
+        /// </summary>
+        /// <returns>A task to wait for finishing or not.</returns>
+        Task RefreshSmintIoTokenAsync();
     }
 }

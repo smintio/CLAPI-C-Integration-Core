@@ -19,11 +19,7 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-#nullable enable
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using IdentityModel.Client;
-using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator
 {
@@ -56,6 +52,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator
         /// <remarks>A valid value is returned only if the authentication scheme uses access tokens. The kind of
         /// access token is target dependent and thus does not need to be provided here.</remarks>
         /// <returns>An access token or <c>null</c> if none is used nor available.</returns>
-        Task<string?> GetAccessTokenAsync();
+        Task<string> GetAccessTokenAsync();
     }
 }

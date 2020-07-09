@@ -40,7 +40,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
 
-
         public OAuthAuthenticationRefresherImpl(
             ITokenDatabaseProvider tokenDatabaseProvider,
             ILogger<OAuthAuthenticationRefresherImpl> logger)
