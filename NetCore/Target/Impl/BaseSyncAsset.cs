@@ -13,7 +13,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         where TSyncReleaseDetails : ISyncReleaseDetails
         where TSyncDownloadConstraints : ISyncDownloadConstraints
     {
-
         private FileDownloaderDelegate _fileDownloader;
 
         private FileInfo _downloadedFile;
