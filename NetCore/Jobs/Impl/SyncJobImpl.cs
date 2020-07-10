@@ -343,6 +343,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                 await _syncTarget.AfterAssetsSyncAsync();
             }
+            catch (Exception)
+            {
+                throw;
+            }
             finally
             {
                 RemoveTempFolder(folderName);

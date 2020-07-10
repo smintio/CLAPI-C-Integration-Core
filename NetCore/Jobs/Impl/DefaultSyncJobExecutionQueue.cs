@@ -152,6 +152,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             {
                 await currentJob.Job.Invoke();
             }
+            catch (Exception)
+            {
+                throw;
+            }
             finally
             {
                 // remove the "running" flag AFTER reading all consumers waiting for notification
