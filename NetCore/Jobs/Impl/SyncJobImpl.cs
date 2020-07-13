@@ -286,7 +286,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                         {
                             if (targetAsset.IsCompoundAsset)
                             {
-                                string targetCompoundAssetUuid = await _syncTarget.GetTargetCompoundAssetUuidAsync(targetAsset.Uuid);
+                                string targetCompoundAssetUuid = await _syncTarget.GetTargetCompoundAssetUuidAsync(targetAsset.Uuid, targetAsset.RecommendedFileName);
 
                                 if (!string.IsNullOrEmpty(targetCompoundAssetUuid))
                                 {
@@ -301,7 +301,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                             }
                             else
                             {
-                                string targetAssetUuid = await _syncTarget.GetTargetAssetBinaryUuidAsync(targetAsset.Uuid, targetAsset.BinaryUuid);
+                                string targetAssetUuid = await _syncTarget.GetTargetAssetBinaryUuidAsync(targetAsset.Uuid, targetAsset.BinaryUuid, targetAsset.RecommendedFileName);
 
                                 if (!string.IsNullOrEmpty(targetAssetUuid))
                                 {
