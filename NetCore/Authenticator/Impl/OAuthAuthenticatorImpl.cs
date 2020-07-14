@@ -51,7 +51,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public virtual async Task InitializeAuthenticationAsync()
         {
-            _logger.LogInformation("Authenticating OAuth through system browser...");
+            _logger.LogInformation("Acquiring OAuth through system browser...");
 
             var authority = AuthorityEndpoint?.ToString() ?? throw new ArgumentNullException("AuthorityEndpoint");
 
