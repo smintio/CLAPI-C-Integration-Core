@@ -320,8 +320,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
 
                 if (!compoundAssetsSupported)
                 {
-                    throw new SmintIoSyncJobException(
-                       SmintIoSyncJobException.SyncJobError.Generic,
+                    throw new SyncJobException(
+                       SyncJobException.SyncJobError.Generic,
                        "SyncTarget does not support compound assets!"
                    );
                 }
@@ -335,8 +335,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
 
                     if (!binaryUpdatesSupported)
                     {
-                        throw new SmintIoSyncJobException(
-                            SmintIoSyncJobException.SyncJobError.Generic,
+                        throw new SyncJobException(
+                            SyncJobException.SyncJobError.Generic,
                             "SyncTarget does not support binary updates!"
                         );
                     }

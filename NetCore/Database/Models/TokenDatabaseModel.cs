@@ -38,14 +38,12 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Models
 
         internal void ValidateForTokenRefresh()
         {
-            if (!Success || string.IsNullOrEmpty(RefreshToken))
-                throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.SmintIoIntegrationWrongState, "The refresh token is missing");
+            if (!Success || string.IsNullOrEmpty(RefreshToken)) throw new ArgumentNullException(nameof(RefreshToken));
         }
 
         internal void ValidateForSync()
         {
-            if (!Success || string.IsNullOrEmpty(AccessToken))
-                throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.SmintIoIntegrationWrongState, "The access token is missing");
+            if (!Success || string.IsNullOrEmpty(AccessToken)) throw new ArgumentNullException(nameof(AccessToken));
         }
 
         internal void ValidateForPusher()

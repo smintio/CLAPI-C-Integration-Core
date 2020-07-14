@@ -156,8 +156,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
 
         #endregion
 
-        Task HandleAuthenticatorExceptionAsync(SmintIoAuthenticatorException exception);
-        Task HandleSyncJobExceptionAsync(SmintIoSyncJobException exception);
+        Task HandleAuthenticatorExceptionAsync(AuthenticatorException exception);
+        Task HandleSyncJobExceptionAsync(SyncJobException exception);
 
         /// <summary>
         /// A hook to be called after all synchronisation took place.

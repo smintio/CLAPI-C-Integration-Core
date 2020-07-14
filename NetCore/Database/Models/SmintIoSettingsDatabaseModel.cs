@@ -20,6 +20,7 @@
 #endregion
 
 using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
+using System;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Models
 {
@@ -57,37 +58,24 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Models
 
         internal void ValidateForAuthenticator()
         {
-            if (string.IsNullOrEmpty(TenantId))
-                throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.SmintIoIntegrationWrongState, "The tenant ID is missing");
-
-            if (string.IsNullOrEmpty(ClientId))
-                throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.SmintIoIntegrationWrongState, "The client ID is missing");
-
-            if (string.IsNullOrEmpty(ClientSecret))
-                throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.SmintIoIntegrationWrongState, "The client secret is missing");
-
-            if (string.IsNullOrEmpty(RedirectUri))
-                throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.SmintIoIntegrationWrongState, "The redirect URI is missing");
+            if (string.IsNullOrEmpty(TenantId)) throw new ArgumentNullException(nameof(TenantId));
+            if (string.IsNullOrEmpty(ClientId)) throw new ArgumentNullException(nameof(ClientId));
+            if (string.IsNullOrEmpty(ClientSecret)) throw new ArgumentNullException(nameof(ClientSecret));
+            if (string.IsNullOrEmpty(RedirectUri)) throw new ArgumentNullException(nameof(RedirectUri));
         }
 
         internal void ValidateForSync()
         {
-            if (string.IsNullOrEmpty(TenantId))
-                throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.SmintIoIntegrationWrongState, "The tenant ID is missing");
-
-            if (ImportLanguages == null || ImportLanguages.Length == 0)
-                throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.SmintIoIntegrationWrongState, "The import languages are missing");
+            if (string.IsNullOrEmpty(TenantId)) throw new ArgumentNullException(nameof(TenantId));
+            if (ImportLanguages == null || ImportLanguages.Length == 0) throw new ArgumentException(nameof(ImportLanguages));
         }
 
         internal void ValidateForPusher()
         {
             ValidateForSync();
 
-            if (ChannelId == null)
-                throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.SmintIoIntegrationWrongState, "The channel ID is missing");
-
-            if (ChannelId <= 0)
-                throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.SmintIoIntegrationWrongState, $"The channel ID is invalid: {ChannelId}");
+            if (ChannelId == null) throw new ArgumentNullException(nameof(ChannelId));
+            if (ChannelId <= 0) throw new ArgumentException(nameof(ChannelId));
         }
     }
 }

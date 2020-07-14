@@ -23,6 +23,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
+using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
@@ -41,17 +42,24 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public override async Task InitializeAuthenticationAsync()
         { 
-            var smintIoSettingsDatabaseModel = await _smintIoSettingsDatabaseProvider.GetSmintIoSettingsDatabaseModelAsync().ConfigureAwait(false);
+            try
+            { 
+                var smintIoSettingsDatabaseModel = await _smintIoSettingsDatabaseProvider.GetSmintIoSettingsDatabaseModelAsync().ConfigureAwait(false);
 
-            smintIoSettingsDatabaseModel.ValidateForAuthenticator();
+                smintIoSettingsDatabaseModel.ValidateForAuthenticator();
 
-            AuthorityEndpoint = new Uri($"https://{smintIoSettingsDatabaseModel.TenantId}.smint.io/.well-known/openid-configuration");
-            ClientId = smintIoSettingsDatabaseModel.ClientId;
-            ClientSecret = smintIoSettingsDatabaseModel.ClientSecret;
-            Scope = "smintio.full openid profile offline_access";
-            TargetRedirectionUrl = new Uri(smintIoSettingsDatabaseModel.RedirectUri);
+                AuthorityEndpoint = new Uri($"https://{smintIoSettingsDatabaseModel.TenantId}.smint.io/.well-known/openid-configuration");
+                ClientId = smintIoSettingsDatabaseModel.ClientId;
+                ClientSecret = smintIoSettingsDatabaseModel.ClientSecret;
+                Scope = "smintio.full openid profile offline_access";
+                TargetRedirectionUrl = new Uri(smintIoSettingsDatabaseModel.RedirectUri);
 
-            await base.InitializeAuthenticationAsync();
+                await base.InitializeAuthenticationAsync();
+            }
+            catch (AuthenticatorException e)
+            {
+                throw new SmintIoAuthenticatorException(e.Error, e.Message);
+            }
         }
     }
 }

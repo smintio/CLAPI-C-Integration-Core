@@ -23,16 +23,19 @@ using System;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Exceptions
 {
-    public class SyncJobException : Exception
+    public class AuthenticatorException : Exception
     {
-        public enum SyncJobError
+        public enum AuthenticatorError
         {
+            IntegrationWrongState,
+            CannotAcquireToken,
+            CannotRefreshToken,
             Generic
         }
 
-        public SyncJobError Error { get; set; }
+        public AuthenticatorError Error { get; set; }
 
-        public SyncJobException(SyncJobError error, string message)
+        public AuthenticatorException(AuthenticatorError error, string message)
             : base(message)
         {
             Error = error;

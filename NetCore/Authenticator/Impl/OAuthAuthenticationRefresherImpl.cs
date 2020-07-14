@@ -50,9 +50,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public virtual async Task RefreshAuthenticationAsync()
         {
-            var _ = TokenEndPointUri?.ToString() ?? throw new NullReferenceException("No OAuth endpoint defined!");
-
             _logger.LogInformation("Refreshing OAuth token for remote system");
+
+            var _ = TokenEndPointUri?.ToString() ?? throw new ArgumentNullException("TokenEndpointUri");
 
             var tokenDatabaseModel = await _tokenDatabaseProvider.GetAuthenticationDatabaseModelAsync().ConfigureAwait(false)
                                      ?? throw new NullReferenceException("No auth token data available to refresh");
@@ -83,7 +83,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
             if (!result.Success)
             {
-                throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.CannotRefreshSmintIoToken,
+                throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
                     $"Refreshing the OAuth access token failed: {tokenDatabaseModel.ErrorMessage}");
             }
 

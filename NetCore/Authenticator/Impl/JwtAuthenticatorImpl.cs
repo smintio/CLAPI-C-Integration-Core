@@ -67,10 +67,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public virtual async Task RefreshAuthenticationAsync()
         {
-            var _ = AuthenticationOptions?.JwtTokenEndpoint
-                    ?? throw new NullReferenceException("No token endpoint defined!");
-
             _logger.LogInformation("Refreshing JWT token for remote system");
+
+            var requestUri = AuthenticationOptions?.JwtTokenEndpoint ?? throw new ArgumentNullException("JwtTokenEndpoint");
 
             var authenticationDatabaseModel = await _syncTargetAuthenticationDatabaseProvider.GetAuthenticationDatabaseModelAsync().ConfigureAwait(false)
                                      ?? throw new NullReferenceException("No authentication data available to refresh");
@@ -79,7 +78,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                 AuthenticationOptions?.ClientId, AuthenticationOptions?.ClientSecret ?? String.Empty
             );
 
-            var requestUri = AuthenticationOptions?.JwtTokenEndpoint;
             if (!AuthenticationOptions.UsePost)
             {
                 // add the user credential data to the query parameters
@@ -135,7 +133,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
             if (!isAuthSuccessful)
             {
-                throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.CannotRefreshSmintIoToken,
+                throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
                     $"Refreshing the JWT access token failed: {authenticationDatabaseModel.ErrorMessage}");
             }
 

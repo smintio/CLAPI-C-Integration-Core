@@ -113,8 +113,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                 if (!_syncTarget.GetCapabilities().IsMultiLanguageSupported() &&
                     smintIoSettingsDatabaseModel.ImportLanguages.Length > 1)
                 {
-                    throw new SmintIoSyncJobException(
-                        SmintIoSyncJobException.SyncJobError.Generic,
+                    throw new SyncJobException(
+                        SyncJobException.SyncJobError.Generic,
                         "SyncTarget supports only one language but multiple language are set to be synced!"
                     );
                 }
@@ -143,13 +143,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                 await _syncTarget.AfterSyncAsync();
             }
-            catch (SmintIoAuthenticatorException e)
+            catch (AuthenticatorException e)
             {
                 _logger.LogError(e, "Error in sync job");
 
                 await _syncTarget.HandleAuthenticatorExceptionAsync(e);
             }
-            catch (SmintIoSyncJobException e)
+            catch (SyncJobException e)
             {
                 _logger.LogError(e, "Error in sync job");
 
@@ -159,7 +159,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             {
                 _logger.LogError(e, "Error in sync job");
 
-                await _syncTarget.HandleSyncJobExceptionAsync(new SmintIoSyncJobException(SmintIoSyncJobException.SyncJobError.Generic, e.Message));
+                await _syncTarget.HandleSyncJobExceptionAsync(new SyncJobException(SyncJobException.SyncJobError.Generic, e.Message));
             }
         }
 
@@ -238,8 +238,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             return metadataElements.ToDictionary(metadataElement => metadataElement.Key,
                 metadataElement => {
                     if (string.IsNullOrEmpty(metadataElement.TargetMetadataUuid))
-                        throw new SmintIoSyncJobException(
-                            SmintIoSyncJobException.SyncJobError.Generic,
+                        throw new SyncJobException(
+                            SyncJobException.SyncJobError.Generic,
                             $"SyncTarget did not return target metadata UUID for metadata element key {metadataElement.Key}!"
                      );
 
@@ -687,8 +687,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_contentProviderCache.ContainsKey(smintIoKey))
                 return _contentProviderCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io content provider key {smintIoKey}!"
                  );
         }
@@ -698,8 +698,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_contentTypeCache.ContainsKey(smintIoKey))
                 return _contentTypeCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io content type key {smintIoKey}!"
                  );
         }
@@ -709,8 +709,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_contentCategoryCache.ContainsKey(smintIoKey))
                 return _contentCategoryCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io content category key {smintIoKey}!"
                  );
         }
@@ -720,8 +720,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_binaryTypeCache.ContainsKey(smintIoKey))
                 return _binaryTypeCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io binary type key {smintIoKey}!"
                  );
         }
@@ -731,8 +731,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_licenseTypeCache.ContainsKey(smintIoKey))
                 return _licenseTypeCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io license type key {smintIoKey}!"
                  );
         }
@@ -742,8 +742,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_releaseStateCache.ContainsKey(smintIoKey))
                 return _releaseStateCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io release state key {smintIoKey}!"
                  );
         }
@@ -768,8 +768,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_licenseExclusivityCache.ContainsKey(smintIoKey))
                 return _licenseExclusivityCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io license exclusivity key {smintIoKey}!"
                  );
         }
@@ -794,8 +794,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_licenseUsageCache.ContainsKey(smintIoKey))
                 return _licenseUsageCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io license usage key {smintIoKey}!"
                  );
         }
@@ -820,8 +820,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_licenseSizeCache.ContainsKey(smintIoKey))
                 return _licenseSizeCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io license size key {smintIoKey}!"
                  );
         }
@@ -846,8 +846,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_licensePlacementCache.ContainsKey(smintIoKey))
                 return _licensePlacementCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io license placement key {smintIoKey}!"
                  );
         }
@@ -872,8 +872,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_licenseDistributionCache.ContainsKey(smintIoKey))
                 return _licenseDistributionCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io license distribution key {smintIoKey}!"
                  );
         }
@@ -898,8 +898,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_licenseGeographyCache.ContainsKey(smintIoKey))
                 return _licenseGeographyCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io license geography key {smintIoKey}!"
                  );
         }
@@ -924,8 +924,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_licenseIndustryCache.ContainsKey(smintIoKey))
                 return _licenseIndustryCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io license industry key {smintIoKey}!"
                  );
         }
@@ -950,8 +950,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_licenseLanguageCache.ContainsKey(smintIoKey))
                 return _licenseLanguageCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io license language key {smintIoKey}!"
                  );
         }
@@ -976,8 +976,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (_licenseUsageLimitCache.ContainsKey(smintIoKey))
                 return _licenseUsageLimitCache[smintIoKey];
 
-            throw new SmintIoSyncJobException(
-                     SmintIoSyncJobException.SyncJobError.Generic,
+            throw new SyncJobException(
+                     SyncJobException.SyncJobError.Generic,
                      $"SyncTarget did not return key mapping covering Smint.io license usage limit key {smintIoKey}!"
                  );
         }

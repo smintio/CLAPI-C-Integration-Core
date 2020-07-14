@@ -53,8 +53,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
         {
             _logger.LogInformation("Authenticating OAuth through system browser...");
 
-            var authority = AuthorityEndpoint?.ToString()
-                            ?? throw new NullReferenceException("No OAuth identity endpoint defined!");
+            var authority = AuthorityEndpoint?.ToString() ?? throw new ArgumentNullException("AuthorityEndpoint");
 
             try
             {
@@ -64,8 +63,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                     ClientId = ClientId,
                     ClientSecret = ClientSecret,
                     Scope = Scope,
-                    RedirectUri = TargetRedirectionUrl?.ToString()
-                                  ?? throw new NullReferenceException("No redirection URL defined!"),
+                    RedirectUri = TargetRedirectionUrl?.ToString() ?? throw new ArgumentNullException("RedirectUri"),
                     FilterClaims = false,
                     Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
                     ResponseMode = OidcClientOptions.AuthorizeResponseMode.FormPost
@@ -89,7 +87,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
                 if (!tokenDatabaseModel.Success)
                 {
-                    throw new SmintIoAuthenticatorException(SmintIoAuthenticatorException.AuthenticatorError.CannotAcquireSmintIoToken,
+                    throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotAcquireToken,
                         $"Acquiring the OAuth access token failed: {tokenDatabaseModel.ErrorMessage}");
                 }
 

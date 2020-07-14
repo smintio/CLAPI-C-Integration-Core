@@ -21,6 +21,7 @@
 
 using Microsoft.Extensions.Logging;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
+using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 using System;
 using System.Threading.Tasks;
 
@@ -42,15 +43,22 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public override async Task RefreshAuthenticationAsync()
         {
-            var smintIoSettingsDatabaseModel = await _smintIoSettingsDatabaseProvider.GetSmintIoSettingsDatabaseModelAsync().ConfigureAwait(false);
+            try
+            {
+                var smintIoSettingsDatabaseModel = await _smintIoSettingsDatabaseProvider.GetSmintIoSettingsDatabaseModelAsync().ConfigureAwait(false);
 
-            smintIoSettingsDatabaseModel.ValidateForAuthenticator();
+                smintIoSettingsDatabaseModel.ValidateForAuthenticator();
 
-            TokenEndPointUri = new Uri($"https://{smintIoSettingsDatabaseModel.TenantId}.smint.io/connect/token");
-            ClientId = smintIoSettingsDatabaseModel.ClientId;
-            ClientSecret = smintIoSettingsDatabaseModel.ClientSecret;
+                TokenEndPointUri = new Uri($"https://{smintIoSettingsDatabaseModel.TenantId}.smint.io/connect/token");
+                ClientId = smintIoSettingsDatabaseModel.ClientId;
+                ClientSecret = smintIoSettingsDatabaseModel.ClientSecret;
 
-            await base.RefreshAuthenticationAsync();
+                await base.RefreshAuthenticationAsync();
+            } 
+            catch (AuthenticatorException e)
+            {
+                throw new SmintIoAuthenticatorException(e.Error, e.Message);
+            }
         }
     }
 }
