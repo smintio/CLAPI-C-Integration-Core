@@ -65,10 +65,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error refreshing Smint.io OAuth token");
+                _logger.LogError(ex, "Error refreshing Smint.io OAuth access token");
 
                 throw new SmintIoAuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
-                        $"Refreshing the Smint.io OAuth token failed: {ex.Message}");
+                        $"Refreshing the Smint.io OAuth access token failed: {ex.Message}");
             }
         }
     }

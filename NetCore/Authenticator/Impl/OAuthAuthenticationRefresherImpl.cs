@@ -50,7 +50,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public virtual async Task RefreshAuthenticationAsync()
         {
-            _logger.LogInformation("Refreshing OAuth token...");
+            _logger.LogInformation("Refreshing OAuth access token...");
 
             var _ = TokenEndPointUri?.ToString() ?? throw new ArgumentNullException("TokenEndpointUri");
 
@@ -89,7 +89,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                         $"Refreshing the OAuth access token failed: {tokenDatabaseModel.ErrorMessage}");
                 }
 
-                _logger.LogInformation("Successfully refreshed token for OAuth");
+                _logger.LogInformation("Successfully refreshed access token for OAuth");
             }
             catch (AuthenticatorException)
             {
@@ -97,10 +97,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error refreshing token for OAuth");
+                _logger.LogError(ex, "Error refreshing access token for OAuth");
 
                 throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
-                        $"Refreshing the OAuth token failed: {ex.Message}");
+                        $"Refreshing the OAuth access token failed: {ex.Message}");
             }
         }
 

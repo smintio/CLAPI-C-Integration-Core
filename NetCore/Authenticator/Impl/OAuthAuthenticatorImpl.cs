@@ -51,7 +51,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public virtual async Task InitializeAuthenticationAsync()
         {
-            _logger.LogInformation("Acquiring OAuth through system browser...");
+            _logger.LogInformation("Acquiring OAuth access token through system browser...");
 
             var authority = AuthorityEndpoint?.ToString() ?? throw new ArgumentNullException("AuthorityEndpoint");
 
@@ -91,7 +91,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                         $"Acquiring the OAuth access token failed: {tokenDatabaseModel.ErrorMessage}");
                 }
 
-                _logger.LogInformation("Successfully acquired OAuth through system browser");
+                _logger.LogInformation("Successfully acquired OAuth access token through system browser");
             }
             catch (AuthenticatorException)
             {
@@ -99,10 +99,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error acquiring OAuth through system browser");
+                _logger.LogError(ex, "Error acquiring OAuth access token through system browser");
 
                 throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotAcquireToken,
-                        $"Acquiring the OAuth token through system browser failed: {ex.Message}");
+                        $"Acquiring the OAuth access token through system browser failed: {ex.Message}");
             }
         }
 

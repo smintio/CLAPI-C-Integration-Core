@@ -66,10 +66,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error acquiring Smint.io OAuth token through system browser");
+                _logger.LogError(ex, "Error acquiring Smint.io OAuth access token through system browser");
 
                 throw new SmintIoAuthenticatorException(AuthenticatorException.AuthenticatorError.CannotAcquireToken,
-                        $"Acquiring the Smint.io OAuth token through system browser failed: {ex.Message}");
+                        $"Acquiring the Smint.io OAuth access token through system browser failed: {ex.Message}");
             }
         }
     }
