@@ -31,7 +31,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 {
     internal class PusherService : IPusherService, IHostedService
     {
-        private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
+        private readonly ISmintIoSettingsDatabaseProvider _smintIoSettingsDatabaseProvider;
         private readonly ISmintIoTokenDatabaseProvider _smintIoTokenDatabaseProvider;
 
         private Pusher _pusher;
@@ -44,13 +44,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
         private readonly ILogger _logger;
 
         public PusherService(
-            ISettingsDatabaseProvider settingsDatabaseProvider,
+            ISmintIoSettingsDatabaseProvider smintIoSettingsDatabaseProvider,
             ISmintIoTokenDatabaseProvider smintIoTokenDatabaseProvider,            
             ISyncJobExecutionQueue jobExecutionQueue,
             ISyncJob syncJob,
             ILogger<PusherService> logger)
         {
-            _settingsDatabaseProvider = settingsDatabaseProvider;
+            _smintIoSettingsDatabaseProvider = smintIoSettingsDatabaseProvider;
             _smintIoTokenDatabaseProvider = smintIoTokenDatabaseProvider;
 
             _jobExecutionQueue = jobExecutionQueue;
@@ -81,11 +81,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 
         private async Task StartPusherAsync()
         {
-            var settingsDatabaseModel = await _settingsDatabaseProvider.GetSettingsDatabaseModelAsync();
+            var smintIoSettingsDatabaseModel = await _smintIoSettingsDatabaseProvider.GetSmintIoSettingsDatabaseModelAsync();
 
-            settingsDatabaseModel.ValidateForPusher();
+            smintIoSettingsDatabaseModel.ValidateForPusher();
 
-            var pusherAuthEndpoint = $"https://{settingsDatabaseModel.TenantId}.clapi.smint.io/consumer/v1/notifications/pusher/auth";
+            var pusherAuthEndpoint = $"https://{smintIoSettingsDatabaseModel.TenantId}.clapi.smint.io/consumer/v1/notifications/pusher/auth";
 
             var tokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();
 
@@ -106,7 +106,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 
             if (connectionState == ConnectionState.Connected)
             {
-                await SubscribeToPusherChannelAsync((int)settingsDatabaseModel.ChannelId);
+                await SubscribeToPusherChannelAsync((int)smintIoSettingsDatabaseModel.ChannelId);
             }
         }
 

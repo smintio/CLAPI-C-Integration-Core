@@ -19,11 +19,9 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
-
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator
 {
-    public interface ISmintIoAuthenticationRefresher : IAuthenticationRefresher<TokenDatabaseModel>
+    public interface ISmintIoAuthenticator : IOAuthAuthenticator
     {
     }
 }

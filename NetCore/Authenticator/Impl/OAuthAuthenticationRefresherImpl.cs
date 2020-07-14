@@ -32,7 +32,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
     public class OAuthAuthenticationRefresherImpl : IOAuthAuthenticationRefresher
     {
-        private readonly ITokenDatabaseProvider _tokenDatabaseProvider;
+        private readonly IAuthenticationDatabaseProvider<TokenDatabaseModel> _tokenDatabaseProvider;
 
         private readonly ILogger<OAuthAuthenticationRefresherImpl> _logger;
 
@@ -41,7 +41,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
         public string ClientSecret { get; set; }
 
         public OAuthAuthenticationRefresherImpl(
-            ITokenDatabaseProvider tokenDatabaseProvider,
+            IAuthenticationDatabaseProvider<TokenDatabaseModel> tokenDatabaseProvider,
             ILogger<OAuthAuthenticationRefresherImpl> logger)
         {
             _tokenDatabaseProvider = tokenDatabaseProvider;
@@ -54,7 +54,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
             _logger.LogInformation("Refreshing OAuth token for remote system");
 
-            var tokenDatabaseModel = await _tokenDatabaseProvider.GetTokenDatabaseModelAsync().ConfigureAwait(false)
+            var tokenDatabaseModel = await _tokenDatabaseProvider.GetAuthenticationDatabaseModelAsync().ConfigureAwait(false)
                                      ?? throw new NullReferenceException("No auth token data available to refresh");
 
             tokenDatabaseModel.ValidateForTokenRefresh();
@@ -70,7 +70,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             var response = await client.ExecuteAsync<RefreshTokenResultModel>(request).ConfigureAwait(false);
             var result = response.Data;
 
-            tokenDatabaseModel = await _tokenDatabaseProvider.GetTokenDatabaseModelAsync().ConfigureAwait(false);
+            tokenDatabaseModel = await _tokenDatabaseProvider.GetAuthenticationDatabaseModelAsync().ConfigureAwait(false);
 
             tokenDatabaseModel.Success = result.Success;
             tokenDatabaseModel.ErrorMessage = result.ErrorMsg;
@@ -79,7 +79,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             tokenDatabaseModel.IdentityToken = result.IdentityToken;
             tokenDatabaseModel.Expiration = result.Expiration;
 
-            await _tokenDatabaseProvider.SetTokenDatabaseModelAsync(tokenDatabaseModel).ConfigureAwait(false);
+            await _tokenDatabaseProvider.SetAuthenticationDatabaseModelAsync(tokenDatabaseModel).ConfigureAwait(false);
 
             if (!result.Success)
             {

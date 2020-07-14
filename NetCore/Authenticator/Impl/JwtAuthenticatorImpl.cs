@@ -70,7 +70,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             var _ = AuthenticationOptions?.JwtTokenEndpoint
                     ?? throw new NullReferenceException("No token endpoint defined!");
 
-            _logger.LogInformation("Refreshing OAuth token for remote system");
+            _logger.LogInformation("Refreshing JWT token for remote system");
 
             var authenticationDatabaseModel = await _syncTargetAuthenticationDatabaseProvider.GetAuthenticationDatabaseModelAsync().ConfigureAwait(false)
                                      ?? throw new NullReferenceException("No authentication data available to refresh");
@@ -139,13 +139,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                     $"Refreshing the JWT access token failed: {authenticationDatabaseModel.ErrorMessage}");
             }
 
-            _logger.LogInformation("Successfully refreshed token for OAuth");
+            _logger.LogInformation("Successfully refreshed token for JWT");
         }
 
         public IAuthenticationDatabaseProvider<SyncTargetAuthenticationDatabaseModel> GetAuthenticationDatabaseProvider()
             => _syncTargetAuthenticationDatabaseProvider;
 
-        public Task InitializeAuthenticationAsync() => RefreshAuthenticationAsync();
+        public async Task InitializeAuthenticationAsync() => await RefreshAuthenticationAsync();
 
         /// <summary>
         /// Creates POST body with form data encoding to simulate a form authentication.

@@ -23,7 +23,7 @@ using System;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models
 {
-    internal class RefreshTokenResultModel
+    public class RefreshTokenResultModel
     {
         public bool Success { get; set; }
 

@@ -19,8 +19,12 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
+using Client.Options;
+using Microsoft.Extensions.Configuration;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl;
 using SmintIo.CLAPI.Consumer.Integration.Core.Jobs;
 using SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl;
 using SmintIo.CLAPI.Consumer.Integration.Core.Providers;
@@ -34,13 +38,17 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class IntegrationCoreServiceCollectionExtensions
     {
-        public static IServiceCollection AddSmintIoClapicIntegrationCore<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>(this IServiceCollection services)
+        public static IServiceCollection AddSmintIoClapicIntegrationCore<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>(this IServiceCollection services, IConfiguration configuration)
             where TSyncAsset : BaseSyncAsset<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>
             where TSyncLicenseTerm : ISyncLicenseTerm
             where TSyncReleaseDetails : ISyncReleaseDetails
             where TSyncDownloadConstraints : ISyncDownloadConstraints
         {            
             Console.WriteLine("Initializing CLAPI-C Integration Core...");
+
+            var smintIoSection = configuration.GetSection("SmintIo");
+            services.AddSingleton(smintIoSection.GetSection("App").Get<SmintIoAppOptions>());
+            services.AddSingleton(smintIoSection.GetSection("Auth").Get<SmintIoAuthOptions>());
 
             services.AddSingleton<ISyncJob, SyncJobImpl<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>>();
 
@@ -51,6 +59,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddHostedService<PusherService>();
 
             services.AddSingleton<ISmintIoAuthenticationRefresher, SmintIoAuthenticationRefresherImpl>();
+            services.AddSingleton<ISmintIoAuthenticator, SmintIoSystemBrowserAuthenticatorImpl>();
+
+            services.AddSingleton<ISmintIoSettingsDatabaseProvider, SmintIoSettingsMemoryDatabase>();
+            services.AddSingleton<ISmintIoTokenDatabaseProvider, SmintIoTokenMemoryDatabase>();
+            services.AddSingleton<ISyncDatabaseProvider, SyncJsonDatabase>();
 
             Console.WriteLine("CLAPI-C Integration Core initialized successfully");
 

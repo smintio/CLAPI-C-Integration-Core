@@ -38,7 +38,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Browser
     /// <summary>
     /// https://github.com/IdentityModel/IdentityModel.OidcClient.Samples/blob/master/NetCoreConsoleClient/src/NetCoreConsoleClient/SystemBrowser.cs
     /// </summary>
-    internal class SystemBrowser : IBrowser
+    public class SystemBrowser : IBrowser
     {
         public int Port { get; }
 

@@ -27,6 +27,7 @@ using System.Threading.Tasks;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Browser;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
 using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
@@ -41,7 +42,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
         public Uri TargetRedirectionUrl { get; set; }
 
         public OAuthAuthenticatorImpl(
-            ITokenDatabaseProvider tokenDatabaseProvider,
+            IAuthenticationDatabaseProvider<TokenDatabaseModel> tokenDatabaseProvider,
             ILogger<OAuthAuthenticatorImpl> logger)
             : base(tokenDatabaseProvider, logger)
         {
@@ -57,7 +58,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
             try
             {
-
                 var clientOptions = new OidcClientOptions
                 {
                     Authority = authority,

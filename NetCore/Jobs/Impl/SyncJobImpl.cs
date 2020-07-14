@@ -45,7 +45,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
     {
         private const string Folder = "temp";
 
-        private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
+        private readonly ISmintIoSettingsDatabaseProvider _smintIoSettingsDatabaseProvider;
         private readonly ISmintIoTokenDatabaseProvider _smintIoTokenDatabaseProvider;
         private readonly ISyncDatabaseProvider _syncDatabaseProvider;
 
@@ -77,7 +77,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
         private Dictionary<string, string> _licenseUsageLimitCache;
 
         public SyncJobImpl(
-            ISettingsDatabaseProvider settingsDatabaseProvider,
+            ISmintIoSettingsDatabaseProvider smintIoSettingsDatabaseProvider,
             ISmintIoTokenDatabaseProvider smintIoTokenDatabaseProvider,
             ISyncDatabaseProvider syncDatabaseProvider,            
             ISmintIoApiClientProvider smintIoClient,
@@ -85,7 +85,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             ISyncTarget<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> syncTarget,
             ILogger<SyncJobImpl<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>> logger)
         {
-            _settingsDatabaseProvider = settingsDatabaseProvider;
+            _smintIoSettingsDatabaseProvider = smintIoSettingsDatabaseProvider;
             _smintIoTokenDatabaseProvider = smintIoTokenDatabaseProvider;
             _syncDatabaseProvider = syncDatabaseProvider;
 
@@ -101,11 +101,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
         {
             try
             {
-                var settingsDatabaseModel = await _settingsDatabaseProvider.GetSettingsDatabaseModelAsync();
-                settingsDatabaseModel.ValidateForSync();
+                var smintIoSettingsDatabaseModel = await _smintIoSettingsDatabaseProvider.GetSmintIoSettingsDatabaseModelAsync();
+                smintIoSettingsDatabaseModel.ValidateForSync();
 
                 if (!_syncTarget.GetCapabilities().IsMultiLanguageSupported() &&
-                    settingsDatabaseModel.ImportLanguages.Length > 1)
+                    smintIoSettingsDatabaseModel.ImportLanguages.Length > 1)
                 {
                     throw new SmintIoSyncJobException(
                         SmintIoSyncJobException.SyncJobError.Generic,

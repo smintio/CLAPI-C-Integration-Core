@@ -26,40 +26,32 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Database;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
-    public class SmintIoSystemBrowserAuthenticatorImpl : SmintIoAuthenticationRefresherImpl
+    public class SmintIoSystemBrowserAuthenticatorImpl : OAuthAuthenticatorImpl, ISmintIoAuthenticator
     {
-        private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
-        private readonly IOAuthAuthenticator _oAuthAuthenticator;
-        private readonly ILogger _logger;
+        private readonly ISmintIoSettingsDatabaseProvider _smintIoSettingsDatabaseProvider;
 
         public SmintIoSystemBrowserAuthenticatorImpl(
-            ISettingsDatabaseProvider settingsDatabaseProvider,
-            IOAuthAuthenticator oAuthAuthenticator,
+            ISmintIoSettingsDatabaseProvider smintIoSettingsDatabaseProvider,
+            ISmintIoTokenDatabaseProvider tokenDatabaseProvider,
             ILogger<SmintIoSystemBrowserAuthenticatorImpl> logger)
-            : base(settingsDatabaseProvider, oAuthAuthenticator, logger)
+            : base(tokenDatabaseProvider, logger)
         {
-            _settingsDatabaseProvider = settingsDatabaseProvider;
-            _oAuthAuthenticator = oAuthAuthenticator;
-            _logger = logger;
+            _smintIoSettingsDatabaseProvider = smintIoSettingsDatabaseProvider;
         }
 
-        public async Task InitSmintIoAuthenticationAsync()
-        {
-            _logger.LogInformation("Authenticating with Smint.io through system browser...");
+        public override async Task InitializeAuthenticationAsync()
+        { 
+            var smintIoSettingsDatabaseModel = await _smintIoSettingsDatabaseProvider.GetSmintIoSettingsDatabaseModelAsync().ConfigureAwait(false);
 
-            var settingsDatabaseModel = await _settingsDatabaseProvider.GetSettingsDatabaseModelAsync().ConfigureAwait(false);
+            smintIoSettingsDatabaseModel.ValidateForAuthenticator();
 
-            settingsDatabaseModel.ValidateForAuthenticator();
+            AuthorityEndpoint = new Uri($"https://{smintIoSettingsDatabaseModel.TenantId}.smint.io/.well-known/openid-configuration");
+            ClientId = smintIoSettingsDatabaseModel.ClientId;
+            ClientSecret = smintIoSettingsDatabaseModel.ClientSecret;
+            Scope = "smintio.full openid profile offline_access";
+            TargetRedirectionUrl = new Uri(smintIoSettingsDatabaseModel.RedirectUri);
 
-            _oAuthAuthenticator.AuthorityEndpoint = new Uri($"https://{settingsDatabaseModel.TenantId}.smint.io/.well-known/openid-configuration");
-            _oAuthAuthenticator.ClientId = settingsDatabaseModel.ClientId;
-            _oAuthAuthenticator.ClientSecret = settingsDatabaseModel.ClientSecret;
-            _oAuthAuthenticator.Scope = "smintio.full openid profile offline_access";
-            _oAuthAuthenticator.TargetRedirectionUrl = new Uri(settingsDatabaseModel.RedirectUri);
-
-            await _oAuthAuthenticator.InitializeAuthenticationAsync().ConfigureAwait(false);
-
-            _logger.LogInformation("Successfully authenticated with Smint.io through system browser");
+            await base.InitializeAuthenticationAsync();
         }
     }
 }

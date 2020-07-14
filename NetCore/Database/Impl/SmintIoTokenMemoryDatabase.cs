@@ -34,9 +34,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
     /// </summary>
     public class SmintIoTokenMemoryDatabase : AuthenticationDataMemoryDatabase<TokenDatabaseModel>, ISmintIoTokenDatabaseProvider
     {
-        public Task<TokenDatabaseModel> GetTokenDatabaseModelAsync() => GetAuthenticationDatabaseModelAsync();
+        public async Task<TokenDatabaseModel> GetTokenDatabaseModelAsync() => await GetAuthenticationDatabaseModelAsync();
 
-        public Task SetTokenDatabaseModelAsync(TokenDatabaseModel tokenDatabaseModel)
-            => SetAuthenticationDatabaseModelAsync(tokenDatabaseModel);
+        public async Task SetTokenDatabaseModelAsync(TokenDatabaseModel tokenDatabaseModel)
+            => await SetAuthenticationDatabaseModelAsync(tokenDatabaseModel);
     }
 }

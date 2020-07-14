@@ -24,8 +24,8 @@ using System.Threading.Tasks;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Database
 {
-    public interface ISettingsDatabaseProvider
+    public interface ISmintIoSettingsDatabaseProvider
     {
-        Task<SettingsDatabaseModel> GetSettingsDatabaseModelAsync();
+        Task<SmintIoSettingsDatabaseModel> GetSmintIoSettingsDatabaseModelAsync();
     }
 }

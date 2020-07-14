@@ -43,7 +43,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Models
     ///   </list>
     /// </para>
     /// </remarks>
-    public class SettingsDatabaseModel
+    public class SmintIoSettingsDatabaseModel
     {
         public string TenantId { get; set; }
         public int? ChannelId { get; set; }

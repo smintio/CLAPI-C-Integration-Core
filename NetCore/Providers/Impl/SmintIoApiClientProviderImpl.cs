@@ -40,7 +40,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
     {
         private const int MaxRetryAttempts = 5;
 
-        private readonly ISettingsDatabaseProvider _settingsDatabaseProvider;
+        private readonly ISmintIoSettingsDatabaseProvider _smintIoSettingsDatabaseProvider;
         private readonly ISmintIoTokenDatabaseProvider _smintIoTokenDatabaseProvider;
 
         private readonly ISmintIoAuthenticationRefresher _smintIoAuthenticationRefresher;
@@ -56,12 +56,12 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
         private readonly CLAPICOpenApiClient _clapicOpenApiClient;
 
         public SmintIoApiClientProviderImpl(
-            ISettingsDatabaseProvider settingsDatabaseProvider,
+            ISmintIoSettingsDatabaseProvider smintIoSettingsDatabaseProvider,
             ISmintIoTokenDatabaseProvider smintIoTokenDatabaseProvider,
             ILogger<SmintIoApiClientProviderImpl> logger,
             ISmintIoAuthenticationRefresher smintIoAuthenticationRefresher)
         {
-            _settingsDatabaseProvider = settingsDatabaseProvider;
+            _smintIoSettingsDatabaseProvider = smintIoSettingsDatabaseProvider;
             _smintIoTokenDatabaseProvider = smintIoTokenDatabaseProvider;
 
             _smintIoAuthenticationRefresher = smintIoAuthenticationRefresher;
@@ -94,9 +94,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
 
             var smintIoGenericMetadata = new SmintIoGenericMetadata();
 
-            var settingsDatabaseModel = await _settingsDatabaseProvider.GetSettingsDatabaseModelAsync();
+            var smintIoSettingsDatabaseModel = await _smintIoSettingsDatabaseProvider.GetSmintIoSettingsDatabaseModelAsync();
 
-            var importLanguages = settingsDatabaseModel.ImportLanguages;
+            var importLanguages = smintIoSettingsDatabaseModel.ImportLanguages;
 
             smintIoGenericMetadata.ContentProviders = GetGroupedMetadataElementsForImportLanguages(importLanguages, syncGenericMetadata.Providers);
 
@@ -182,7 +182,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                         {
                             if (apiEx.StatusCode == (int)HttpStatusCode.Forbidden || apiEx.StatusCode == (int)HttpStatusCode.Unauthorized)
                             {
-                                await _smintIoAuthenticationRefresher.RefreshSmintIoTokenAsync();
+                                await _smintIoAuthenticationRefresher.RefreshAuthenticationAsync();
 
                                 // backoff and try again 
 
@@ -208,7 +208,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
         {
             await SetupClapicOpenApiClientAsync();
 
-            var settingsDatabaseModel = await _settingsDatabaseProvider.GetSettingsDatabaseModelAsync();
+            var smintIoSettingsDatabaseModel = await _smintIoSettingsDatabaseProvider.GetSmintIoSettingsDatabaseModelAsync();
 
             IList<SmintIoAsset> assets = new List<SmintIoAsset>();
 
@@ -255,9 +255,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     }
                 }
 
-                string url = $"https://{settingsDatabaseModel.TenantId}.smint.io/project/{lpt.Project_uuid}/content-element/{lpt.Content_element.Uuid}";
+                string url = $"https://{smintIoSettingsDatabaseModel.TenantId}.smint.io/project/{lpt.Project_uuid}/content-element/{lpt.Content_element.Uuid}";
 
-                var importLanguages = settingsDatabaseModel.ImportLanguages;
+                var importLanguages = smintIoSettingsDatabaseModel.ImportLanguages;
 
                 var asset = new SmintIoAsset()
                 {
@@ -474,10 +474,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
 
         private async Task SetupClapicOpenApiClientAsync()
         {
-            var settingsDatabaseModel = await _settingsDatabaseProvider.GetSettingsDatabaseModelAsync();
+            var smintIoSettingsDatabaseModel = await _smintIoSettingsDatabaseProvider.GetSmintIoSettingsDatabaseModelAsync();
             var tokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();
 
-            _clapicOpenApiClient.BaseUrl = $"https://{settingsDatabaseModel.TenantId}.clapi.smint.io/consumer/v1";
+            _clapicOpenApiClient.BaseUrl = $"https://{smintIoSettingsDatabaseModel.TenantId}.clapi.smint.io/consumer/v1";
             _clapicOpenApiClient.AccessToken = tokenDatabaseModel.AccessToken;
         }
 
