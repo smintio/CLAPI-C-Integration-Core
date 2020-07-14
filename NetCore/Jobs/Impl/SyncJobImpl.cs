@@ -34,6 +34,7 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Target;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 using SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl;
+using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 {
@@ -50,6 +51,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
         private readonly ISyncDatabaseProvider _syncDatabaseProvider;
 
         private readonly ISmintIoApiClientProvider _smintIoClient;
+
+        private readonly ISyncTargetAuthenticator _syncTargetAuthenticator;
 
         private readonly ISyncTargetDataFactory<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> _syncTargetDataFactory;
         private readonly ISyncTarget<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> _syncTarget;
@@ -81,6 +84,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             ISmintIoTokenDatabaseProvider smintIoTokenDatabaseProvider,
             ISyncDatabaseProvider syncDatabaseProvider,            
             ISmintIoApiClientProvider smintIoClient,
+            ISyncTargetAuthenticator syncTargetAuthenticator,
             ISyncTargetDataFactory<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> syncTargetDataFactory,
             ISyncTarget<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints> syncTarget,
             ILogger<SyncJobImpl<TSyncAsset, TSyncLicenseTerm, TSyncReleaseDetails, TSyncDownloadConstraints>> logger)
@@ -90,6 +94,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             _syncDatabaseProvider = syncDatabaseProvider;
 
             _smintIoClient = smintIoClient;
+
+            _syncTargetAuthenticator = syncTargetAuthenticator;
 
             _syncTargetDataFactory = syncTargetDataFactory;
             _syncTarget = syncTarget;
@@ -115,6 +121,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                 var smintIoTokenDatabaseModel = await _smintIoTokenDatabaseProvider.GetTokenDatabaseModelAsync();
                 smintIoTokenDatabaseModel.ValidateForSync();
+
+                await _syncTargetAuthenticator.InitializeAuthenticationAsync();
 
                 var cancelTask = !await _syncTarget.BeforeSyncAsync();
                 

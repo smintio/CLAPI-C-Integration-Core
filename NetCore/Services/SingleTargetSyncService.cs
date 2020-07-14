@@ -27,9 +27,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator;
-using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl;
-using SmintIo.CLAPI.Consumer.Integration.Core.Factory;
 using SmintIo.CLAPI.Consumer.Integration.Core.SyncClient;
+using SmintIo.CLAPI.Consumer.Integration.Core.Target;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 {

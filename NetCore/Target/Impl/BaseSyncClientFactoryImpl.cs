@@ -19,21 +19,16 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Client.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl;
 using SmintIo.CLAPI.Consumer.Integration.Core.Services;
 using SmintIo.CLAPI.Consumer.Integration.Core.SyncClient;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Factory
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 {
     /// <summary>
     /// Implementing classes create new synchronisation clients of specific types that can be used to sync the tenant's

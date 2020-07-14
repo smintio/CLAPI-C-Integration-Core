@@ -25,7 +25,7 @@ using Client.Options;
 using Microsoft.Extensions.Configuration;
 using SmintIo.CLAPI.Consumer.Integration.Core.SyncClient;
 
-namespace SmintIo.CLAPI.Consumer.Integration.Core.Factory
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
 {
     /// <summary>
     /// Implementing classes create new synchronisation clients of specific types that can be used to sync the tenant's
