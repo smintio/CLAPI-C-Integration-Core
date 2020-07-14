@@ -71,73 +71,86 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
             var requestUri = AuthenticationOptions?.JwtTokenEndpoint ?? throw new ArgumentNullException("JwtTokenEndpoint");
 
-            var authenticationDatabaseModel = await _syncTargetAuthenticationDatabaseProvider.GetAuthenticationDatabaseModelAsync().ConfigureAwait(false)
+            try
+            {
+                var authenticationDatabaseModel = await _syncTargetAuthenticationDatabaseProvider.GetAuthenticationDatabaseModelAsync().ConfigureAwait(false)
                                      ?? throw new NullReferenceException("No authentication data available to refresh");
 
-            var credentials = new BasicAuthenticationHeaderValue(
-                AuthenticationOptions?.ClientId, AuthenticationOptions?.ClientSecret ?? String.Empty
-            );
-
-            if (!AuthenticationOptions.UsePost)
-            {
-                // add the user credential data to the query parameters
-                var queryData = QueryHelpers.ParseQuery(requestUri.Query);
-
-                var queryItems = queryData.SelectMany(
-                    x => x.Value,
-                    (col, value) => new KeyValuePair<string, string>(col.Key, value)
-                ).ToList();
-
-                requestUri = new UriBuilder(requestUri)
-                {
-                    Query = new QueryBuilder(queryItems)
-                    {
-                        {"grant_type", "password"},
-                        {"username", AuthenticationOptions?.Username},
-                        {"password", AuthenticationOptions?.Password}
-                    }.ToQueryString().ToString(),
-                }.Uri;
-            }
-
-            bool isAuthSuccessful;
-            var method = AuthenticationOptions.UsePost ? HttpMethod.Post : HttpMethod.Get;
-            using (var client = _serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient())
-            {
-                using var request = new HttpRequestMessage(method, requestUri);
-                request.Headers.Authorization = credentials;
-
-                if (AuthenticationOptions.UsePost)
-                {
-                    request.Content = CreatePostContent(AuthenticationOptions);
-                }
-
-                using var response = await client
-                    .SendAsync(request, HttpCompletionOption.ResponseContentRead)
-                    .ConfigureAwait(false);
-
-                response.EnsureSuccessStatusCode();
-
-                var responseData = JsonConvert.DeserializeObject<JwtRefreshTokenResultModel>(
-                    await response.Content.ReadAsStringAsync().ConfigureAwait(false)
+                var credentials = new BasicAuthenticationHeaderValue(
+                    AuthenticationOptions?.ClientId, AuthenticationOptions?.ClientSecret ?? String.Empty
                 );
 
-                isAuthSuccessful = responseData.Success;
+                if (!AuthenticationOptions.UsePost)
+                {
+                    // add the user credential data to the query parameters
+                    var queryData = QueryHelpers.ParseQuery(requestUri.Query);
 
-                authenticationDatabaseModel.Success = isAuthSuccessful;
-                authenticationDatabaseModel.ErrorMessage = responseData.ErrorMsg;
-                authenticationDatabaseModel.AuthData = responseData.AccessToken;
-                authenticationDatabaseModel.Expiration = responseData.Expiration;
+                    var queryItems = queryData.SelectMany(
+                        x => x.Value,
+                        (col, value) => new KeyValuePair<string, string>(col.Key, value)
+                    ).ToList();
 
-                await _syncTargetAuthenticationDatabaseProvider.SetAuthenticationDatabaseModelAsync(authenticationDatabaseModel).ConfigureAwait(false);
+                    requestUri = new UriBuilder(requestUri)
+                    {
+                        Query = new QueryBuilder(queryItems)
+                        {
+                            {"grant_type", "password"},
+                            {"username", AuthenticationOptions?.Username},
+                            {"password", AuthenticationOptions?.Password}
+                        }.ToQueryString().ToString(),
+                    }.Uri;
+                }
+
+                bool isAuthSuccessful;
+                var method = AuthenticationOptions.UsePost ? HttpMethod.Post : HttpMethod.Get;
+                using (var client = _serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient())
+                {
+                    using var request = new HttpRequestMessage(method, requestUri);
+                    request.Headers.Authorization = credentials;
+
+                    if (AuthenticationOptions.UsePost)
+                    {
+                        request.Content = CreatePostContent(AuthenticationOptions);
+                    }
+
+                    using var response = await client
+                        .SendAsync(request, HttpCompletionOption.ResponseContentRead)
+                        .ConfigureAwait(false);
+
+                    response.EnsureSuccessStatusCode();
+
+                    var responseData = JsonConvert.DeserializeObject<JwtRefreshTokenResultModel>(
+                        await response.Content.ReadAsStringAsync().ConfigureAwait(false)
+                    );
+
+                    isAuthSuccessful = responseData.Success;
+
+                    authenticationDatabaseModel.Success = isAuthSuccessful;
+                    authenticationDatabaseModel.ErrorMessage = responseData.ErrorMsg;
+                    authenticationDatabaseModel.AuthData = responseData.AccessToken;
+                    authenticationDatabaseModel.Expiration = responseData.Expiration;
+
+                    await _syncTargetAuthenticationDatabaseProvider.SetAuthenticationDatabaseModelAsync(authenticationDatabaseModel).ConfigureAwait(false);
+                }
+
+                if (!isAuthSuccessful)
+                {
+                    throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
+                        $"Refreshing the JWT access token failed: {authenticationDatabaseModel.ErrorMessage}");
+                }
+
+                _logger.LogInformation("Successfully refreshed token for JWT");
             }
-
-            if (!isAuthSuccessful)
+            catch (AuthenticatorException)
             {
-                throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
-                    $"Refreshing the JWT access token failed: {authenticationDatabaseModel.ErrorMessage}");
+                throw;
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error authenticating JWT");
 
-            _logger.LogInformation("Successfully refreshed token for JWT");
+                throw;
+            }
         }
 
         public IAuthenticationDatabaseProvider<SyncTargetAuthenticationDatabaseModel> GetAuthenticationDatabaseProvider()

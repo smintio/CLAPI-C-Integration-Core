@@ -93,9 +93,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
                 _logger.LogInformation("Successfully authenticated OAuth through system browser");
             }
+            catch (AuthenticatorException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error authenticating OAuth through system browser");
+
                 throw;
             }
         }
