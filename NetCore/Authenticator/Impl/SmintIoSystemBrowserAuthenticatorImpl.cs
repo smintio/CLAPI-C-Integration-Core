@@ -31,6 +31,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
     {
         private readonly ISmintIoSettingsDatabaseProvider _smintIoSettingsDatabaseProvider;
 
+        private readonly ILogger<SmintIoSystemBrowserAuthenticatorImpl> _logger;
+
         public SmintIoSystemBrowserAuthenticatorImpl(
             ISmintIoSettingsDatabaseProvider smintIoSettingsDatabaseProvider,
             ISmintIoTokenDatabaseProvider tokenDatabaseProvider,
@@ -38,6 +40,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             : base(tokenDatabaseProvider, logger)
         {
             _smintIoSettingsDatabaseProvider = smintIoSettingsDatabaseProvider;
+
+            _logger = logger;
         }
 
         public override async Task InitializeAuthenticationAsync()
@@ -59,6 +63,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             catch (AuthenticatorException e)
             {
                 throw new SmintIoAuthenticatorException(e.Error, e.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error acquiring Smint.io OAuth token through system browser");
+
+                throw new SmintIoAuthenticatorException(AuthenticatorException.AuthenticatorError.CannotAcquireToken,
+                        $"Acquiring the Smint.io OAuth token through system browser failed: {ex.Message}");
             }
         }
     }

@@ -30,7 +30,7 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
-    public class OAuthAuthenticationRefresherImpl : IOAuthAuthenticationRefresher
+    public abstract class OAuthAuthenticationRefresherImpl : IOAuthAuthenticationRefresher
     {
         private readonly IAuthenticationDatabaseProvider<TokenDatabaseModel> _tokenDatabaseProvider;
 
@@ -54,40 +54,54 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
             var _ = TokenEndPointUri?.ToString() ?? throw new ArgumentNullException("TokenEndpointUri");
 
-            var tokenDatabaseModel = await _tokenDatabaseProvider.GetAuthenticationDatabaseModelAsync().ConfigureAwait(false)
-                                     ?? throw new NullReferenceException("No auth token data available to refresh");
+            try
+            { 
+                var tokenDatabaseModel = await _tokenDatabaseProvider.GetAuthenticationDatabaseModelAsync().ConfigureAwait(false)
+                                         ?? throw new NullReferenceException("No auth token data available to refresh");
 
-            tokenDatabaseModel.ValidateForTokenRefresh();
+                tokenDatabaseModel.ValidateForTokenRefresh();
 
-            var client = new RestClient(TokenEndPointUri.ToString());
-            var request = new RestRequest(Method.POST);
+                var client = new RestClient(TokenEndPointUri.ToString());
+                var request = new RestRequest(Method.POST);
 
-            request.AddParameter("grant_type", "refresh_token");
-            request.AddParameter("refresh_token", tokenDatabaseModel.RefreshToken);
-            request.AddParameter("client_id", ClientId);
-            request.AddParameter("client_secret", ClientSecret);
+                request.AddParameter("grant_type", "refresh_token");
+                request.AddParameter("refresh_token", tokenDatabaseModel.RefreshToken);
+                request.AddParameter("client_id", ClientId);
+                request.AddParameter("client_secret", ClientSecret);
 
-            var response = await client.ExecuteAsync<RefreshTokenResultModel>(request).ConfigureAwait(false);
-            var result = response.Data;
+                var response = await client.ExecuteAsync<RefreshTokenResultModel>(request).ConfigureAwait(false);
+                var result = response.Data;
 
-            tokenDatabaseModel = await _tokenDatabaseProvider.GetAuthenticationDatabaseModelAsync().ConfigureAwait(false);
+                tokenDatabaseModel = await _tokenDatabaseProvider.GetAuthenticationDatabaseModelAsync().ConfigureAwait(false);
 
-            tokenDatabaseModel.Success = result.Success;
-            tokenDatabaseModel.ErrorMessage = result.ErrorMsg;
-            tokenDatabaseModel.AccessToken = result.AccessToken;
-            tokenDatabaseModel.RefreshToken = result.RefreshToken;
-            tokenDatabaseModel.IdentityToken = result.IdentityToken;
-            tokenDatabaseModel.Expiration = result.Expiration;
+                tokenDatabaseModel.Success = result.Success;
+                tokenDatabaseModel.ErrorMessage = result.ErrorMsg;
+                tokenDatabaseModel.AccessToken = result.AccessToken;
+                tokenDatabaseModel.RefreshToken = result.RefreshToken;
+                tokenDatabaseModel.IdentityToken = result.IdentityToken;
+                tokenDatabaseModel.Expiration = result.Expiration;
 
-            await _tokenDatabaseProvider.SetAuthenticationDatabaseModelAsync(tokenDatabaseModel).ConfigureAwait(false);
+                await _tokenDatabaseProvider.SetAuthenticationDatabaseModelAsync(tokenDatabaseModel).ConfigureAwait(false);
 
-            if (!result.Success)
-            {
-                throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
-                    $"Refreshing the OAuth access token failed: {tokenDatabaseModel.ErrorMessage}");
+                if (!result.Success)
+                {
+                    throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
+                        $"Refreshing the OAuth access token failed: {tokenDatabaseModel.ErrorMessage}");
+                }
+
+                _logger.LogInformation("Successfully refreshed token for OAuth");
             }
+            catch (AuthenticatorException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error refreshing token for OAuth");
 
-            _logger.LogInformation("Successfully refreshed token for OAuth");
+                throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
+                        $"Refreshing the OAuth token failed: {ex.Message}");
+            }
         }
 
         public IAuthenticationDatabaseProvider<TokenDatabaseModel> GetAuthenticationDatabaseProvider() => _tokenDatabaseProvider;

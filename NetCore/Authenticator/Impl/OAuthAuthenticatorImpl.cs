@@ -99,9 +99,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error authenticating OAuth through system browser");
+                _logger.LogError(ex, "Error acquiring OAuth through system browser");
 
-                throw;
+                throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
+                        $"Authenticating the OAuth token through system browser failed: {ex.Message}");
             }
         }
 

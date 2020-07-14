@@ -147,9 +147,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error authenticating JWT");
+                _logger.LogError(ex, "Error refreshing JWT token");
 
-                throw;
+                throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
+                        $"Refreshing the JWT token failed: {ex.Message}");
             }
         }
 
