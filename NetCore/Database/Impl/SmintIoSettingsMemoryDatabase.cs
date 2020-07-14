@@ -23,9 +23,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
             };
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<SmintIoSettingsDatabaseModel> GetSmintIoSettingsDatabaseModelAsync()
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
-            return await Task.FromResult(_smintIoSettingsDatabaseModel);
+            return _smintIoSettingsDatabaseModel;
         }
     }
 }

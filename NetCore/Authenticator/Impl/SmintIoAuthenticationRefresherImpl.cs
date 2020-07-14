@@ -31,6 +31,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
     {
         private readonly ISmintIoSettingsDatabaseProvider _smintIoSettingsDatabaseProvider;
 
+        private ILogger<SmintIoAuthenticationRefresherImpl> _logger;
+
         public SmintIoAuthenticationRefresherImpl(
             ISmintIoSettingsDatabaseProvider smintIoSettingsDatabaseProvider,
             ISmintIoTokenDatabaseProvider tokenDatabaseProvider,
@@ -39,6 +41,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         {
             _smintIoSettingsDatabaseProvider = smintIoSettingsDatabaseProvider;
+
+            _logger = logger;
         }
 
         public override async Task RefreshAuthenticationAsync()
@@ -58,6 +62,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             catch (AuthenticatorException e)
             {
                 throw new SmintIoAuthenticatorException(e.Error, e.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error refreshing Smint.io OAuth token");
+
+                throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
+                        $"Refreshing the Smint.io OAuth token failed: {ex.Message}");
             }
         }
     }

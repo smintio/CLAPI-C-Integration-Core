@@ -42,15 +42,18 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
             _syncTargetAuthenticationDatabaseModel = new T();
         }
 
-        public Task<T> GetAuthenticationDatabaseModelAsync()
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public async Task<T> GetAuthenticationDatabaseModelAsync()
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
-            return Task.FromResult(_syncTargetAuthenticationDatabaseModel);
+            return _syncTargetAuthenticationDatabaseModel;
         }
 
-        public Task SetAuthenticationDatabaseModelAsync(T syncTargetAuthenticationDatabaseModel)
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public async Task SetAuthenticationDatabaseModelAsync(T syncTargetAuthenticationDatabaseModel)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             _syncTargetAuthenticationDatabaseModel = syncTargetAuthenticationDatabaseModel;
-            return Task.FromResult<dynamic>(null);
         }
     }
 }

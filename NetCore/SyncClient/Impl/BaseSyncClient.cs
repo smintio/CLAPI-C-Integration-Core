@@ -91,10 +91,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.SyncClient.Impl
             }
         }
 
-        public Task TriggerSyncAsync(bool syncWithMetaData)
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public async Task TriggerSyncAsync(bool syncWithMetaData)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             _timedService?.TriggerSyncJobExecution();
-            return Task.CompletedTask;
         }
 
         public void Dispose()

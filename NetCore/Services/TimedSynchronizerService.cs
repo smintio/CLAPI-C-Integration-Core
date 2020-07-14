@@ -53,26 +53,26 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
             _timer?.Dispose();
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public async Task StartAsync(CancellationToken cancellationToken)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             _logger.LogInformation("Starting timed synchronizer service...");
 
             _timer = new Timer(TriggerSyncJobExecution, null, TimeSpan.Zero, TimeSpan.FromMinutes(30));
 
             _logger.LogInformation("Started timed synchronizer service");
-
-            return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public async Task StopAsync(CancellationToken cancellationToken)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             _logger.LogInformation("Stopping timed synchronizer service...");
 
             _timer?.Change(Timeout.Infinite, 0);
 
             _logger.LogInformation("Stopped timed synchronizer service");
-
-            return Task.CompletedTask;
         }
 
         public void TriggerSyncJobExecution(object state)
