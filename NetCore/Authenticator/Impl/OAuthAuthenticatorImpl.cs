@@ -91,7 +91,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                         $"Acquiring the OAuth access token failed: {tokenDatabaseModel.ErrorMessage}");
                 }
 
-                _logger.LogInformation("Successfully authenticated OAuth through system browser");
+                _logger.LogInformation("Successfully acquired OAuth through system browser");
             }
             catch (AuthenticatorException)
             {
