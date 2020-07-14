@@ -50,7 +50,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public virtual async Task RefreshAuthenticationAsync()
         {
-            _logger.LogInformation("Refreshing OAuth token for remote system...");
+            _logger.LogInformation("Refreshing OAuth token...");
 
             var _ = TokenEndPointUri?.ToString() ?? throw new ArgumentNullException("TokenEndpointUri");
 
