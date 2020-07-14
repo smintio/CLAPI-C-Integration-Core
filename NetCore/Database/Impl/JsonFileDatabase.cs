@@ -37,10 +37,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
 
         public JsonFileDatabase(string storeToFile)
         {
-            if (string.IsNullOrEmpty(storeToFile))
-            {
-                throw new ArgumentNullException(nameof(storeToFile));
-            }
+            if (string.IsNullOrEmpty(storeToFile)) throw new ArgumentNullException(nameof(storeToFile));
 
             FileName = storeToFile;
         }

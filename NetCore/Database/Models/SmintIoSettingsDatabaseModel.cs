@@ -67,7 +67,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Models
         internal void ValidateForSync()
         {
             if (string.IsNullOrEmpty(TenantId)) throw new ArgumentNullException(nameof(TenantId));
-            if (ImportLanguages == null || ImportLanguages.Length == 0) throw new ArgumentException(nameof(ImportLanguages));
+            if (ImportLanguages == null || ImportLanguages.Length == 0) throw new ArgumentException("Import languages missing", nameof(ImportLanguages));
         }
 
         internal void ValidateForPusher()
@@ -75,7 +75,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Models
             ValidateForSync();
 
             if (ChannelId == null) throw new ArgumentNullException(nameof(ChannelId));
-            if (ChannelId <= 0) throw new ArgumentException(nameof(ChannelId));
+            if (ChannelId <= 0) throw new ArgumentException("Must not be equal or smaller than 0", nameof(ChannelId));
         }
     }
 }
