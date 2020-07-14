@@ -102,7 +102,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
             }
             else
             {
-                _logger.LogInformation("Synchronizer service has not been started yet.");
+                _logger.LogInformation("Synchronizer service has not been started yet");
             }
         }
     }

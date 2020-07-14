@@ -128,7 +128,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                 
                 if (cancelTask)
                 {
-                    _logger.LogInformation("'BeforeSync' task terminated with 'false', indicating to abort sync.");
+                    _logger.LogInformation("BeforeSync task terminated with 'false', indicating to abort sync");
 
                     return;
                 }
@@ -171,7 +171,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             if (cancelMetadataSync &&
                 _contentProviderCache != null)
             {
-                _logger.LogInformation("'BeforeGenericMetadataSyncAsync' task aborted meta data sync");
+                _logger.LogInformation("BeforeGenericMetadataSyncAsync task aborted meta data sync");
 
                 return;
             }
@@ -254,7 +254,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             var cancelAssetsSync = !await _syncTarget.BeforeAssetsSyncAsync();
             if (cancelAssetsSync)
             {
-                _logger.LogInformation("'BeforeAssetsSyncAsync' task aborted assets sync");
+                _logger.LogInformation("BeforeAssetsSyncAsync task aborted assets sync");
 
                 return;
             }

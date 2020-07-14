@@ -67,7 +67,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public virtual async Task RefreshAuthenticationAsync()
         {
-            _logger.LogInformation("Refreshing JWT token for remote system");
+            _logger.LogInformation("Refreshing JWT token for remote system...");
 
             var requestUri = AuthenticationOptions?.JwtTokenEndpoint ?? throw new ArgumentNullException("JwtTokenEndpoint");
 
