@@ -25,8 +25,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models
 {
     public class RefreshTokenResultModel
     {
-        public bool Success { get; set; }
-
         public string ErrorMsg { get; set; }
 
         public string AccessToken { get; set; }
@@ -34,5 +32,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models
         public string IdentityToken { get; set; }
 
         public DateTimeOffset? Expiration { get; set; }
+
+        public bool IsSuccess()
+        {
+            return string.IsNullOrEmpty(ErrorMsg) && !string.IsNullOrEmpty(AccessToken);
+        }
     }
 }

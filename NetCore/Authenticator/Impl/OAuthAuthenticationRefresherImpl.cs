@@ -70,11 +70,18 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                 request.AddParameter("client_secret", ClientSecret);
 
                 var response = await client.ExecuteAsync<RefreshTokenResultModel>(request).ConfigureAwait(false);
+
+                if (!response.IsSuccessful)
+                {
+                    throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
+                            $"Refreshing the OAuth access token failed: {response.StatusCode} {response.StatusDescription}");
+                }
+
                 var result = response.Data;
 
                 tokenDatabaseModel = await _tokenDatabaseProvider.GetAuthenticationDatabaseModelAsync().ConfigureAwait(false);
 
-                tokenDatabaseModel.Success = result.Success;
+                tokenDatabaseModel.Success = result.IsSuccess();
                 tokenDatabaseModel.ErrorMessage = result.ErrorMsg;
                 tokenDatabaseModel.AccessToken = result.AccessToken;
                 tokenDatabaseModel.RefreshToken = result.RefreshToken;
@@ -83,7 +90,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
                 await _tokenDatabaseProvider.SetAuthenticationDatabaseModelAsync(tokenDatabaseModel).ConfigureAwait(false);
 
-                if (!result.Success)
+                if (tokenDatabaseModel.Success)
                 {
                     throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
                         $"Refreshing the OAuth access token failed: {tokenDatabaseModel.ErrorMessage}");

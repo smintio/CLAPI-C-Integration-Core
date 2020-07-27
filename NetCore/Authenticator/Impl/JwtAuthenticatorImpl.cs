@@ -103,6 +103,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
                 bool isAuthSuccessful;
                 var method = AuthenticationOptions.UsePost ? HttpMethod.Post : HttpMethod.Get;
+
                 using (var client = _serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient())
                 {
                     using var request = new HttpRequestMessage(method, requestUri);
@@ -123,7 +124,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                         await response.Content.ReadAsStringAsync().ConfigureAwait(false)
                     );
 
-                    isAuthSuccessful = responseData.Success;
+                    isAuthSuccessful = responseData.IsSuccess();
 
                     authenticationDatabaseModel.Success = isAuthSuccessful;
                     authenticationDatabaseModel.ErrorMessage = responseData.ErrorMsg;
@@ -188,42 +189,4 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             });
         }
     }
-
-    internal class JwtRefreshTokenResultModel : RefreshTokenResultModel
-    {
-        public JwtRefreshTokenResultModel()
-        {
-            Success = true;
-        }
-
-        [JsonProperty("access_token")]
-        public string CustomAccessToken
-        {
-            set
-            {
-                AccessToken = value;
-                Success = Success && !string.IsNullOrEmpty(value);
-            }
-        }
-
-        [JsonProperty("token_type")]
-        public string TokenType { set => Success = Success && string.Equals("Bearer", value); }
-
-        [JsonProperty("error")]
-        public string CustomErrorFlag { set => Success = Success && string.IsNullOrEmpty(value); }
-
-        [JsonProperty("error_description")]
-        private string ErrorDescription
-        {
-            set
-            {
-                ErrorMsg = value;
-                Success = false;
-            }
-        }
-
-        [JsonProperty("expires_in")]
-        private int ExpiresIn { set => Expiration = DateTimeOffset.Now.Add(TimeSpan.FromSeconds(value)); }
-    }
-
 }
