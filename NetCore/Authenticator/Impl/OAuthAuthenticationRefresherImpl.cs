@@ -90,7 +90,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
                 await _tokenDatabaseProvider.SetAuthenticationDatabaseModelAsync(tokenDatabaseModel).ConfigureAwait(false);
 
-                if (tokenDatabaseModel.Success)
+                if (!tokenDatabaseModel.Success)
                 {
                     throw new AuthenticatorException(AuthenticatorException.AuthenticatorError.CannotRefreshToken,
                         $"Refreshing the OAuth access token failed: {tokenDatabaseModel.ErrorMessage}");
