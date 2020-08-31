@@ -380,6 +380,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                     var targetAsset = _syncTargetDataFactory.CreateSyncBinaryAsset();
 
+                    targetAsset.SetBinary(binary);
+
                     targetAsset.SetUuid(rawAsset.LicensePurchaseTransactionUuid);
 
                     targetAsset.SetRecommendedFileName(recommendedFileName);

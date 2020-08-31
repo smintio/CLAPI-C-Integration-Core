@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SmintIo.CLAPI.Consumer.Integration.Core.Contracts;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -34,6 +35,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 
         public IList<TSyncAsset> AssetParts { get; set; }
 
+        public SmintIoBinary Binary { get; set; }
+        
         public BaseSyncAsset()
         {
             IsCompoundAsset = false;
@@ -42,6 +45,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         public BaseSyncAsset(FileDownloaderDelegate downloader)
         {
             this._fileDownloader = downloader;
+        }
+
+        internal void SetBinary(SmintIoBinary binary)
+        {
+            Binary = binary;
         }
 
         internal void SetUuid(string uuid)
