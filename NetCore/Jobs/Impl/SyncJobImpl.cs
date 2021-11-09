@@ -689,6 +689,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetContentProviderKey(string smintIoKey)
         {
+            if (_contentProviderCache == null)
+                return smintIoKey;
+
             if (_contentProviderCache.ContainsKey(smintIoKey))
                 return _contentProviderCache[smintIoKey];
 
@@ -700,6 +703,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetContentTypeKey(string smintIoKey)
         {
+            if (_contentProviderCache == null)
+                return smintIoKey;
+
             if (_contentTypeCache.ContainsKey(smintIoKey))
                 return _contentTypeCache[smintIoKey];
 
@@ -711,6 +717,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetContentCategoryKey(string smintIoKey)
         {
+            if (_contentCategoryCache == null)
+                return smintIoKey;
+
             if (_contentCategoryCache.ContainsKey(smintIoKey))
                 return _contentCategoryCache[smintIoKey];
 
@@ -722,6 +731,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetBinaryTypeKey(string smintIoKey)
         {
+            if (_binaryTypeCache == null)
+                return smintIoKey;
+
             if (_binaryTypeCache.ContainsKey(smintIoKey))
                 return _binaryTypeCache[smintIoKey];
 
@@ -733,6 +745,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetLicenseTypeKey(string smintIoKey)
         {
+            if (_licenseTypeCache == null)
+                return smintIoKey;
+
             if (_licenseTypeCache.ContainsKey(smintIoKey))
                 return _licenseTypeCache[smintIoKey];
 
@@ -744,6 +759,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetReleaseStateKey(string smintIoKey)
         {
+            if (_releaseStateCache == null)
+                return smintIoKey;
+
             if (_releaseStateCache.ContainsKey(smintIoKey))
                 return _releaseStateCache[smintIoKey];
 
@@ -770,6 +788,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetLicenseExclusivityKey(string smintIoKey)
         {
+            if (_licenseExclusivityCache == null)
+                return smintIoKey;
+
             if (_licenseExclusivityCache.ContainsKey(smintIoKey))
                 return _licenseExclusivityCache[smintIoKey];
 
@@ -796,6 +817,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetLicenseUsageKey(string smintIoKey)
         {
+            if (_licenseUsageCache == null)
+                return smintIoKey;
+
             if (_licenseUsageCache.ContainsKey(smintIoKey))
                 return _licenseUsageCache[smintIoKey];
 
@@ -822,6 +846,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetLicenseSizeKey(string smintIoKey)
         {
+            if (_licenseSizeCache == null)
+                return smintIoKey;
+
             if (_licenseSizeCache.ContainsKey(smintIoKey))
                 return _licenseSizeCache[smintIoKey];
 
@@ -848,6 +875,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetLicensePlacementKey(string smintIoKey)
         {
+            if (_licensePlacementCache == null)
+                return smintIoKey;
+
             if (_licensePlacementCache.ContainsKey(smintIoKey))
                 return _licensePlacementCache[smintIoKey];
 
@@ -874,6 +904,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetLicenseDistributionKey(string smintIoKey)
         {
+            if (_licenseDistributionCache == null)
+                return smintIoKey;
+
             if (_licenseDistributionCache.ContainsKey(smintIoKey))
                 return _licenseDistributionCache[smintIoKey];
 
@@ -900,6 +933,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetLicenseGeographyKey(string smintIoKey)
         {
+            if (_licenseGeographyCache == null)
+                return smintIoKey;
+
             if (_licenseGeographyCache.ContainsKey(smintIoKey))
                 return _licenseGeographyCache[smintIoKey];
 
@@ -926,6 +962,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetLicenseIndustryKey(string smintIoKey)
         {
+            if (_licenseIndustryCache == null)
+                return smintIoKey;
+
             if (_licenseIndustryCache.ContainsKey(smintIoKey))
                 return _licenseIndustryCache[smintIoKey];
 
@@ -952,6 +991,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetLicenseLanguageKey(string smintIoKey)
         {
+            if (_licenseLanguageCache == null)
+                return smintIoKey;
+
             if (_licenseLanguageCache.ContainsKey(smintIoKey))
                 return _licenseLanguageCache[smintIoKey];
 
@@ -978,6 +1020,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         private string GetLicenseUsageLimitKey(string smintIoKey)
         {
+            if (_licenseUsageLimitCache == null)
+                return smintIoKey;
+
             if (_licenseUsageLimitCache.ContainsKey(smintIoKey))
                 return _licenseUsageLimitCache[smintIoKey];
 
