@@ -133,10 +133,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                     return;
                 }
 
-                if (synchronizeGenericMetadata ||
-                    _contentProviderCache == null)
+                if (!_syncTarget.GetCapabilities().IsCustomizedMetadataSynchronization())
                 {
-                    await SynchronizeGenericMetadataAsync();
+                    if (synchronizeGenericMetadata ||
+                        _contentProviderCache == null)
+                    {
+                        await SynchronizeGenericMetadataAsync();
+                    }
                 }
                 
                 await SynchronizeAssetsAsync();

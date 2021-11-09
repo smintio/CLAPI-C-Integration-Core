@@ -27,7 +27,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
     {
         MultiLanguageEnum,
         CompoundAssetsEnum,
-        BinaryUpdatesEnum
+        BinaryUpdatesEnum,
+        CustomizedMetadataSynchronizationEnum
     }
 
     public class BaseSyncTargetCapabilities
@@ -89,6 +90,19 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         {
             return ((IList<SyncTargetCapabilitiesEnum>)Capabilities)
                 .Contains(SyncTargetCapabilitiesEnum.BinaryUpdatesEnum);
+        }
+
+        /// <summary>
+        /// Indicates whether the target implements customized metadata synchronization, thus
+        /// the generic metadata synchronization of the integration core library should not be used.
+        /// </summary>
+        ///
+        /// <remarks>The value should be calculated based on the provided <see cref="Capabilities"/>.
+        /// </remarks>
+        public bool IsCustomizedMetadataSynchronization()
+        {
+            return ((IList<SyncTargetCapabilitiesEnum>)Capabilities)
+                .Contains(SyncTargetCapabilitiesEnum.CustomizedMetadataSynchronizationEnum);
         }
     }
 }
