@@ -383,6 +383,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                     var targetAsset = _syncTargetDataFactory.CreateSyncBinaryAsset();
 
+                    _syncTarget.PrepareTargetAsset(targetAsset);
+
                     targetAsset.SetAsset(rawAsset);
 
                     targetAsset.SetBinary(binary);

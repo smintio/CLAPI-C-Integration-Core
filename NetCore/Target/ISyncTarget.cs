@@ -169,6 +169,12 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target
         /// <exception cref="Exception">Any such exception is being caught and ignored. The task does not need to take
         /// special care.</exception>
         Task AfterSyncAsync();
+
+        /// <summary>
+        /// A hook that will be called when the target asset has been created, but not yet filled.
+        /// </summary>
+        /// <param name="targetAsset">The prepared target asset</param>
+        void PrepareTargetAsset(TSyncAsset targetAsset);
     }
 }
 
