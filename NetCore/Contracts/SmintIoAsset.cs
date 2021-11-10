@@ -78,6 +78,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
         public DateTimeOffset CreatedAt { get; set; }
 
         public DateTimeOffset? LastUpdatedAt { get; set; }
+
+        public SyncLicensePurchaseTransaction RawLicensePurchaseTransaction { get; set; }
     }
 }
 

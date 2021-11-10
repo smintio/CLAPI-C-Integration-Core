@@ -35,6 +35,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
 
         public IList<TSyncAsset> AssetParts { get; set; }
 
+        public SmintIoAsset Asset { get; set; }
         public SmintIoBinary Binary { get; set; }
         
         public BaseSyncAsset()
@@ -45,6 +46,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         public BaseSyncAsset(FileDownloaderDelegate downloader)
         {
             this._fileDownloader = downloader;
+        }
+
+        internal void SetAsset(SmintIoAsset asset)
+        {
+            Asset = asset;
         }
 
         internal void SetBinary(SmintIoBinary binary)

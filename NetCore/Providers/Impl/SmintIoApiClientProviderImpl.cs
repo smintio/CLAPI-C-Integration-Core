@@ -290,6 +290,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     PurchasedAt = lpt.Purchased_at,
                     CreatedAt = (DateTimeOffset)lpt.Created_at,
                     LastUpdatedAt = lpt.Last_updated_at ?? lpt.Created_at ?? DateTimeOffset.Now,
+                    RawLicensePurchaseTransaction = lpt
                 };
 
                 // we need to store this separately because list will be empty if all assets of the batch have Can_be_synced == false
