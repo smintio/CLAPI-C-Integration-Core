@@ -39,6 +39,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
         public Uri TokenEndPointUri { get; set; }
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
+        public string RefreshToken { get; set; }
 
         public OAuthAuthenticationRefresherImpl(
             IAuthenticationDatabaseProvider<TokenDatabaseModel> tokenDatabaseProvider,
@@ -58,6 +59,12 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
             { 
                 var tokenDatabaseModel = await _tokenDatabaseProvider.GetAuthenticationDatabaseModelAsync().ConfigureAwait(false)
                                          ?? throw new NullReferenceException("No auth token data available to refresh");
+
+                if (string.IsNullOrEmpty(tokenDatabaseModel.RefreshToken) && !string.IsNullOrEmpty(RefreshToken))
+                {
+                    tokenDatabaseModel.Success = true;
+                    tokenDatabaseModel.RefreshToken = RefreshToken;
+                }
 
                 tokenDatabaseModel.ValidateForTokenRefresh();
 

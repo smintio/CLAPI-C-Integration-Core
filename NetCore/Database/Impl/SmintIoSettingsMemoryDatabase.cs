@@ -19,7 +19,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
                 ClientId = authOptions.ClientId,
                 ClientSecret = authOptions.ClientSecret,
                 RedirectUri = authOptions.RedirectUri,
-                ImportLanguages = appOptions.ImportLanguages
+                ImportLanguages = appOptions.ImportLanguages,
+                RefreshToken = authOptions.RefreshToken
             };
         }
 

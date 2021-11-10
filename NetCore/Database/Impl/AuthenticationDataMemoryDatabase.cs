@@ -21,7 +21,6 @@
 
 
 using System.Threading.Tasks;
-using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
 {

@@ -56,6 +56,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Models
 
         public string[] ImportLanguages { get; set; }
 
+        public string RefreshToken { get; set; }
+
         internal void ValidateForAuthenticator()
         {
             if (string.IsNullOrEmpty(TenantId)) throw new ArgumentNullException(nameof(TenantId));

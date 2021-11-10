@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 // MIT License
 //
 // Copyright (c) 2019 Smint.io GmbH
@@ -19,17 +19,17 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-namespace Client.Options
+
+using System.Threading.Tasks;
+using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
+
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
 {
-    public class SmintIoAuthOptions
+    public class SmintIoTokenJsonDatabase : AuthenticationDataJsonDatabase<TokenDatabaseModel>, ISmintIoTokenDatabaseProvider
     {
-        public SmintIoAuthOptions() { }
+        public async Task<TokenDatabaseModel> GetTokenDatabaseModelAsync() => await GetAuthenticationDatabaseModelAsync();
 
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-
-        public string RedirectUri { get; set; }
-
-        public string RefreshToken { get; set; }
+        public async Task SetTokenDatabaseModelAsync(TokenDatabaseModel tokenDatabaseModel)
+            => await SetAuthenticationDatabaseModelAsync(tokenDatabaseModel);
     }
 }

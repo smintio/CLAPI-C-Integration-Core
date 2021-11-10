@@ -19,17 +19,26 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
-namespace Client.Options
+using System.Threading.Tasks;
+
+namespace SmintIo.CLAPI.Consumer.Integration.Core.Database.Impl
 {
-    public class SmintIoAuthOptions
+    /// <summary>
+    /// Stores the sync database into a JSON file named "authentication_data_database.json" in the current working directory of the
+    /// process.
+    /// </summary>
+    public class AuthenticationDataJsonDatabase<T> : JsonFileDatabase<T>, IAuthenticationDatabaseProvider<T> where T : class, new()
     {
-        public SmintIoAuthOptions() { }
+        public AuthenticationDataJsonDatabase() : base("authentication_data_database.json") {}
 
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
+        public async Task<T> GetAuthenticationDatabaseModelAsync()
+        {
+            return await LoadDataAsync().ConfigureAwait(false);
+        }
 
-        public string RedirectUri { get; set; }
-
-        public string RefreshToken { get; set; }
+        public async Task SetAuthenticationDatabaseModelAsync(T authenticationData)
+        {
+            await this.StoreDataAsync(authenticationData).ConfigureAwait(false);
+        }
     }
 }
