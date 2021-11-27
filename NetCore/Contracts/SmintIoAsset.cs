@@ -32,6 +32,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
         public string LicensePurchaseTransactionUuid { get; set; }
         public string CartPurchaseTransactionUuid { get; set; }
 
+        public string ReusedLicensePurchaseTransactionUuid { get; set; }
+
         public LicensePurchaseTransactionStateEnum? State { get; set; }
 
         public string Provider { get; set; }

@@ -28,7 +28,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         MultiLanguageEnum,
         CompoundAssetsEnum,
         BinaryUpdatesEnum,
-        CustomizedMetadataSynchronizationEnum
+        CustomizedMetadataSynchronizationEnum,
+        HandleReuseEnum
     }
 
     public class BaseSyncTargetCapabilities
@@ -103,6 +104,18 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         {
             return ((IList<SyncTargetCapabilitiesEnum>)Capabilities)
                 .Contains(SyncTargetCapabilitiesEnum.CustomizedMetadataSynchronizationEnum);
+        }
+
+        /// <summary>
+        /// Indicates whether the target can properly handle the reuse of license purchase transactions.
+        /// </summary>
+        ///
+        /// <remarks>The value should be calculated based on the provided <see cref="Capabilities"/>.
+        /// </remarks>
+        public bool IsHandleReuse()
+        {
+            return ((IList<SyncTargetCapabilitiesEnum>)Capabilities)
+                .Contains(SyncTargetCapabilitiesEnum.HandleReuseEnum);
         }
     }
 }

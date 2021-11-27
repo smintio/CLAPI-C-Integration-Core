@@ -263,6 +263,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                 {
                     ContentElementUuid = lpt.Content_element.Uuid,
                     LicensePurchaseTransactionUuid = lpt.Uuid,
+                    ReusedLicensePurchaseTransactionUuid = lpt.Reused_license_purchase_transaction_uuid,
                     CartPurchaseTransactionUuid = lpt.Cart_purchase_transaction_uuid,                    
                     State = lpt.State,
                     Provider = lpt.Content_element.Provider,

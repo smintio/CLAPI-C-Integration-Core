@@ -19,6 +19,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         private FileInfo _downloadedFile;
 
         public string Uuid { get; set; }
+        
+        public string ReusedUuid { get; set; }
 
         public string TargetAssetUuid { get; set; }
 
@@ -63,6 +65,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
             Uuid = uuid;
 
             SetTransactionUuid(uuid);
+        }
+
+        internal void SetReusedUuid(string reusedUuid)
+        {
+            ReusedUuid = reusedUuid;
         }
 
         internal void SetTargetAssetUuid(string targetAssetUuid)

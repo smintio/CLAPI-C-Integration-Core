@@ -312,7 +312,24 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                             }
                             else
                             {
-                                string targetAssetUuid = await _syncTarget.GetTargetAssetBinaryUuidAsync(targetAsset.Uuid, targetAsset.BinaryUuid, targetAsset.RecommendedFileName);
+                                string targetAssetUuid;
+
+                                if (_syncTarget.GetCapabilities().IsHandleReuse() &&
+                                    !string.IsNullOrEmpty(targetAsset.ReusedUuid))
+                                {
+                                    // target is able to handle reuses of LPTs
+
+                                    targetAssetUuid = await _syncTarget.GetTargetAssetBinaryUuidAsync(targetAsset.ReusedUuid, targetAsset.BinaryUuid, targetAsset.RecommendedFileName);
+
+                                    // make sure we know when there is some issue
+
+                                    if (string.IsNullOrEmpty(targetAssetUuid))
+                                        throw new Exception($"Target asset for reuse not found (${targetAsset.ReusedUuid})");
+                                }
+                                else
+                                {
+                                    targetAssetUuid = await _syncTarget.GetTargetAssetBinaryUuidAsync(targetAsset.Uuid, targetAsset.BinaryUuid, targetAsset.RecommendedFileName);
+                                }
 
                                 if (!string.IsNullOrEmpty(targetAssetUuid))
                                 {
@@ -393,6 +410,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                     targetAsset.SetRecommendedFileName(recommendedFileName);
 
+                    if (_syncTarget.GetCapabilities().IsHandleReuse() &&
+                        !string.IsNullOrEmpty(rawAsset.ReusedLicensePurchaseTransactionUuid))
+                    {
+                        // target supports reuse of LPTs
+
+                        targetAsset.SetReusedUuid(rawAsset.ReusedLicensePurchaseTransactionUuid);
+                    }
+
                     string localFileName = $"{temporaryFolder}/{recommendedFileName}";
                     var targetFile = new FileInfo(localFileName);
                     targetAsset.SetDownloadedFileProvider(async () =>
@@ -435,6 +460,14 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                     var targetCompoundAsset = _syncTargetDataFactory.CreateSyncCompoundAsset();
 
                     targetCompoundAsset.SetUuid(rawAsset.LicensePurchaseTransactionUuid);
+
+                    if (_syncTarget.GetCapabilities().IsHandleReuse() &&
+                        !string.IsNullOrEmpty(rawAsset.ReusedLicensePurchaseTransactionUuid))
+                    {
+                        // target supportes reuse of LPTs
+
+                        targetCompoundAsset.SetReusedUuid(rawAsset.ReusedLicensePurchaseTransactionUuid);
+                    }
 
                     targetCompoundAsset.SetAssetParts(assetPartAssets);
 
