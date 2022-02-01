@@ -103,31 +103,5 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs
         /// </para>
         /// </remarks>
         Task<ISyncJobExecutionQueue> RunAsync();
-
-
-        /// <summary>
-        /// Checks whether a job has already been added to the waiting queue.
-        /// </summary>
-        ///
-        /// <remarks>
-        /// <para>
-        /// The call is non-blocking.
-        /// </para>
-        /// </remarks>
-        /// <returns><c>true</c> if at least one job is waiting or <c>false</c> otherwise.</returns>
-        bool HasWaitingJob();
-
-
-        /// <summary>
-        /// Checks whether a job is currently being executed.
-        /// </summary>
-        ///
-        /// <remarks>
-        /// <para>
-        /// The call is non-blocking.
-        /// </para>
-        /// </remarks>
-        /// <returns><c>true</c> if at least one job is waiting or <c>false</c> otherwise.</returns>
-        bool IsRunning();
     }
 }

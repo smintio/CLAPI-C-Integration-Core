@@ -127,27 +127,30 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
         public async Task<ISyncJobExecutionQueue> RunAsync()
         {
-            if (IsRunning())
-            {
-                return this;
-            }
-
             JobDescription nextJob = null;
-            lock (_jobWaitingQueue)
-            {
-                if (!_jobWaitingQueue.TryDequeue(out nextJob))
-                {
-                    return this;
-                }
-            }
 
             lock (_runningJobSemaphore)
             {
+                if (_runningJob != null)
+                {
+                    return this;
+                }
+
+                lock (_jobWaitingQueue)
+                {
+                    if (!_jobWaitingQueue.TryDequeue(out nextJob))
+                    {
+                        return this;
+                    }
+                }
+
                 _runningJob = nextJob;
             }
 
             // run outside of semaphore to avoid blocking other calls to run()
+
             JobDescription currentJob = nextJob;
+            
             try
             {
                 await currentJob.Job.Invoke();
@@ -159,6 +162,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             finally
             {
                 // remove the "running" flag AFTER reading all consumers waiting for notification
+
                 lock (_runningJobSemaphore)
                 {
                     if (_runningJob == currentJob)
@@ -171,22 +175,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             TryRunNextJob();
 
             return this;
-        }
-
-        public bool HasWaitingJob()
-        {
-            lock (_jobWaitingQueue)
-            {
-                return !_jobWaitingQueue.IsEmpty;
-            }
-        }
-
-        public bool IsRunning()
-        {
-            lock (_runningJobSemaphore)
-            {
-                return _runningJob != null;
-            }
         }
 
         private class JobDescription

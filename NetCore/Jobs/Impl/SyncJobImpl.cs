@@ -324,7 +324,26 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                                     // make sure we know when there is some issue
 
                                     if (string.IsNullOrEmpty(targetAssetUuid))
-                                        throw new Exception($"Target asset for reuse not found (${targetAsset.ReusedUuid})");
+                                    {
+                                        // commit to make sure a reuse in the same batch is handled correctly
+
+                                        await CommitAsync(newTargetAssets, updatedTargetAssets, newTargetCompoundAssets, updatedTargetCompoundAssets).ConfigureAwait(false);
+
+                                        // safety sleep to make sure indices are up-to-date in the target
+
+                                        await Task.Delay(10000);
+
+                                        // try again
+
+                                        targetAssetUuid = await _syncTarget.GetTargetAssetBinaryUuidAsync(targetAsset.ReusedUuid, targetAsset.BinaryUuid, targetAsset.RecommendedFileName);
+
+                                        if (string.IsNullOrEmpty(targetAssetUuid))
+                                        {
+                                            // now we are sure
+
+                                            throw new Exception($"Target asset for reuse not found (${targetAsset.ReusedUuid})");
+                                        }
+                                    }
                                 }
                                 else
                                 {
@@ -344,19 +363,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
                             }
                         }
 
-                        if (newTargetAssets.Count > 0)
-                            await _syncTarget.ImportNewTargetAssetsAsync(newTargetAssets);
+                        await CommitAsync(newTargetAssets, updatedTargetAssets, newTargetCompoundAssets, updatedTargetCompoundAssets).ConfigureAwait(false);
 
-                        if (updatedTargetAssets.Count > 0)
-                            await _syncTarget.UpdateTargetAssetsAsync(updatedTargetAssets);
-
-                        if (newTargetCompoundAssets.Count > 0)
-                            await _syncTarget.ImportNewTargetCompoundAssetsAsync(newTargetCompoundAssets);
-
-                        if (updatedTargetCompoundAssets.Count > 0)
-                            await _syncTarget.UpdateTargetCompoundAssetsAsync(updatedTargetCompoundAssets);
-                        
-                        // store committed data
+                        // store batch commit
 
                         await _syncDatabaseProvider.SetSyncDatabaseModelAsync(new SyncDatabaseModel()
                         {
@@ -379,6 +388,26 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
             {
                 RemoveTempFolder(folderName);
             }
+        }
+
+        private async Task CommitAsync(IList<TSyncAsset> newTargetAssets, IList<TSyncAsset> updatedTargetAssets, IList<TSyncAsset> newTargetCompoundAssets, IList<TSyncAsset> updatedTargetCompoundAssets)
+        {
+            if (newTargetAssets.Count > 0)
+                await _syncTarget.ImportNewTargetAssetsAsync(newTargetAssets);
+
+            if (updatedTargetAssets.Count > 0)
+                await _syncTarget.UpdateTargetAssetsAsync(updatedTargetAssets);
+
+            if (newTargetCompoundAssets.Count > 0)
+                await _syncTarget.ImportNewTargetCompoundAssetsAsync(newTargetCompoundAssets);
+
+            if (updatedTargetCompoundAssets.Count > 0)
+                await _syncTarget.UpdateTargetCompoundAssetsAsync(updatedTargetCompoundAssets);
+
+            newTargetAssets.Clear();
+            updatedTargetAssets.Clear();
+            newTargetCompoundAssets.Clear();
+            updatedTargetCompoundAssets.Clear();
         }
 
         private IList<TSyncAsset> TransformAssets(IList<SmintIoAsset> rawAssets, string temporaryFolder)
