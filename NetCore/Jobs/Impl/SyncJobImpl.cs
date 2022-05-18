@@ -288,6 +288,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                         var targetAssets = TransformAssets(rawAssets, folderName);
 
+                        targetAssets= targetAssets
+                            .OrderBy(targetAsset => targetAsset.ReusedUuid ?? "")
+                            .ToList();
+
                         IList<TSyncAsset> newTargetAssets = new List<TSyncAsset>();
                         IList<TSyncAsset> updatedTargetAssets = new List<TSyncAsset>();
                         IList<TSyncAsset> newTargetCompoundAssets = new List<TSyncAsset>();
