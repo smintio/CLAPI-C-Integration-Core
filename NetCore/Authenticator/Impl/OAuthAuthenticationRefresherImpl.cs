@@ -30,7 +30,7 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
-    public abstract class OAuthAuthenticationRefresherImpl : IOAuthAuthenticationRefresher
+    public class OAuthAuthenticationRefresherImpl : IOAuthAuthenticationRefresher
     {
         private readonly IAuthenticationDatabaseProvider<TokenDatabaseModel> _tokenDatabaseProvider;
 
