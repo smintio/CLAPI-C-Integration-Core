@@ -464,7 +464,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                         try
                         {
+#pragma warning disable SYSLIB0014 // Typ oder Element ist veraltet
                             WebClient wc = new WebClient();
+#pragma warning restore SYSLIB0014 // Typ oder Element ist veraltet
                             await wc.DownloadFileTaskAsync(downloadUrl, targetFile.FullName);
                         }
                         catch (WebException we)

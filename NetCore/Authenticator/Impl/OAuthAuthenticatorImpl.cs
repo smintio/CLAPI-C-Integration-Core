@@ -64,9 +64,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                     ClientSecret = ClientSecret,
                     Scope = Scope,
                     RedirectUri = TargetRedirectionUrl?.ToString() ?? throw new ArgumentNullException("RedirectUri"),
-                    FilterClaims = false,
-                    Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
-                    ResponseMode = OidcClientOptions.AuthorizeResponseMode.FormPost
+                    FilterClaims = false
                 };
 
                 clientOptions.Policy.Discovery.ValidateIssuerName = false;
