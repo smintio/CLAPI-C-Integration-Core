@@ -35,6 +35,7 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
 using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 using SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator;
+using Newtonsoft.Json;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 {
@@ -158,11 +159,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                 await _syncTarget.HandleSyncJobExceptionAsync(e);
             }
-            catch (Client.Generated.ApiException e)
+            catch (Client.Generated.ApiException<Client.Generated.Error> e)
             {
-                _logger.LogError(e, $"Error in sync job: {e.Response}");
+                var result = e.Result != null ? JsonConvert.SerializeObject(e.Result) : "No result";
 
-                await _syncTarget.HandleSyncJobExceptionAsync(new SyncJobException(SyncJobException.SyncJobError.Generic, $"{e.Message} - {e.Response}"));
+                _logger.LogError(e, $"Error in sync job: {result}");
+
+                await _syncTarget.HandleSyncJobExceptionAsync(new SyncJobException(SyncJobException.SyncJobError.Generic, $"{e.Message} - {result}"));
             }
             catch (Exception e)
             {
