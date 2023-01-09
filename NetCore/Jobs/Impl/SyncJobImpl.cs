@@ -158,6 +158,12 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
                 await _syncTarget.HandleSyncJobExceptionAsync(e);
             }
+            catch (Client.Generated.ApiException e)
+            {
+                _logger.LogError(e, $"Error in sync job: {e.Response}");
+
+                await _syncTarget.HandleSyncJobExceptionAsync(new SyncJobException(SyncJobException.SyncJobError.Generic, $"{e.Message} - {e.Response}"));
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error in sync job");
