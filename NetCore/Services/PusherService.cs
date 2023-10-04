@@ -94,7 +94,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 
             var authorizer = new HttpAuthorizer(pusherAuthEndpoint)
             {
-                AuthenticationHeader = new AuthenticationHeaderValue("Authorization", $"Bearer {tokenDatabaseModel.AccessToken}")
+                AuthenticationHeader = new AuthenticationHeaderValue("Bearer", tokenDatabaseModel.AccessToken)
             };
 
             _pusher = new Pusher("32f31c26a83e09dc401b", new PusherOptions()
