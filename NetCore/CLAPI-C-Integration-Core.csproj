@@ -61,6 +61,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
     <PackageReference Include="Polly" Version="7.2.3" />
+    <PackageReference Include="PusherClient" Version="2.2.1" />
     <PackageReference Include="RestSharp" Version="106.15.0" />
     <PackageReference Include="SmintIo.CLAPI.Consumer.Client" Version="1.5.5" />
 	  <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.2.32" />
@@ -76,11 +77,6 @@
   <ItemGroup>
     <Folder Include="Configuration\" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\pusher-websocket-dotnet\PusherClient\PusherClient.csproj" />
-  </ItemGroup>
-
 
   <!-- Implicit bottom import -->
   <!-- see: https://docs.microsoft.com/en-us/visualstudio/msbuild/how-to-use-project-sdk?view=vs-2019 -->
