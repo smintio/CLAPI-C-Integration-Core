@@ -26,6 +26,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SmintIo.CLAPI.Consumer.Integration.Core.Jobs;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
+using System.Net.Http.Headers;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 {
@@ -91,7 +92,10 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
 
             tokenDatabaseModel.ValidateForPusher();
 
-            var authorizer = new HttpAuthorizer(pusherAuthEndpoint, tokenDatabaseModel.AccessToken);
+            var authorizer = new HttpAuthorizer(pusherAuthEndpoint)
+            {
+                AuthenticationHeader = new AuthenticationHeaderValue("Authorization", $"Bearer {tokenDatabaseModel.AccessToken}")
+            };
 
             _pusher = new Pusher("32f31c26a83e09dc401b", new PusherOptions()
             {
@@ -102,9 +106,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Services
             _pusher.ConnectionStateChanged += ConnectionStateChanged;
             _pusher.Error += PusherError;
 
-            var connectionState = await _pusher.ConnectAsync();
+            await _pusher.ConnectAsync();
 
-            if (connectionState == ConnectionState.Connected)
+            if (_pusher.State == ConnectionState.Connected)
             {
                 await SubscribeToPusherChannelAsync((int)smintIoSettingsDatabaseModel.ChannelId);
             }
