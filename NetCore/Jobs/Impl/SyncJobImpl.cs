@@ -661,6 +661,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Jobs.Impl
 
             if (rawAsset.HasRestrictiveLicenseTerms != null)
                 targetAsset.SetHasRestrictiveLicenseTerms((bool)rawAsset.HasRestrictiveLicenseTerms);
+
+            if (rawAsset.IsAi != null)
+                targetAsset.SetIsAi((bool)rawAsset.IsAi);
         }
 
         private IList<TSyncLicenseTerm> GetLicenseTerms(IList<SmintIoLicenseTerm> rawLicenseTerms)
