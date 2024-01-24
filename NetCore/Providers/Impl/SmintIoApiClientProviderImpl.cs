@@ -286,6 +286,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Providers.Impl
                     LicenseTerms = GetLicenseTerms(importLanguages, lpt),
                     DownloadConstraints = GetDownloadConstraints(lpt),
                     IsEditorialUse = isEditorialUse,
+                    IsAi = lpt.Content_element.Is_ai,
                     HasRestrictiveLicenseTerms = lpt.Has_potentially_restrictive_license_terms ?? false,
                     SmintIoUrl = url,
                     PurchasedAt = lpt.Purchased_at,

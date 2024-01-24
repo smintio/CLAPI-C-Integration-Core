@@ -72,6 +72,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Contracts
         public bool? IsEditorialUse { get; set; }
         public bool? HasRestrictiveLicenseTerms { get; set; }
 
+        public bool? IsAi { get; set; }
+
         public List<SmintIoBinary> Binaries { get; set; }
 
         public string SmintIoUrl { get; set; }

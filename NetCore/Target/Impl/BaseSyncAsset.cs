@@ -172,6 +172,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         public abstract void SetIsEditorialUse(bool isEditorialUse);
         public abstract void SetHasRestrictiveLicenseTerms(bool hasRestrictiveLicenseTerms);
 
+        public abstract void SetIsAi(bool isAi);
+
         public abstract void SetLicenseType(string licenseTypeKey);
 
         public abstract void SetLicenseeUuid(string licenseeUuid);
