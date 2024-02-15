@@ -43,8 +43,11 @@
     <CoverageReportHtmlPath>$([System.IO.Path]::Combine($(CoverageReportsPath), 'html'))</CoverageReportHtmlPath>
   </PropertyGroup>
 
-  <Target Name="Coverage" AfterTargets="VSTest">
-    <Exec Command="dotnet reportgenerator -reports:'$(CoverageCobertureFile)' -targetdir:$(CoverageReportHtmlPath) -reportTypes:htmlInline" WorkingDirectory="$(MSBuildThisFileDirectory)" />
-  </Target>
+    <Target Name="Coverage" AfterTargets="VSTest">
+        <Exec
+          Command="dotnet reportgenerator -reports:'$(CoverageCobertureFile)' -targetdir:$(CoverageReportHtmlPath) -reportTypes:htmlInline"
+          WorkingDirectory="$(MSBuildThisFileDirectory)"
+    />
+    </Target>
 
 </Project>
