@@ -217,9 +217,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.UnitTests.Database.Models
         }
 
 
-        private SettingsDatabaseModel CreateValidSettingsDatabaseModel()
+        private SmintIoSettingsDatabaseModel CreateValidSettingsDatabaseModel()
         {
-            return new SettingsDatabaseModel()
+            return new SmintIoSettingsDatabaseModel()
             {
                 ChannelId = 1,
                 TenantId = "tennantId",
@@ -230,9 +230,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.UnitTests.Database.Models
             };
         }
 
-        private SmintIoAuthenticatorException CheckForException(Action<SettingsDatabaseModel> prepareData)
+        private SmintIoAuthenticatorException CheckForException(Action<SmintIoSettingsDatabaseModel> prepareData)
         {
-            SettingsDatabaseModel dbModel = CreateValidSettingsDatabaseModel();
+            SmintIoSettingsDatabaseModel dbModel = CreateValidSettingsDatabaseModel();
             return Assert.Throws<SmintIoAuthenticatorException>(() => prepareData(dbModel));
         }
     }
