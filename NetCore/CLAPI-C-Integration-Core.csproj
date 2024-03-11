@@ -62,7 +62,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
     <PackageReference Include="Polly" Version="8.3.0" />
     <PackageReference Include="PusherClient" Version="2.2.1" />
-    <PackageReference Include="RestSharp" Version="106.15.0" />
+    <PackageReference Include="RestSharp" Version="110.2.0" />
+    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="110.2.0" />
     <PackageReference Include="SmintIo.CLAPI.Consumer.Client" Version="2.0.3" />
 	  <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.9.28">
 	    <PrivateAssets>all</PrivateAssets>
