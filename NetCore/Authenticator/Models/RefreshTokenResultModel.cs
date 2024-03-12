@@ -28,9 +28,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models
         [JsonProperty("error")]
         public string ErrorMsg { get; set; }
 
-        [JsonProperty("error_description")]
-        public string ErrorDescription { get; set; }
-
         [JsonProperty("access_token")]
         public string AccessToken { get; set; }
 
@@ -39,9 +36,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models
 
         [JsonProperty("id_token")]
         public string IdentityToken { get; set; }
-
-        [JsonProperty("expires_in")]
-        public int? Expiration { get; set; }
 
         public bool IsSuccess()
         {

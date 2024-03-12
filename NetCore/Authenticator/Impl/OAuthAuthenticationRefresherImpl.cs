@@ -95,11 +95,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                 tokenDatabaseModel.RefreshToken = result.RefreshToken;
                 tokenDatabaseModel.IdentityToken = result.IdentityToken;
 
-                if (result.Expiration.HasValue)
-                {
-                    tokenDatabaseModel.Expiration = DateTimeOffset.Now.Add(TimeSpan.FromSeconds(result.Expiration.Value));
-                }
-
                 await _tokenDatabaseProvider.SetAuthenticationDatabaseModelAsync(tokenDatabaseModel).ConfigureAwait(false);
 
                 if (!tokenDatabaseModel.Success)
