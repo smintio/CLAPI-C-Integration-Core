@@ -77,7 +77,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                 request.AddParameter("client_id", ClientId);
                 request.AddParameter("client_secret", ClientSecret);
 
-                var response = await client.ExecutePostAsync<JwtRefreshTokenResultModel>(request).ConfigureAwait(false);
+                var response = await client.ExecutePostAsync<RefreshTokenResultModel>(request).ConfigureAwait(false);
 
                 if (!response.IsSuccessful)
                 {
@@ -94,7 +94,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                 tokenDatabaseModel.AccessToken = result.AccessToken;
                 tokenDatabaseModel.RefreshToken = result.RefreshToken;
                 tokenDatabaseModel.IdentityToken = result.IdentityToken;
-                tokenDatabaseModel.Expiration = result.Expiration;
 
                 await _tokenDatabaseProvider.SetAuthenticationDatabaseModelAsync(tokenDatabaseModel).ConfigureAwait(false);
 
