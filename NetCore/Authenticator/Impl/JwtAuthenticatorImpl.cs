@@ -120,7 +120,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
                     response.EnsureSuccessStatusCode();
 
-                    var responseData = JsonConvert.DeserializeObject<JwtRefreshTokenResultModel>(
+                    var responseData = JsonConvert.DeserializeObject<RefreshTokenResultModel>(
                         await response.Content.ReadAsStringAsync().ConfigureAwait(false)
                     );
 
@@ -129,7 +129,11 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                     authenticationDatabaseModel.Success = isAuthSuccessful;
                     authenticationDatabaseModel.ErrorMessage = responseData.ErrorMsg;
                     authenticationDatabaseModel.AuthData = responseData.AccessToken;
-                    authenticationDatabaseModel.Expiration = responseData.Expiration;
+
+                    if (responseData.Expiration.HasValue)
+                    {
+                        authenticationDatabaseModel.Expiration = DateTimeOffset.Now.Add(TimeSpan.FromSeconds(responseData.Expiration.Value));
+                    }
 
                     await _syncTargetAuthenticationDatabaseProvider.SetAuthenticationDatabaseModelAsync(authenticationDatabaseModel).ConfigureAwait(false);
                 }
