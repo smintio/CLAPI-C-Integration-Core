@@ -19,6 +19,7 @@
 // SPDX-License-Identifier: MIT
 #endregion
 
+using System;
 using Newtonsoft.Json;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models
@@ -36,6 +37,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models
 
         [JsonProperty("id_token")]
         public string IdentityToken { get; set; }
+
+        public DateTimeOffset? Expiration { get; set; }
 
         public bool IsSuccess()
         {
