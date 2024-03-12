@@ -38,8 +38,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models
         [JsonProperty("id_token")]
         public string IdentityToken { get; set; }
 
-        public DateTimeOffset? Expiration { get; set; }
-
         public bool IsSuccess()
         {
             return string.IsNullOrEmpty(ErrorMsg) && !string.IsNullOrEmpty(AccessToken);

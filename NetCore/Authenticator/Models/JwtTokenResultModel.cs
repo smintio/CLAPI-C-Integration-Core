@@ -32,8 +32,5 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models
                 ErrorMsg = value;
             }
         }
-
-        [JsonProperty("expires_in")]
-        private int ExpiresIn { set => Expiration = DateTimeOffset.Now.Add(TimeSpan.FromSeconds(value)); }
     }
 }

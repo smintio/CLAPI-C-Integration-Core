@@ -130,11 +130,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                     authenticationDatabaseModel.ErrorMessage = responseData.ErrorMsg;
                     authenticationDatabaseModel.AuthData = responseData.AccessToken;
 
-                    if (responseData.Expiration.HasValue)
-                    {
-                        authenticationDatabaseModel.Expiration = DateTimeOffset.Now.Add(TimeSpan.FromSeconds(responseData.Expiration.Value));
-                    }
-
                     await _syncTargetAuthenticationDatabaseProvider.SetAuthenticationDatabaseModelAsync(authenticationDatabaseModel).ConfigureAwait(false);
                 }
 
