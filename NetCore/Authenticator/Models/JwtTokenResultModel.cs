@@ -18,6 +18,15 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models
             }
         }
 
+        [JsonProperty("refresh_token")]
+        public string CustomRefreshToken
+        {
+            set
+            {
+                RefreshToken = value;
+            }
+        }
+
         [JsonProperty("token_type")]
         public string TokenType { set => string.Equals("Bearer", value); }
 
