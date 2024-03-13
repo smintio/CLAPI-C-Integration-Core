@@ -28,6 +28,7 @@ using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Browser;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
 using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
+using System.Net.Http;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
@@ -43,8 +44,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public OAuthAuthenticatorImpl(
             IAuthenticationDatabaseProvider<TokenDatabaseModel> tokenDatabaseProvider,
+            IHttpClientFactory httpClientFactory,
             ILogger<OAuthAuthenticatorImpl> logger)
-            : base(tokenDatabaseProvider, logger)
+            : base(tokenDatabaseProvider, httpClientFactory, logger)
         {
             _logger = logger;
         }

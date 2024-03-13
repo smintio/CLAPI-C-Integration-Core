@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
 using RestSharp;
 using RestSharp.Authenticators.OAuth2;
 using RestSharp.Serializers.NewtonsoftJson;
@@ -10,9 +11,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Factory
     {
         private readonly ISyncTargetAuthenticator _syncTargetAuthenticator;
 
-        public RestClientFactoryImpl(ISyncTargetAuthenticator syncTargetAuthenticator)
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public RestClientFactoryImpl(IHttpClientFactory httpClientFactory, ISyncTargetAuthenticator syncTargetAuthenticator)
         {
             _syncTargetAuthenticator = syncTargetAuthenticator;
+
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task<IRestClient> CreateRestClientAsync()
@@ -27,7 +32,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Factory
                 Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(accessToken, "Bearer")
             };
 
+            var httpClient = _httpClientFactory.CreateClient();
             var restClient = new RestClient(
+                httpClient,
                 restClientOptions, 
                 configureSerialization: s => s.UseNewtonsoftJson());
 

@@ -20,6 +20,8 @@
 #endregion
 
 using System;
+using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using RestSharp;
@@ -35,6 +37,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
     {
         private readonly IAuthenticationDatabaseProvider<TokenDatabaseModel> _tokenDatabaseProvider;
 
+        private readonly IHttpClientFactory _httpClientFactory;
+
         private readonly ILogger<OAuthAuthenticationRefresherImpl> _logger;
 
         public Uri TokenEndPointUri { get; set; }
@@ -44,9 +48,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public OAuthAuthenticationRefresherImpl(
             IAuthenticationDatabaseProvider<TokenDatabaseModel> tokenDatabaseProvider,
+            IHttpClientFactory httpClientFactory,
             ILogger<OAuthAuthenticationRefresherImpl> logger)
         {
             _tokenDatabaseProvider = tokenDatabaseProvider;
+            
+            _httpClientFactory = httpClientFactory;
+
             _logger = logger;
         }
 
@@ -69,7 +77,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
                 tokenDatabaseModel.ValidateForTokenRefresh();
 
-                var client = new RestClient(TokenEndPointUri.ToString(), configureSerialization: sc => sc.UseNewtonsoftJson());
+                var httpClient = _httpClientFactory.CreateClient();
+                var client = new RestClient(httpClient, new RestClientOptions(TokenEndPointUri.ToString()), configureSerialization: sc => sc.UseNewtonsoftJson());
                 var request = new RestRequest();
 
                 request.AddParameter("grant_type", "refresh_token");

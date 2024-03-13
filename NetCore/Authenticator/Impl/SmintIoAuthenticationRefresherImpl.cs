@@ -23,6 +23,7 @@ using Microsoft.Extensions.Logging;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
 using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
@@ -36,8 +37,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
         public SmintIoAuthenticationRefresherImpl(
             ISmintIoSettingsDatabaseProvider smintIoSettingsDatabaseProvider,
             ISmintIoTokenDatabaseProvider tokenDatabaseProvider,
+            IHttpClientFactory httpClientFactory,
             ILogger<SmintIoAuthenticationRefresherImpl> logger)
-            : base(tokenDatabaseProvider, logger)
+            : base(tokenDatabaseProvider, httpClientFactory, logger)
 
         {
             _smintIoSettingsDatabaseProvider = smintIoSettingsDatabaseProvider;
