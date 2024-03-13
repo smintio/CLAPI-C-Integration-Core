@@ -120,7 +120,7 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
                     response.EnsureSuccessStatusCode();
 
-                    var responseData = JsonConvert.DeserializeObject<RefreshTokenResultModel>(
+                    var responseData = JsonConvert.DeserializeObject<JwtRefreshTokenResultModel>(
                         await response.Content.ReadAsStringAsync().ConfigureAwait(false)
                     );
 
