@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
 using RestSharp;
-using RestSharp.Authenticators;
-using RestSharp.Serialization;
+using RestSharp.Authenticators.OAuth2;
+using RestSharp.Serializers.NewtonsoftJson;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Factory
@@ -11,9 +11,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Factory
     {
         private readonly ISyncTargetAuthenticator _syncTargetAuthenticator;
 
-        public RestClientFactoryImpl(ISyncTargetAuthenticator syncTargetAuthenticator)
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public RestClientFactoryImpl(IHttpClientFactory httpClientFactory, ISyncTargetAuthenticator syncTargetAuthenticator)
         {
             _syncTargetAuthenticator = syncTargetAuthenticator;
+
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task<IRestClient> CreateRestClientAsync()
@@ -23,31 +27,18 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Factory
 
             var accessToken = await _syncTargetAuthenticator.GetAccessTokenAsync();
 
-            return new RestClient
+            var restClientOptions = new RestClientOptions
             {
-                Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(accessToken, "Bearer"),
-            }.UseSerializer(() => new JsonNetSerializer());
-        }
-
-        private class JsonNetSerializer : IRestSerializer
-        {
-            public string Serialize(object obj) => 
-                JsonConvert.SerializeObject(obj);
-
-            public string Serialize(Parameter parameter) => 
-                JsonConvert.SerializeObject(parameter.Value);
-
-            public T Deserialize<T>(IRestResponse response) => 
-                JsonConvert.DeserializeObject<T>(response.Content);
-
-            public string[] SupportedContentTypes { get; } =
-            {
-                "application/json", "text/json", "text/x-json", "text/javascript", "*+json"
+                Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(accessToken, "Bearer")
             };
 
-            public string ContentType { get; set; } = "application/json";
+            var httpClient = _httpClientFactory.CreateClient();
+            var restClient = new RestClient(
+                httpClient,
+                restClientOptions, 
+                configureSerialization: s => s.UseNewtonsoftJson());
 
-            public DataFormat DataFormat { get; } = DataFormat.Json;
+            return restClient;
         }
     }
 }

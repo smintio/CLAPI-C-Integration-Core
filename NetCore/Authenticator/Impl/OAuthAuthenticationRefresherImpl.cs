@@ -20,9 +20,12 @@
 #endregion
 
 using System;
+using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using RestSharp;
+using RestSharp.Serializers.NewtonsoftJson;
 using SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Models;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database.Models;
@@ -34,6 +37,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
     {
         private readonly IAuthenticationDatabaseProvider<TokenDatabaseModel> _tokenDatabaseProvider;
 
+        private readonly IHttpClientFactory _httpClientFactory;
+
         private readonly ILogger<OAuthAuthenticationRefresherImpl> _logger;
 
         public Uri TokenEndPointUri { get; set; }
@@ -43,9 +48,13 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
         public OAuthAuthenticationRefresherImpl(
             IAuthenticationDatabaseProvider<TokenDatabaseModel> tokenDatabaseProvider,
+            IHttpClientFactory httpClientFactory,
             ILogger<OAuthAuthenticationRefresherImpl> logger)
         {
             _tokenDatabaseProvider = tokenDatabaseProvider;
+            
+            _httpClientFactory = httpClientFactory;
+
             _logger = logger;
         }
 
@@ -68,15 +77,16 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 
                 tokenDatabaseModel.ValidateForTokenRefresh();
 
-                var client = new RestClient(TokenEndPointUri.ToString());
-                var request = new RestRequest(Method.POST);
+                var httpClient = _httpClientFactory.CreateClient();
+                var client = new RestClient(httpClient, new RestClientOptions(TokenEndPointUri.ToString()), configureSerialization: sc => sc.UseNewtonsoftJson());
+                var request = new RestRequest();
 
                 request.AddParameter("grant_type", "refresh_token");
                 request.AddParameter("refresh_token", tokenDatabaseModel.RefreshToken);
                 request.AddParameter("client_id", ClientId);
                 request.AddParameter("client_secret", ClientSecret);
 
-                var response = await client.ExecuteAsync<RefreshTokenResultModel>(request).ConfigureAwait(false);
+                var response = await client.ExecutePostAsync<RefreshTokenResultModel>(request).ConfigureAwait(false);
 
                 if (!response.IsSuccessful)
                 {
@@ -93,7 +103,6 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
                 tokenDatabaseModel.AccessToken = result.AccessToken;
                 tokenDatabaseModel.RefreshToken = result.RefreshToken;
                 tokenDatabaseModel.IdentityToken = result.IdentityToken;
-                tokenDatabaseModel.Expiration = result.Expiration;
 
                 await _tokenDatabaseProvider.SetAuthenticationDatabaseModelAsync(tokenDatabaseModel).ConfigureAwait(false);
 

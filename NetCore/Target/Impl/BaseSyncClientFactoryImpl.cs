@@ -59,6 +59,8 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Target.Impl
         {
             var services = new ServiceCollection();
 
+            services.AddHttpClient();
+
             services.AddSingleton<ITimedSynchronizerService, TimedSynchronizerService>();
             services.AddSingleton<IPusherService, PusherService>();
 

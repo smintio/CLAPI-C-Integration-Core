@@ -24,6 +24,7 @@ using System;
 using System.Threading.Tasks;
 using SmintIo.CLAPI.Consumer.Integration.Core.Database;
 using SmintIo.CLAPI.Consumer.Integration.Core.Exceptions;
+using System.Net.Http;
 
 namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
 {
@@ -36,8 +37,9 @@ namespace SmintIo.CLAPI.Consumer.Integration.Core.Authenticator.Impl
         public SmintIoSystemBrowserAuthenticatorImpl(
             ISmintIoSettingsDatabaseProvider smintIoSettingsDatabaseProvider,
             ISmintIoTokenDatabaseProvider tokenDatabaseProvider,
+            IHttpClientFactory httpClientFactory,
             ILogger<SmintIoSystemBrowserAuthenticatorImpl> logger)
-            : base(tokenDatabaseProvider, logger)
+            : base(tokenDatabaseProvider, httpClientFactory, logger)
         {
             _smintIoSettingsDatabaseProvider = smintIoSettingsDatabaseProvider;
 
